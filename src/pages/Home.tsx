@@ -1,0 +1,237 @@
+import { Link } from 'react-router-dom';
+
+const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+
+const features = [
+  { icon: '/assets/images/compass.png', label: 'Small Groups', desc: 'Intimate 6–12 person expeditions for a real, personal experience.' },
+  { icon: '/assets/images/maps-and-flags.png', label: 'Authentic Local Experiences', desc: 'Every tour is rooted in genuine local history, legend, and lore.' },
+  { icon: '/assets/images/backpack.png', label: 'Curated Immersive Travel', desc: 'Thoughtfully designed journeys that go far beyond the typical tour.' },
+];
+
+const experiences = [
+  {
+    category: 'Walking Tours',
+    items: [
+      { title: 'Legends & Lore of Crestone', desc: "Step into the legends and lore of Crestone's past. Ancient spiritual sites, unexplained phenomena, and centuries of hidden history await.", img: '/assets/images/Colorado Photo.jpg' },
+      { title: 'UAPs & Local Mysteries', desc: "Dive into tales of UFOs and local mysteries. The San Luis Valley is one of the most active UAP corridors in North America.", img: '/assets/images/kellepics-fantasy-2847724_1920.jpg' },
+    ],
+  },
+  {
+    category: 'Wilderness Trips',
+    items: [
+      { title: 'Sangre de Cristo Expedition', desc: 'Venture deep into the Sangre de Cristo range. Remote high-altitude terrain, ancient sites, and landscapes that defy description.', img: '/assets/images/20241109_165442-EDIT.jpg' },
+      { title: 'Ruins & Mining Trails', desc: 'Uncover ruins and forgotten mining trails. Ghost towns, collapsed shafts, and the stories of those who came before.', img: '/assets/images/kellepics-fantasy-2861815_1920.jpg' },
+    ],
+  },
+  {
+    category: 'Field Research',
+    items: [
+      { title: 'Cryptid Hunt', desc: 'Join the search for elusive creatures and phenomena. Evidence review, fieldwork techniques, and hands-on investigation.', img: '/assets/images/sylwesterl-spider-8279740_1920.jpg' },
+      { title: 'Night Sky & the Unknown', desc: 'Gaze at stars and witness the unknown. Structured sky watches with expert commentary on UAP reporting protocols.', img: '/assets/images/infinite-creations-scary-6389656_1920.jpg' },
+    ],
+  },
+];
+
+const testimonials = [
+  { quote: "Every step on these tours felt like peeling back a layer of Crestone's hidden history. I left with more questions—and a deeper respect for this extraordinary place.", name: 'Sarah K.', role: 'Historian & Adventurer' },
+  { quote: "I never imagined a walking tour could be this immersive. The stories, the landscapes, and the mysteries—each moment felt like a scene from a documentary.", name: 'Marcus T.', role: 'Outdoor Educator' },
+  { quote: "From ancient legends to unexplained lights in the sky, this experience made me see the world with new eyes. Absolutely life-changing.", name: 'Elena R.', role: 'Paranormal Researcher' },
+  { quote: "The guides blend knowledge, humor, and real adventure. I felt safe, challenged, and part of something bigger than myself.", name: 'David L.', role: 'Expedition Participant' },
+];
+
+const blogPreviews = [
+  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Step into the wild with us—read firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: '/assets/images/20250810_090914-EDIT.jpg' },
+  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Our guides share hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: '/assets/images/kellepics-fantasy-2847724_1920.jpg' },
+  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests. New perspectives on history, mystery, and discovery.', img: '/assets/images/Colorado Photo.jpg' },
+];
+
+export default function Home() {
+  return (
+    <main>
+      {/* HERO */}
+      <section style={{
+        position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center',
+        background: 'linear-gradient(to bottom, rgba(8,12,23,0.55) 0%, rgba(8,12,23,0.75) 100%)',
+      }}>
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: -1,
+          backgroundImage: "url('/assets/images/Colorado Photo.jpg')",
+          backgroundSize: 'cover', backgroundPosition: 'center 30%',
+        }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.7) 0%, rgba(11,15,28,0.5) 100%)' }} />
+
+        <div className="container" style={{ paddingTop: 120, paddingBottom: 80 }}>
+          <span className="eyebrow">Colorado · Crestone · Cañon City</span>
+          <h1 style={{ fontSize: 'clamp(52px, 9vw, 100px)', maxWidth: 780, marginBottom: 28 }}>
+            Step Into<br />The Unknown
+          </h1>
+          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 'clamp(17px, 2.5vw, 22px)', color: 'rgba(240,244,255,0.82)', maxWidth: 560, marginBottom: 44, lineHeight: 1.55 }}>
+            Immersive small-group guided tours designed for curious travelers. History, mystery, and wild landscapes—all in one unforgettable experience.
+          </p>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 16, padding: '16px 36px' }}>
+              Explore Journeys
+            </a>
+            <a href="https://www.youtube.com/@ModernExplorer" target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ fontSize: 16, padding: '16px 36px' }}>
+              ▶ See Trailer
+            </a>
+          </div>
+        </div>
+
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top, var(--bg), transparent)' }} />
+      </section>
+
+      {/* FEATURES STRIP */}
+      <section style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '56px 0' }}>
+        <div className="container">
+          <div className="grid-3">
+            {features.map(f => (
+              <div key={f.label} style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+                <div style={{ width: 48, height: 48, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 6 }}>
+                  <img src={f.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'invert(1) sepia(1) hue-rotate(30deg) saturate(2)' }} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: 16, marginBottom: 6, color: 'var(--text)' }}>{f.label}</h4>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EXPERIENCES */}
+      <section className="section">
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <span className="eyebrow">What We Offer</span>
+            <h2 style={{ fontSize: 'clamp(36px, 5vw, 56px)', marginBottom: 20 }}>Travel Beyond The Ordinary</h2>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 18, maxWidth: 560, margin: '0 auto' }}>
+              Every journey is built around wonder, authenticity, and the kind of story you'll be telling for years.
+            </p>
+          </div>
+
+          {experiences.map(group => (
+            <div key={group.category} style={{ marginBottom: 64 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+                <span className="tag">{group.category}</span>
+                <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+              </div>
+              <div className="grid-2">
+                {group.items.map(item => (
+                  <div key={item.title} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ position: 'relative', paddingTop: '56%', overflow: 'hidden' }}>
+                      <img src={item.img} alt={item.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                        onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
+                        onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                      />
+                    </div>
+                    <div style={{ padding: '24px 28px 28px' }}>
+                      <h3 style={{ fontSize: 22, marginBottom: 12 }}>{item.title}</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.65, marginBottom: 20 }}>{item.desc}</p>
+                      <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: 13, padding: '10px 20px' }}>
+                        Book This Tour
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA BANNER */}
+      <section style={{ position: 'relative', padding: '100px 0', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/20241109_165442-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+        <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
+          <span className="eyebrow">Ready?</span>
+          <h2 style={{ fontSize: 'clamp(36px, 6vw, 64px)', marginBottom: 24 }}>Adventure Starts at the Edge</h2>
+          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 20, color: 'rgba(240,244,255,0.8)', maxWidth: 560, margin: '0 auto 40px' }}>
+            Ready to seek the unknown? Join our guided journeys—where history, mystery, and wild landscapes come alive.
+          </p>
+          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 16, padding: '16px 40px' }}>
+            Book Your Expedition
+          </a>
+        </div>
+      </section>
+
+      {/* FIELD REPORTS PREVIEW */}
+      <section className="section" style={{ background: 'var(--bg-section)' }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <span className="eyebrow">From the Field</span>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>With Modern Explorer<br />You Will Learn…</h2>
+            </div>
+            <Link to="/field-reports" className="btn btn-ghost" style={{ fontSize: 13, padding: '10px 22px' }}>
+              All Reports →
+            </Link>
+          </div>
+          <div className="grid-3">
+            {blogPreviews.map(post => (
+              <div key={post.title} className="card">
+                <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
+                  <img src={post.img} alt={post.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: '20px 22px 24px' }}>
+                  <span className="tag" style={{ marginBottom: 12 }}>{post.tag}</span>
+                  <h3 style={{ fontSize: 18, margin: '12px 0 10px' }}>{post.title}</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.65 }}>{post.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="section">
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <span className="eyebrow">Explorer Stories</span>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Begin Your Next True Adventure</h2>
+          </div>
+          <div className="grid-2">
+            {testimonials.map(t => (
+              <div key={t.name} style={{ padding: '32px 36px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, position: 'relative' }}>
+                <div style={{ fontSize: 48, color: 'var(--accent)', fontFamily: 'Georgia, serif', lineHeight: 1, marginBottom: 16, opacity: 0.6 }}>"</div>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 17, color: 'var(--text)', lineHeight: 1.7, marginBottom: 24, fontStyle: 'italic' }}>
+                  {t.quote}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-heading)', fontSize: 14, color: 'var(--accent)' }}>
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, letterSpacing: '0.05em' }}>{t.name}</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-alt)' }}>{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '80px 0' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <span className="eyebrow">Don't Wait</span>
+          <h2 style={{ fontSize: 'clamp(32px, 5vw, 54px)', marginBottom: 20 }}>Curious About Crestone's Secrets?</h2>
+          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 40px', lineHeight: 1.65 }}>
+            Step into a world of hidden history, spiritual sanctuaries, and unexplained mysteries. Our guided walking tours are your invitation to explore, question, and connect.
+          </p>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '14px 36px' }}>
+              Book a Tour
+            </a>
+            <Link to="/about" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 36px' }}>
+              Learn About Us
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
