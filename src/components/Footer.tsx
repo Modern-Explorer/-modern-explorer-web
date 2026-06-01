@@ -9,7 +9,7 @@ export default function Footer() {
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 64 }}>
           <div>
             <img
-              src="/assets/images/ME Logo Draft 4.png"
+              src="/assets/images/content/Logo/ME Logo Draft 5.png"
               alt="Modern Explorer"
               style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: 20 }}
             />

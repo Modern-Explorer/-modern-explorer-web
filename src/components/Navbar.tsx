@@ -34,7 +34,7 @@ export default function Navbar() {
       <div className="container" style={{ display: 'flex', alignItems: 'center', height: 72, gap: 32 }}>
         <Link to="/" style={{ flexShrink: 0 }}>
           <img
-            src="/assets/images/ME Logo Draft 4.png"
+            src="/assets/images/content/Logo/ME Logo Draft 5.png"
             alt="Modern Explorer"
             style={{ height: 40, width: 'auto', objectFit: 'contain' }}
           />

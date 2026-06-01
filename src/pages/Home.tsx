@@ -86,6 +86,18 @@ export default function Home() {
         <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.82) 0%, rgba(8,12,23,0.55) 60%, rgba(8,12,23,0.4) 100%)' }} />
 
         <div className="container" style={{ paddingTop: 120, paddingBottom: 80 }}>
+          <img
+            src="/assets/images/content/Logo/ME Logo Draft 5.png"
+            alt="Modern Explorer"
+            style={{
+              height: 'clamp(140px, 18vw, 260px)',
+              width: 'auto',
+              objectFit: 'contain',
+              marginBottom: 40,
+              display: 'block',
+              filter: 'drop-shadow(0 4px 32px rgba(203,243,110,0.18))',
+            }}
+          />
           <span className="eyebrow">Colorado · Crestone · San Luis Valley</span>
           <h1 style={{ fontSize: 'clamp(52px, 9vw, 100px)', maxWidth: 780, marginBottom: 28 }}>
             Step Into<br />The Unknown
@@ -103,6 +115,66 @@ export default function Home() {
           </div>
         </div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: 'linear-gradient(to top, var(--bg), transparent)' }} />
+      </section>
+
+      {/* SPANISH MAP FEATURE */}
+      <section style={{ background: '#07090f', borderTop: '1px solid var(--border)', padding: '80px 0 0' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <span className="eyebrow">Primary Source</span>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', marginBottom: 16 }}>A Map the Historians Buried</h2>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, maxWidth: 580, margin: '0 auto', lineHeight: 1.7 }}>
+              A hand-drawn Spanish colonial map documenting treasure routes through the San Luis Valley. We've been following this document into the field. This is where the expedition begins.
+            </p>
+          </div>
+        </div>
+
+        {/* Full-bleed map image */}
+        <div style={{ position: 'relative', maxWidth: 1000, margin: '0 auto', padding: '0 24px 0' }}>
+          <div style={{
+            position: 'relative',
+            borderRadius: '6px 6px 0 0',
+            overflow: 'hidden',
+            border: '1px solid rgba(203,243,110,0.15)',
+            borderBottom: 'none',
+            boxShadow: '0 -8px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(203,243,110,0.08)',
+          }}>
+            <img
+              src="/assets/images/content/History/Spanish Map.jpg"
+              alt="Spanish colonial treasure map — San Luis Valley"
+              style={{
+                width: '100%',
+                display: 'block',
+                filter: 'sepia(0.25) contrast(1.08) brightness(0.92)',
+              }}
+            />
+            {/* Subtle vignette overlay */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'radial-gradient(ellipse at center, transparent 55%, rgba(7,9,15,0.55) 100%)',
+              pointerEvents: 'none',
+            }} />
+            {/* Bottom gradient fade into next section */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: 120,
+              background: 'linear-gradient(to top, #07090f, transparent)',
+              pointerEvents: 'none',
+            }} />
+            {/* Caption badge */}
+            <div style={{
+              position: 'absolute', bottom: 20, left: 24,
+              padding: '6px 14px',
+              background: 'rgba(7,9,15,0.82)',
+              border: '1px solid rgba(203,243,110,0.2)',
+              borderRadius: 3,
+              backdropFilter: 'blur(8px)',
+            }}>
+              <span style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                Spanish Colonial Document · San Luis Valley Region
+              </span>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* FEATURES STRIP */}
