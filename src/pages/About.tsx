@@ -8,21 +8,6 @@ const values = [
   { title: 'Community-Driven', desc: 'This is a "we" operation. Our guests, guides, and local partners are all part of the same expedition.' },
 ];
 
-const team = [
-  {
-    name: 'Mateo Argüello',
-    role: 'Founder & Lead Guide',
-    bio: 'Based in Colorado Springs, Mateo built Modern Explorer from a lifelong passion for the unexplained and a belief that the best travel leaves you with more questions than you started with. He has been leading guided tours throughout Colorado for years, specializing in cryptozoology, local lore, and high-altitude wilderness navigation.',
-    img: IMG('Mateo', '20250301_134650.jpg'),
-  },
-  {
-    name: 'Glenn Norberg',
-    role: 'Field Investigator & Artist',
-    bio: 'Glenn is an accomplished artist by trade and a passionate field investigator at heart. He brings creative vision and years of independent on-the-ground work to Modern Explorer, particularly in the areas of cryptid research and anomalous phenomena documentation across the American Southwest.',
-    img: IMG('Crestone', '20250810_091206-EDIT.jpg'),
-  },
-];
-
 const gallery = [
   IMG('Crestone', '20250810_090447-EDIT.jpg'),
   IMG('Crestone', '20250810_090525-EDIT.jpg'),
@@ -30,6 +15,19 @@ const gallery = [
   IMG('Nature', '20241109_165442-EDIT.jpg'),
   IMG('Crestone', '20250810_091607-EDIT.jpg'),
   IMG('Nature', '20250510_091707-EDIT.jpg'),
+];
+
+const coreTeamPlaceholders = [
+  { slot: 1, label: 'Core Team Member' },
+  { slot: 2, label: 'Core Team Member' },
+  { slot: 3, label: 'Core Team Member' },
+];
+
+const guidePlaceholders = [
+  { slot: 1 },
+  { slot: 2 },
+  { slot: 3 },
+  { slot: 4 },
 ];
 
 export default function About() {
@@ -48,28 +46,38 @@ export default function About() {
         </div>
       </section>
 
-      {/* MISSION */}
+      {/* FOUNDER */}
       <section className="section">
         <div className="container">
           <div className="grid-2" style={{ alignItems: 'center', gap: 64 }}>
+            <div style={{ position: 'relative' }}>
+              <img
+                src={IMG('Mateo', '20250301_134650.jpg')}
+                alt="Mateo Argüello"
+                style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
+              />
+              <div style={{
+                position: 'absolute', bottom: -20, right: -20,
+                background: 'var(--bg-card)', border: '1px solid var(--border-accent)',
+                borderRadius: 6, padding: '14px 22px',
+              }}>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 2 }}>Founder</p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Mateo Argüello</p>
+              </div>
+            </div>
             <div>
-              <span className="eyebrow">Our Mission</span>
-              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 20 }}>Build a Self-Funded<br />Exploration Engine</h2>
+              <span className="eyebrow">The Founder</span>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 20 }}>Built From<br />the Ground Up</h2>
               <div className="divider" />
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 20 }}>
-                We're building a self-funded exploration engine that enables real discovery in archaeology, cryptozoology, UAPs, paranormal phenomena, and anomalous events—in places where conventional funding falls short.
+                Mateo Argüello built Modern Explorer from a lifelong obsession with the unexplained and a conviction that real discovery still happens—if you're willing to look for it. He created this company to bring curious people into the field, not just to a viewpoint.
               </p>
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 32 }}>
-                Our walking tours in Crestone and Cañon City are the first step. Every ticket sold funds deeper field research, better equipment, and more ambitious expeditions. You're not just a tourist—you're a supporter of genuine discovery.
+                Based in Colorado and rooted in the San Luis Valley, Mateo specializes in cryptozoology, high-strangeness field research, and the kind of local lore that doesn't make it into the guidebooks. Every tour he leads is built on what he's actually found—not what's expected.
               </p>
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Join an Expedition</a>
-            </div>
-            <div style={{ position: 'relative' }}>
-              <img src={IMG('Crestone', '20250810_090851-EDIT.jpg')} alt="Colorado field expedition" style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)' }} />
-              <div style={{ position: 'absolute', bottom: -24, right: -24, background: 'var(--bg-card)', border: '1px solid var(--border-accent)', borderRadius: 6, padding: '16px 24px' }}>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 28, fontWeight: 700, color: 'var(--accent)' }}>2</p>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Colorado Locations</p>
-              </div>
+              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                Join an Expedition
+              </a>
             </div>
           </div>
         </div>
@@ -79,7 +87,7 @@ export default function About() {
       <section style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', height: 280 }}>
           {gallery.map((src, i) => (
-            <div key={i} style={{ flex: 1, minWidth: 0, overflow: 'hidden', position: 'relative' }}>
+            <div key={i} style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
                 onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.06)')}
                 onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
@@ -89,8 +97,26 @@ export default function About() {
         </div>
       </section>
 
-      {/* VALUES */}
+      {/* MISSION */}
       <section className="section" style={{ background: 'var(--bg-section)' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <span className="eyebrow">Our Mission</span>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Build a Self-Funded<br />Exploration Engine</h2>
+          </div>
+          <div style={{ maxWidth: 780, margin: '0 auto', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 18, lineHeight: 1.8, marginBottom: 20 }}>
+              We're building a self-funded exploration engine that enables real discovery in archaeology, cryptozoology, UAPs, paranormal phenomena, and anomalous events—in places where conventional funding falls short.
+            </p>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 18, lineHeight: 1.8 }}>
+              Every ticket sold funds deeper field research, better equipment, and more ambitious expeditions into the San Luis Valley and beyond. You're not just a tourist—you're a supporter of genuine discovery.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* VALUES */}
+      <section className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <span className="eyebrow">What We Stand For</span>
@@ -108,23 +134,43 @@ export default function About() {
         </div>
       </section>
 
-      {/* TEAM */}
-      <section className="section">
+      {/* CORE TEAM */}
+      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span className="eyebrow">The Team</span>
-            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Meet Your Guides</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 56, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <span className="eyebrow">The Team</span>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Core Team</h2>
+            </div>
+            <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', fontStyle: 'italic' }}>
+              Growing soon
+            </p>
           </div>
-          <div className="grid-2" style={{ gap: 40 }}>
-            {team.map(member => (
-              <div key={member.name} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
-                <div style={{ position: 'relative', paddingTop: '65%' }}>
-                  <img src={member.img} alt={member.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+          <div className="grid-3">
+            {coreTeamPlaceholders.map(p => (
+              <div key={p.slot} style={{
+                background: 'var(--bg-card)',
+                border: '1px dashed var(--border)',
+                borderRadius: 6,
+                overflow: 'hidden',
+                opacity: 0.55,
+              }}>
+                <div style={{
+                  paddingTop: '75%',
+                  background: 'repeating-linear-gradient(45deg, var(--bg) 0px, var(--bg) 10px, var(--bg-card) 10px, var(--bg-card) 20px)',
+                  position: 'relative',
+                }}>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--bg-section)', border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 22, opacity: 0.4 }}>👤</span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ padding: '28px 32px' }}>
-                  <h3 style={{ fontSize: 24, marginBottom: 4 }}>{member.name}</h3>
-                  <p style={{ color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontSize: 13, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 16 }}>{member.role}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.75 }}>{member.bio}</p>
+                <div style={{ padding: '20px 24px 24px' }}>
+                  <div style={{ height: 14, width: '60%', background: 'var(--bg-section)', borderRadius: 3, marginBottom: 8 }} />
+                  <div style={{ height: 10, width: '40%', background: 'var(--bg-section)', borderRadius: 3, marginBottom: 16 }} />
+                  <div style={{ height: 8, width: '100%', background: 'var(--bg-section)', borderRadius: 2, marginBottom: 6 }} />
+                  <div style={{ height: 8, width: '85%', background: 'var(--bg-section)', borderRadius: 2 }} />
                 </div>
               </div>
             ))}
@@ -132,40 +178,88 @@ export default function About() {
         </div>
       </section>
 
-      {/* LOCATIONS */}
-      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
+      {/* GUIDES */}
+      <section className="section">
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span className="eyebrow">Where We Operate</span>
-            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Current Focus Areas</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <span className="eyebrow">In the Field</span>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Our Guides</h2>
+            </div>
+            <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', fontStyle: 'italic' }}>
+              Guide profiles coming soon
+            </p>
           </div>
-          <div className="grid-2" style={{ gap: 32 }}>
-            {[
-              {
-                name: 'Crestone, Colorado', county: 'Saguache County',
-                desc: "A spiritual hotbed in the San Luis Valley. Home to sacred land, unexplained phenomena, and some of the most stunning high-desert terrain in the Rockies.",
-                img: IMG('Crestone', '20250810_093131-EDIT.jpg'),
-              },
-              {
-                name: 'Cañon City, Colorado', county: 'Fremont County',
-                desc: "The Royal Gorge region is layered with history—from ancient Native American routes to Old West mining lore. Stunning geology and decades of unexplained field reports.",
-                img: IMG('History', '20250602_154545-EDIT.jpg'),
-              },
-            ].map(loc => (
-              <div key={loc.name} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
-                <div style={{ position: 'relative', paddingTop: '50%' }}>
-                  <img src={loc.img} alt={loc.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(11,15,28,0.85), transparent)' }} />
-                  <div style={{ position: 'absolute', bottom: 20, left: 24 }}>
-                    <h3 style={{ fontSize: 22 }}>{loc.name}</h3>
-                    <p style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{loc.county}</p>
+          <div className="grid-4">
+            {guidePlaceholders.map(p => (
+              <div key={p.slot} style={{
+                background: 'var(--bg-card)',
+                border: '1px dashed var(--border)',
+                borderRadius: 6,
+                overflow: 'hidden',
+                opacity: 0.5,
+              }}>
+                <div style={{ paddingTop: '100%', position: 'relative', background: 'var(--bg-section)' }}>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--bg)', border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 18, opacity: 0.4 }}>👤</span>
+                    </div>
                   </div>
                 </div>
-                <div style={{ padding: '20px 24px 28px' }}>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>{loc.desc}</p>
+                <div style={{ padding: '14px 16px 18px' }}>
+                  <div style={{ height: 12, width: '70%', background: 'var(--bg-section)', borderRadius: 3, marginBottom: 6 }} />
+                  <div style={{ height: 9, width: '50%', background: 'var(--bg-section)', borderRadius: 2, marginBottom: 10 }} />
+                  <div style={{ height: 7, width: '100%', background: 'var(--bg-section)', borderRadius: 2, marginBottom: 4 }} />
+                  <div style={{ height: 7, width: '80%', background: 'var(--bg-section)', borderRadius: 2 }} />
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* LOCATION — Crestone only */}
+      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
+        <div className="container">
+          <div className="grid-2" style={{ alignItems: 'center', gap: 64 }}>
+            <div>
+              <span className="eyebrow">Where We Operate</span>
+              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 20 }}>Crestone &<br />the San Luis Valley</h2>
+              <div className="divider" />
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 16 }}>
+                Crestone sits in the heart of the San Luis Valley—one of the most anomaly-rich corridors in North America. Surrounded by the Sangre de Cristo mountains, it draws spiritual seekers, researchers, and the simply curious from around the world.
+              </p>
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>
+                The Valley has logged more UAP reports per capita than almost anywhere in the U.S. The land holds centuries of Indigenous history. The mountains contain ruins that haven't been fully documented. This is where we work.
+              </p>
+              <div style={{ display: 'flex', gap: 24 }}>
+                {[
+                  { value: '7,500\'', label: 'Elevation' },
+                  { value: '122mi', label: 'Valley Length' },
+                  { value: '14', label: 'Peaks Above 14k ft' },
+                ].map(stat => (
+                  <div key={stat.label}>
+                    <p style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--accent)', marginBottom: 2 }}>{stat.value}</p>
+                    <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              {[
+                IMG('Crestone', '20250810_093131-EDIT.jpg'),
+                IMG('Crestone', '20250810_093137-EDIT.jpg'),
+                IMG('Crestone', '20250810_093528-EDIT.jpg'),
+                IMG('Nature', '20250510_100646-EDIT.jpg'),
+              ].map((src, i) => (
+                <div key={i} style={{ paddingTop: '80%', position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
+                  <img src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                    onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
+                    onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
