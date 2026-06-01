@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 
+const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
+
 const features = [
   { icon: '/assets/images/compass.png', label: 'Small Groups', desc: 'Intimate 6–12 person expeditions for a real, personal experience.' },
   { icon: '/assets/images/maps-and-flags.png', label: 'Authentic Local Experiences', desc: 'Every tour is rooted in genuine local history, legend, and lore.' },
@@ -12,22 +14,46 @@ const experiences = [
   {
     category: 'Walking Tours',
     items: [
-      { title: 'Legends & Lore of Crestone', desc: "Step into the legends and lore of Crestone's past. Ancient spiritual sites, unexplained phenomena, and centuries of hidden history await.", img: '/assets/images/Colorado Photo.jpg' },
-      { title: 'UAPs & Local Mysteries', desc: "Dive into tales of UFOs and local mysteries. The San Luis Valley is one of the most active UAP corridors in North America.", img: '/assets/images/kellepics-fantasy-2847724_1920.jpg' },
+      {
+        title: 'Legends & Lore of Crestone',
+        desc: "Step into the legends and lore of Crestone's past. Ancient spiritual sites, unexplained phenomena, and centuries of hidden history await.",
+        img: IMG('Crestone', '20250810_090739-EDIT.jpg'),
+      },
+      {
+        title: 'UAPs & Local Mysteries',
+        desc: 'Dive into tales of UFOs and local mysteries. The San Luis Valley is one of the most active UAP corridors in North America.',
+        img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'),
+      },
     ],
   },
   {
     category: 'Wilderness Trips',
     items: [
-      { title: 'Sangre de Cristo Expedition', desc: 'Venture deep into the Sangre de Cristo range. Remote high-altitude terrain, ancient sites, and landscapes that defy description.', img: '/assets/images/20241109_165442-EDIT.jpg' },
-      { title: 'Ruins & Mining Trails', desc: 'Uncover ruins and forgotten mining trails. Ghost towns, collapsed shafts, and the stories of those who came before.', img: '/assets/images/kellepics-fantasy-2861815_1920.jpg' },
+      {
+        title: 'Sangre de Cristo Expedition',
+        desc: 'Venture deep into the Sangre de Cristo range. Remote high-altitude terrain, ancient sites, and landscapes that defy description.',
+        img: IMG('Crestone', '20250810_090914-EDIT.jpg'),
+      },
+      {
+        title: 'Ruins & Mining Trails',
+        desc: 'Uncover ruins and forgotten mining trails. Ghost towns, collapsed shafts, and the stories of those who came before.',
+        img: IMG('History', '20250602_154009-EDIT.jpg'),
+      },
     ],
   },
   {
     category: 'Field Research',
     items: [
-      { title: 'Cryptid Hunt', desc: 'Join the search for elusive creatures and phenomena. Evidence review, fieldwork techniques, and hands-on investigation.', img: '/assets/images/sylwesterl-spider-8279740_1920.jpg' },
-      { title: 'Night Sky & the Unknown', desc: 'Gaze at stars and witness the unknown. Structured sky watches with expert commentary on UAP reporting protocols.', img: '/assets/images/infinite-creations-scary-6389656_1920.jpg' },
+      {
+        title: 'Cryptid Hunt',
+        desc: 'Join the search for elusive creatures and phenomena. Evidence review, fieldwork techniques, and hands-on investigation.',
+        img: IMG('Cryptids', 'TqSDS.jpg'),
+      },
+      {
+        title: 'Night Sky & the Unknown',
+        desc: 'Gaze at stars and witness the unknown. Structured sky watches with expert commentary on UAP reporting protocols.',
+        img: IMG('UFOs', 'KaTU7.jpg'),
+      },
     ],
   },
 ];
@@ -40,9 +66,9 @@ const testimonials = [
 ];
 
 const blogPreviews = [
-  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Step into the wild with us—read firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: '/assets/images/20250810_090914-EDIT.jpg' },
-  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Our guides share hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: '/assets/images/kellepics-fantasy-2847724_1920.jpg' },
-  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests. New perspectives on history, mystery, and discovery.', img: '/assets/images/Colorado Photo.jpg' },
+  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: IMG('Crestone', '20250810_093828-EDIT.jpg') },
+  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: IMG('Mateo', '20250421_075338-EDIT.jpg') },
+  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests—new perspectives on history and mystery.', img: IMG('History', '20231110_154447.jpg') },
 ];
 
 export default function Home() {
@@ -51,14 +77,13 @@ export default function Home() {
       {/* HERO */}
       <section style={{
         position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center',
-        background: 'linear-gradient(to bottom, rgba(8,12,23,0.55) 0%, rgba(8,12,23,0.75) 100%)',
       }}>
         <div style={{
           position: 'absolute', inset: 0, zIndex: -1,
-          backgroundImage: "url('/assets/images/Colorado Photo.jpg')",
-          backgroundSize: 'cover', backgroundPosition: 'center 30%',
+          backgroundImage: `url('${IMG('Crestone', '20250810_095413-EDIT.jpg')}')`,
+          backgroundSize: 'cover', backgroundPosition: 'center 40%',
         }} />
-        <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.7) 0%, rgba(11,15,28,0.5) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.82) 0%, rgba(8,12,23,0.55) 60%, rgba(8,12,23,0.4) 100%)' }} />
 
         <div className="container" style={{ paddingTop: 120, paddingBottom: 80 }}>
           <span className="eyebrow">Colorado · Crestone · Cañon City</span>
@@ -77,8 +102,7 @@ export default function Home() {
             </a>
           </div>
         </div>
-
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top, var(--bg), transparent)' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: 'linear-gradient(to top, var(--bg), transparent)' }} />
       </section>
 
       {/* FEATURES STRIP */}
@@ -91,7 +115,7 @@ export default function Home() {
                   <img src={f.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'invert(1) sepia(1) hue-rotate(30deg) saturate(2)' }} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: 16, marginBottom: 6, color: 'var(--text)' }}>{f.label}</h4>
+                  <h4 style={{ fontSize: 16, marginBottom: 6 }}>{f.label}</h4>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{f.desc}</p>
                 </div>
               </div>
@@ -143,7 +167,7 @@ export default function Home() {
 
       {/* CTA BANNER */}
       <section style={{ position: 'relative', padding: '100px 0', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/20241109_165442-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Nature', '20250518_185929-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.28)' }} />
         <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">Ready?</span>
           <h2 style={{ fontSize: 'clamp(36px, 6vw, 64px)', marginBottom: 24 }}>Adventure Starts at the Edge</h2>
@@ -164,9 +188,7 @@ export default function Home() {
               <span className="eyebrow">From the Field</span>
               <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>With Modern Explorer<br />You Will Learn…</h2>
             </div>
-            <Link to="/field-reports" className="btn btn-ghost" style={{ fontSize: 13, padding: '10px 22px' }}>
-              All Reports →
-            </Link>
+            <Link to="/field-reports" className="btn btn-ghost" style={{ fontSize: 13, padding: '10px 22px' }}>All Reports →</Link>
           </div>
           <div className="grid-3">
             {blogPreviews.map(post => (
@@ -175,7 +197,7 @@ export default function Home() {
                   <img src={post.img} alt={post.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '20px 22px 24px' }}>
-                  <span className="tag" style={{ marginBottom: 12 }}>{post.tag}</span>
+                  <span className="tag">{post.tag}</span>
                   <h3 style={{ fontSize: 18, margin: '12px 0 10px' }}>{post.title}</h3>
                   <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.65 }}>{post.desc}</p>
                 </div>
@@ -194,11 +216,9 @@ export default function Home() {
           </div>
           <div className="grid-2">
             {testimonials.map(t => (
-              <div key={t.name} style={{ padding: '32px 36px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, position: 'relative' }}>
+              <div key={t.name} style={{ padding: '32px 36px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6 }}>
                 <div style={{ fontSize: 48, color: 'var(--accent)', fontFamily: 'Georgia, serif', lineHeight: 1, marginBottom: 16, opacity: 0.6 }}>"</div>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 17, color: 'var(--text)', lineHeight: 1.7, marginBottom: 24, fontStyle: 'italic' }}>
-                  {t.quote}
-                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 17, color: 'var(--text)', lineHeight: 1.7, marginBottom: 24, fontStyle: 'italic' }}>{t.quote}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-heading)', fontSize: 14, color: 'var(--accent)' }}>
                     {t.name[0]}
@@ -223,12 +243,8 @@ export default function Home() {
             Step into a world of hidden history, spiritual sanctuaries, and unexplained mysteries. Our guided walking tours are your invitation to explore, question, and connect.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '14px 36px' }}>
-              Book a Tour
-            </a>
-            <Link to="/about" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 36px' }}>
-              Learn About Us
-            </Link>
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '14px 36px' }}>Book a Tour</a>
+            <Link to="/about" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 36px' }}>Learn About Us</Link>
           </div>
         </div>
       </section>

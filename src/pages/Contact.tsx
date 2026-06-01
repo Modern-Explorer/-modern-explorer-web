@@ -31,7 +31,7 @@ export default function Contact() {
     <main style={{ paddingTop: 72 }}>
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/Colorado Photo.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.1 }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Crestone/20250810_093828-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
         <div className="container" style={{ position: 'relative' }}>
           <span className="eyebrow">Get in Touch</span>
           <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', marginBottom: 20 }}>Contact Us</h1>

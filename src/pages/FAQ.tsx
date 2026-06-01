@@ -49,7 +49,7 @@ export default function FAQ() {
     <main style={{ paddingTop: 72 }}>
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/kellepics-fantasy-2847724_1920.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.1 }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Nature/20250510_091707-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
         <div className="container-narrow" style={{ position: 'relative' }}>
           <span className="eyebrow">Got Questions?</span>
           <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', marginBottom: 20 }}>Frequently Asked<br />Questions</h1>

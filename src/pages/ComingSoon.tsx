@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
+
 const upcoming = [
   { title: 'Merch Store', desc: 'Field-tested apparel, art prints by Glenn Norberg, and expedition gear. Built for people who take curiosity seriously.', eta: 'Summer 2025', icon: '🧭' },
   { title: 'Field Research App', desc: 'A mobile-first tool for documenting anomalous events, sharing reports with the community, and building a crowdsourced database of unexplained phenomena.', eta: 'Fall 2025', icon: '📡' },
@@ -22,8 +24,8 @@ export default function ComingSoon() {
     <main style={{ paddingTop: 72 }}>
       {/* HERO */}
       <section style={{ position: 'relative', padding: '100px 0 80px', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/kellepics-fantasy-2861815_1920.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.15 }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(203,243,110,0.05) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', 'DJI_0286 edit.png')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(203,243,110,0.06) 0%, transparent 70%)' }} />
         <div className="container-narrow" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">What's Next</span>
           <h1 style={{ fontSize: 'clamp(44px, 7vw, 80px)', marginBottom: 24 }}>The Expedition<br />Continues</h1>
@@ -34,18 +36,13 @@ export default function ComingSoon() {
           {!submitted ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, maxWidth: 480, margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' }}>
               <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
+                type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="your@email.com" required
                 style={{ flex: 1, minWidth: 240, padding: '14px 18px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 4, color: 'var(--text)', fontFamily: 'var(--font-body)', fontSize: 15, outline: 'none' }}
                 onFocus={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
                 onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
               />
-              <button type="submit" className="btn btn-primary" style={{ fontSize: 14 }}>
-                Notify Me
-              </button>
+              <button type="submit" className="btn btn-primary" style={{ fontSize: 14 }}>Notify Me</button>
             </form>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 32px', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 4 }}>
@@ -56,8 +53,28 @@ export default function ComingSoon() {
         </div>
       </section>
 
+      {/* TEASER PHOTOS */}
+      <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '0', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', height: 240 }}>
+          {[
+            IMG('Crestone', '20250810_090800-EDIT.jpg'),
+            IMG('Nature', '20250729_200506-EDIT.jpg'),
+            IMG('Animals', 'pexels-brett-sayles-1603783.jpg'),
+            IMG('UFOs', 'MrhuO.jpg'),
+            IMG('History', '20241222_124511-EDIT.jpg'),
+          ].map((src, i) => (
+            <div key={i} style={{ flex: 1, minWidth: 0, overflow: 'hidden', position: 'relative' }}>
+              <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.6)', transition: 'filter 0.3s, transform 0.4s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.filter = 'brightness(1)'; (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.05)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.filter = 'brightness(0.6)'; (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)'; }}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* UPCOMING */}
-      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
+      <section className="section" style={{ background: 'var(--bg-section)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <span className="eyebrow">On the Horizon</span>
@@ -67,9 +84,7 @@ export default function ComingSoon() {
             {upcoming.map(item => (
               <div key={item.title} style={{ padding: '28px 30px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6 }}>
                 <div style={{ fontSize: 32, marginBottom: 16 }}>{item.icon}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <h3 style={{ fontSize: 19 }}>{item.title}</h3>
-                </div>
+                <h3 style={{ fontSize: 19, marginBottom: 10 }}>{item.title}</h3>
                 <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 16 }}>{item.desc}</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
