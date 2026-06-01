@@ -54,6 +54,7 @@ export default function Footer() {
               { to: '/', label: 'Home' },
               { to: '/about', label: 'About Us' },
               { to: '/field-reports', label: 'Field Reports' },
+              { to: '/upcoming', label: 'Upcoming Tours' },
               { to: '/merch', label: 'Merch Store' },
             ].map(l => (
               <Link key={l.to} to={l.to} style={{ display: 'block', color: 'var(--text-muted)', fontSize: 14, marginBottom: 12, transition: 'color 0.15s' }}

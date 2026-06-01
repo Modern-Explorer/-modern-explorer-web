@@ -5,6 +5,7 @@ const links = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
   { to: '/field-reports', label: 'Field Reports' },
+  { to: '/upcoming', label: 'Upcoming' },
   { to: '/merch', label: 'Merch' },
   { to: '/contact', label: 'Contact' },
   { to: '/faq', label: 'FAQ' },
