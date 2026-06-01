@@ -80,10 +80,10 @@ export default function Home() {
       }}>
         <div style={{
           position: 'absolute', inset: 0, zIndex: -1,
-          backgroundImage: `url('${IMG('Crestone', '20250810_095413-EDIT.jpg')}')`,
-          backgroundSize: 'cover', backgroundPosition: 'center 40%',
+          backgroundImage: `url('${IMG('Nature', 'pexels-walidphotoz-847402.jpg')}')`,
+          backgroundSize: 'cover', backgroundPosition: 'center 60%',
         }} />
-        <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.82) 0%, rgba(8,12,23,0.55) 60%, rgba(8,12,23,0.4) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.72) 0%, rgba(8,12,23,0.38) 60%, rgba(8,12,23,0.25) 100%)' }} />
 
         <div className="container" style={{ paddingTop: 120, paddingBottom: 80 }}>
           <img
