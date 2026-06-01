@@ -120,6 +120,15 @@ export default function Home() {
               ▶ See Trailer
             </a>
           </div>
+          <p style={{
+            fontFamily: 'var(--font-alt)',
+            fontSize: 'clamp(14px, 1.4vw, 18px)',
+            color: 'rgba(240,244,255,0.65)',
+            letterSpacing: '0.06em',
+            marginTop: 28,
+          }}>
+            Immersive Small-Group Tours Designed For Curious Travelers.
+          </p>
         </div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: 'linear-gradient(to top, var(--bg), transparent)' }} />
       </section>
