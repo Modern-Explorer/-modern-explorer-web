@@ -124,7 +124,7 @@ export default function Contact() {
                 <h3 style={{ fontSize: 20, marginBottom: 16 }}>Based In</h3>
                 {[
                   { place: 'Crestone, Colorado', detail: 'Saguache County · San Luis Valley' },
-                  { place: 'Cañon City, Colorado', detail: 'Fremont County · Royal Gorge region' },
+                  { place: 'San Luis Valley, Colorado', detail: 'Saguache County · Sangre de Cristo range' },
                 ].map(loc => (
                   <div key={loc.place} style={{ paddingBottom: 16, marginBottom: 16, borderBottom: '1px solid var(--border)' }}>
                     <p style={{ fontFamily: 'var(--font-heading)', fontSize: 15, marginBottom: 4 }}>{loc.place}</p>

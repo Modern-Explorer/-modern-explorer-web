@@ -21,10 +21,10 @@ const posts = [
   },
   {
     id: 3, tag: 'Expedition News',
-    title: 'New Tour Launch: Cañon City Mining Trail & Ruins Expedition',
+    title: 'New Route: Crestone Ruins & High-Country Anomaly Corridor',
     date: 'Apr 2025', author: 'Mateo Argüello', readTime: '4 min',
-    img: IMG('History', '20250602_154009-EDIT.jpg'),
-    excerpt: "We're officially launching our Cañon City route this summer. The route covers 4.2 miles of historic mining terrain, three documented ghost sites, and a section of trail that has generated consistent unexplained reports since the 1990s.",
+    img: IMG('Crestone', '20250810_093514-EDIT.jpg'),
+    excerpt: "We're launching a new route through the high country above Crestone. The trail passes three documented ruin sites and a ridge that has generated consistent unexplained reports since the early 2000s.",
   },
   {
     id: 4, tag: 'Community',
@@ -49,7 +49,7 @@ const posts = [
   },
   {
     id: 7, tag: 'Field Report',
-    title: "Animal Behavior Anomalies Near Crestone: What the Wildlife Is Telling Us",
+    title: 'Animal Behavior Anomalies Near Crestone: What the Wildlife Is Telling Us',
     date: 'Feb 2025', author: 'Mateo Argüello', readTime: '5 min',
     img: IMG('Animals', 'pexels-brett-sayles-1467808.jpg'),
     excerpt: "One of the most consistent early indicators of something unusual in the field is animal behavior. Elk, deer, and birds often react before any human does. Here's what we've documented over three seasons.",
@@ -66,9 +66,78 @@ const posts = [
     title: 'Oral History Project: Documenting the Voices of Old Colorado',
     date: 'Dec 2024', author: 'Glenn Norberg', readTime: '8 min',
     img: IMG('History', '20221122_163904.jpg'),
-    excerpt: "We've started recording long-form conversations with locals who hold knowledge that isn't written anywhere. Stories of mining camp disappearances, unexplained cattle incidents, and traditions that predate written records.",
+    excerpt: "We've started recording long-form conversations with locals who hold knowledge that isn't written anywhere. Stories of unexplained cattle incidents and traditions that predate written records.",
   },
 ];
+
+// ─── Mock social data ──────────────────────────────────────────────────────────
+const ytVideos = [
+  { id: 1, title: 'Night Watch: San Luis Valley Sky Anomalies', views: '4.2K', duration: '18:34', ago: '3 days ago', thumb: IMG('UFOs', 'KaTU7.jpg') },
+  { id: 2, title: 'Field Guide: How We Cast Cryptid Tracks', views: '2.8K', duration: '11:52', ago: '2 weeks ago', thumb: IMG('Cryptids', 'TqSDS.jpg') },
+  { id: 3, title: 'Crestone Tour Walkthrough — Full Route', views: '6.1K', duration: '24:07', ago: '1 month ago', thumb: IMG('Crestone', '20250810_095413-EDIT.jpg') },
+];
+
+const igPosts = [
+  { id: 1, img: IMG('Crestone', '20250810_090739-EDIT.jpg'), likes: 312, caption: 'Golden hour above Crestone. The valley floor from up here is something else. 🌄 #SanLuisValley' },
+  { id: 2, img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'), likes: 481, caption: 'Night three of the sky watch. Logged two anomalous events between 2–4am. More details in the field report. 👁️' },
+  { id: 3, img: IMG('Animals', 'pexels-brett-sayles-1098886.jpg'), likes: 228, caption: "Ran into this one at 10,800ft. Animals know things we don't. #Colorado #WildlifeWatch" },
+  { id: 4, img: IMG('Crestone', '20250810_093828-EDIT.jpg'), likes: 395, caption: 'Our new route breaks here at sunrise. This ridge has a story. Coming soon. 🧭' },
+  { id: 5, img: IMG('Mateo', '20250421_075338-EDIT.jpg'), likes: 267, caption: "Gearing up for the season. Everything we carry has a reason. What's in your pack? ⛺" },
+  { id: 6, img: IMG('Cryptids', 'di86V.jpg'), likes: 544, caption: "This came in from a guest last week. Make of it what you will. We're heading back to that area next month. 🐾" },
+];
+
+const fbPosts = [
+  {
+    id: 1, ago: '2 days ago', likes: 88, comments: 14,
+    img: IMG('Crestone', '20250810_090851-EDIT.jpg'),
+    text: 'New field report just dropped — six months of sky watch data from the San Luis Valley in one place. This is the most complete look at what we\'ve been tracking. Link in bio.',
+  },
+  {
+    id: 2, ago: '1 week ago', likes: 61, comments: 9,
+    img: IMG('Nature', '20250518_185929-EDIT.jpg'),
+    text: 'Tour dates are filling up for the fall season. We keep groups small on purpose — this isn\'t a bus tour. If you\'ve been thinking about joining us, now\'s the time to book.',
+  },
+  {
+    id: 3, ago: '2 weeks ago', likes: 103, comments: 22,
+    img: IMG('UFOs', 'MrhuO.jpg'),
+    text: 'Question for the community: what\'s your most unexplained experience in Colorado? We\'re building a community report and want to hear from people who\'ve been in the field.',
+  },
+];
+
+// ─── Sub-components ────────────────────────────────────────────────────────────
+
+function PlatformHeader({ color, label, handle, url }: { color: string; label: string; handle: string; url: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 6, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+          {label === 'YouTube' ? '▶' : label === 'Instagram' ? '◈' : '𝑓'}
+        </div>
+        <div>
+          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', lineHeight: 1 }}>{label}</p>
+          <p style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', marginTop: 2 }}>{handle}</p>
+        </div>
+      </div>
+      <a href={url} target="_blank" rel="noopener noreferrer"
+        style={{ fontSize: 11, fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px solid var(--border)', borderRadius: 3, padding: '5px 10px', transition: 'var(--ease)' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-accent)'; (e.currentTarget as HTMLElement).style.color = 'var(--accent)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-dim)'; }}
+      >
+        Follow →
+      </a>
+    </div>
+  );
+}
+
+function MockBadge() {
+  return (
+    <span style={{ display: 'inline-block', padding: '2px 8px', background: 'rgba(203,243,110,0.08)', border: '1px solid rgba(203,243,110,0.2)', borderRadius: 2, fontSize: 10, fontFamily: 'var(--font-alt)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', opacity: 0.7 }}>
+      Mock Data
+    </span>
+  );
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
 
 export default function FieldReports() {
   const [active, setActive] = useState('All');
@@ -163,6 +232,123 @@ export default function FieldReports() {
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SOCIAL MEDIA DASHBOARD ────────────────────────────────────────────── */}
+      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
+        <div className="container">
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <span className="eyebrow">Follow the Expedition</span>
+              <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)' }}>Social Activity</h2>
+            </div>
+            <MockBadge />
+          </div>
+
+          {/* YOUTUBE */}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px', marginBottom: 24 }}>
+            <PlatformHeader
+              color="#ff0000"
+              label="YouTube"
+              handle="@ModernExplorer"
+              url="https://www.youtube.com/@ModernExplorer"
+            />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              {ytVideos.map(v => (
+                <div key={v.id} style={{ cursor: 'pointer' }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                >
+                  <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 4, overflow: 'hidden', marginBottom: 10, background: 'var(--bg)' }}>
+                    <img src={v.thumb} alt={v.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {/* Play button overlay */}
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' }}>
+                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', paddingLeft: 3 }}>
+                        ▶
+                      </div>
+                    </div>
+                    {/* Duration badge */}
+                    <div style={{ position: 'absolute', bottom: 6, right: 8, background: 'rgba(0,0,0,0.82)', borderRadius: 2, padding: '2px 6px', fontSize: 11, fontFamily: 'var(--font-alt)', fontWeight: 600, color: '#fff' }}>
+                      {v.duration}
+                    </div>
+                  </div>
+                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, fontWeight: 600, lineHeight: 1.35, color: 'var(--text)', marginBottom: 4 }}>{v.title}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{v.views} views · {v.ago}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* INSTAGRAM + FACEBOOK side by side */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+
+            {/* INSTAGRAM */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px' }}>
+              <PlatformHeader
+                color="linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)"
+                label="Instagram"
+                handle="@modern._explorer"
+                url="https://instagram.com/modern._explorer"
+              />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+                {igPosts.map(p => (
+                  <div key={p.id} style={{ position: 'relative', paddingTop: '100%', overflow: 'hidden', borderRadius: 3, cursor: 'pointer' }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.querySelector('div')!.style.opacity = '1'; }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.querySelector('div')!.style.opacity = '0'; }}
+                  >
+                    <img src={p.img} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {/* Hover overlay */}
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', opacity: 0, transition: 'opacity 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                      <span style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>♥ {p.likes}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', marginTop: 14, fontStyle: 'italic' }}>
+                "{igPosts[0].caption}"
+              </p>
+            </div>
+
+            {/* FACEBOOK */}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px', display: 'flex', flexDirection: 'column' }}>
+              <PlatformHeader
+                color="#1877f2"
+                label="Facebook"
+                handle="Modern Explorer"
+                url="https://facebook.com"
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+                {fbPosts.map(p => (
+                  <div key={p.id} style={{ display: 'flex', gap: 14, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ flexShrink: 0, width: 72, height: 72, borderRadius: 4, overflow: 'hidden' }}>
+                      <img src={p.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, color: 'var(--text)', fontFamily: 'var(--font-alt)', lineHeight: 1.55, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
+                        {p.text}
+                      </p>
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>♥ {p.likes}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>💬 {p.comments}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', marginLeft: 'auto' }}>{p.ago}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* API Note */}
+          <div style={{ marginTop: 20, padding: '14px 20px', background: 'rgba(203,243,110,0.04)', border: '1px dashed rgba(203,243,110,0.15)', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 16, opacity: 0.6 }}>🔌</span>
+            <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', lineHeight: 1.5 }}>
+              <strong style={{ color: 'var(--text-muted)' }}>Live API integration pending.</strong>{' '}
+              This dashboard currently shows mock data. Real-time posts will populate once YouTube Data API, Instagram Graph API, and Facebook Graph API are connected.
+            </p>
           </div>
         </div>
       </section>

@@ -14,7 +14,7 @@ export default function Footer() {
               style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: 20 }}
             />
             <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7, maxWidth: 320 }}>
-              Immersive small-group guided tours in Crestone & Cañon City, Colorado. We explore history,
+              Immersive small-group guided tours rooted in Crestone and the San Luis Valley, Colorado. We explore history,
               mystery, and the unexplained—boots on the ground.
             </p>
             <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
@@ -93,7 +93,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Modern Explorer. All rights reserved.
           </p>
           <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)' }}>
-            Crestone & Cañon City, Colorado
+            Crestone · San Luis Valley, Colorado
           </p>
         </div>
       </div>

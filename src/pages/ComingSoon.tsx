@@ -5,7 +5,7 @@ const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/
 const upcoming = [
   { title: 'Merch Store', desc: 'Field-tested apparel, art prints by Glenn Norberg, and expedition gear. Built for people who take curiosity seriously.', eta: 'Summer 2025', icon: '🧭' },
   { title: 'Field Research App', desc: 'A mobile-first tool for documenting anomalous events, sharing reports with the community, and building a crowdsourced database of unexplained phenomena.', eta: 'Fall 2025', icon: '📡' },
-  { title: 'Cañon City Tour Launch', desc: 'Royal Gorge region mining ruins, ghost towns, and high-strangeness corridors. Full season of guided tours launching in Fremont County.', eta: 'Summer 2025', icon: '🏔️' },
+  { title: 'New Tour Routes', desc: 'Expanding into more of the San Luis Valley — new corridors, new ruins, new sky-watch sites. Details coming as routes are finalized.', eta: 'Summer 2025', icon: '🏔️' },
   { title: 'Modern Explorer Podcast', desc: "Weekly conversations with field researchers, historians, local guides, and the explorers who refuse to accept 'we don't know' as a final answer.", eta: 'TBD', icon: '🎙️' },
   { title: 'Member Community', desc: 'Early access to expedition slots, exclusive field reports, gear discounts, and a private community of serious explorers.', eta: 'Late 2025', icon: '⛺' },
   { title: 'Extended Expeditions', desc: 'Multi-day wilderness trips into the Sangre de Cristo range. Camping, high-altitude field research, and genuine remote exploration.', eta: '2026', icon: '🗺️' },

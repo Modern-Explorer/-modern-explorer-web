@@ -36,7 +36,7 @@ const experiences = [
       },
       {
         title: 'Ruins & Mining Trails',
-        desc: 'Uncover ruins and forgotten mining trails. Ghost towns, collapsed shafts, and the stories of those who came before.',
+        desc: 'Uncover ancient ruins and forgotten sites in the Sangre de Cristo foothills. Layers of history hiding in plain sight.',
         img: IMG('History', '20250602_154009-EDIT.jpg'),
       },
     ],
@@ -86,7 +86,7 @@ export default function Home() {
         <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.82) 0%, rgba(8,12,23,0.55) 60%, rgba(8,12,23,0.4) 100%)' }} />
 
         <div className="container" style={{ paddingTop: 120, paddingBottom: 80 }}>
-          <span className="eyebrow">Colorado · Crestone · Cañon City</span>
+          <span className="eyebrow">Colorado · Crestone · San Luis Valley</span>
           <h1 style={{ fontSize: 'clamp(52px, 9vw, 100px)', maxWidth: 780, marginBottom: 28 }}>
             Step Into<br />The Unknown
           </h1>
