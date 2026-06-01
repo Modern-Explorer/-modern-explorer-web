@@ -85,27 +85,34 @@ export default function Home() {
         }} />
         <div style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(135deg, rgba(8,12,23,0.72) 0%, rgba(8,12,23,0.38) 60%, rgba(8,12,23,0.25) 100%)' }} />
 
-        <div className="container" style={{ paddingTop: 120, paddingBottom: 80 }}>
+        <div className="container" style={{ paddingTop: 100, paddingBottom: 80, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Large centerpiece logo — ~¼ of the hero area at full width */}
           <img
             src="/assets/images/content/Logo/ME Logo Draft 5.png"
             alt="Modern Explorer"
             style={{
-              height: 'clamp(140px, 18vw, 260px)',
-              width: 'auto',
-              objectFit: 'contain',
-              marginBottom: 40,
+              width: 'clamp(300px, 48vw, 700px)',
+              height: 'auto',
               display: 'block',
-              filter: 'drop-shadow(0 4px 32px rgba(203,243,110,0.18))',
+              marginBottom: 24,
+              filter: 'drop-shadow(0 0 60px rgba(203,243,110,0.20)) drop-shadow(0 8px 24px rgba(0,0,0,0.6))',
             }}
           />
-          <span className="eyebrow">Colorado · Crestone · San Luis Valley</span>
-          <h1 style={{ fontSize: 'clamp(52px, 9vw, 100px)', maxWidth: 780, marginBottom: 28 }}>
-            Step Into<br />The Unknown
-          </h1>
-          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 'clamp(17px, 2.5vw, 22px)', color: 'rgba(240,244,255,0.82)', maxWidth: 560, marginBottom: 44, lineHeight: 1.55 }}>
-            Immersive small-group guided tours designed for curious travelers. History, mystery, and wild landscapes—all in one unforgettable experience.
+
+          {/* Tagline — large and clearly readable */}
+          <p style={{
+            fontFamily: 'var(--font-alt)',
+            fontSize: 'clamp(15px, 1.8vw, 22px)',
+            fontWeight: 500,
+            color: 'rgba(240,244,255,0.92)',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            marginBottom: 52,
+          }}>
+            Colorado · Crestone · San Luis Valley
           </p>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 16, padding: '16px 36px' }}>
               Explore Journeys
             </a>
