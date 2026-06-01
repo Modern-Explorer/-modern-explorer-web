@@ -122,10 +122,10 @@ export default function Home() {
           </div>
           <p style={{
             fontFamily: 'var(--font-alt)',
-            fontSize: 'clamp(14px, 1.4vw, 18px)',
+            fontSize: 'clamp(16px, 1.8vw, 22px)',
             color: 'rgba(240,244,255,0.65)',
             letterSpacing: '0.06em',
-            marginTop: 28,
+            marginTop: 52,
           }}>
             Immersive Small-Group Tours Designed For Curious Travelers.
           </p>
