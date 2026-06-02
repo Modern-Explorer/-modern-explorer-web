@@ -27,8 +27,19 @@ export default function Contact() {
     transition: 'border-color 0.15s',
   };
 
+  const sageVars = {
+    '--bg':          '#1c3020',
+    '--bg-section':  '#172919',
+    '--bg-card':     '#274030',
+    '--border':      'rgba(140, 185, 130, 0.18)',
+    '--border-accent': 'rgba(203, 243, 110, 0.4)',
+    '--text-muted':  '#96ba8a',
+    '--accent-dim':  'rgba(140, 185, 130, 0.15)',
+    background:      '#1c3020',
+  } as React.CSSProperties;
+
   return (
-    <main style={{ paddingTop: 72 }}>
+    <main style={{ paddingTop: 72, ...sageVars }}>
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Crestone/20250810_093828-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />

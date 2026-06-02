@@ -122,3 +122,95 @@ h1, h2, h3, h4, h5 {
   .section { padding: 64px 0; }
   .btn { padding: 12px 24px; font-size: 13px; }
 }
+
+/* ── Themed icon animations ─────────────────────────────────────── */
+@keyframes meFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-9px); }
+}
+@keyframes mePulseGlow {
+  0%, 100% { opacity: 0.75; filter: drop-shadow(0 0 6px rgba(203,243,110,0.4)) drop-shadow(0 0 18px rgba(203,243,110,0.12)); }
+  50%       { opacity: 1;    filter: drop-shadow(0 0 16px rgba(203,243,110,0.78)) drop-shadow(0 0 36px rgba(203,243,110,0.28)); }
+}
+@keyframes meSpinCompass {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes meSwingLantern {
+  0%, 100% { transform: rotate(-11deg); }
+  50%       { transform: rotate(11deg); }
+}
+@keyframes meFloatFade {
+  0%, 100% { transform: translateY(0);   opacity: 0.55; }
+  50%       { transform: translateY(-7px); opacity: 0.85; }
+}
+
+/* ── Micro-animations ────────────────────────────────────────────── */
+@keyframes meLiveDot {
+  0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.9), 0 0 0 3px rgba(74,222,128,0.2); }
+  100% { box-shadow: 0 0 0 9px rgba(74,222,128,0), 0 0 0 3px rgba(74,222,128,0.2); }
+}
+@keyframes meButtonBreath {
+  0%, 100% { box-shadow: 0 0 10px rgba(203,243,110,0.18), 0 4px 14px rgba(0,0,0,0.35); }
+  50%       { box-shadow: 0 0 26px rgba(203,243,110,0.42), 0 0 50px rgba(203,243,110,0.10), 0 4px 14px rgba(0,0,0,0.35); }
+}
+@keyframes meOrbDrift {
+  0%   { opacity: 0; transform: translateY(-50%) translateX(0px) scale(0.4); }
+  18%  { opacity: 1; transform: translateY(-50%) translateX(0px) scale(1); }
+  75%  { opacity: 0.85; transform: translateY(calc(-50% - 22px)) translateX(250px) scale(0.82); }
+  100% { opacity: 0; transform: translateY(calc(-50% - 30px)) translateX(310px) scale(0.35); }
+}
+@keyframes meFlicker {
+  0%, 100% { opacity: 1; }
+  4%        { opacity: 0.72; }
+  8%        { opacity: 0.96; }
+  16%       { opacity: 0.52; }
+  18%       { opacity: 1; }
+  50%       { opacity: 0.88; }
+  53%       { opacity: 0.62; }
+  56%       { opacity: 1; }
+}
+@keyframes meLockPulse {
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 3px rgba(245,158,11,0.28)); }
+  50%      { transform: scale(1.12); filter: drop-shadow(0 0 11px rgba(245,158,11,0.68)); }
+}
+@keyframes meNavLine {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+/* Primary button breathing glow */
+.btn-primary { animation: meButtonBreath 3.5s ease-in-out infinite; }
+
+/* Scroll reveal */
+[data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+[data-reveal].visible { opacity: 1; transform: translateY(0); }
+
+/* Animated icon classes */
+.me-orb      { animation: meFloat 4.5s ease-in-out infinite, mePulseGlow 3.2s ease-in-out infinite; }
+.me-compass-active { animation: meSpinCompass 22s linear infinite; }
+.me-footprint { animation: meFloatFade 5.5s ease-in-out infinite; }
+
+/* Nav active underline */
+.nav-active-line {
+  position: absolute; bottom: 1px; left: 14px; right: 14px;
+  height: 2px; background: var(--accent); border-radius: 1px;
+  transform-origin: center;
+  animation: meNavLine 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+/* Coming-soon card hover effects */
+.cs-drift-orb {
+  position: absolute; top: 42%; left: 8%;
+  opacity: 0; pointer-events: none; z-index: 3;
+}
+[data-cs-theme="uap"]:hover .cs-drift-orb { animation: meOrbDrift 5s ease-in-out forwards; }
+
+.cs-flicker-layer {
+  position: absolute; inset: 0;
+  background: rgba(80,40,160,0.07); pointer-events: none; z-index: 3; opacity: 0;
+}
+[data-cs-theme="paranormal"]:hover .cs-flicker-layer { animation: meFlicker 2.8s linear infinite; opacity: 1; }
+
+[data-cs-theme="mining"]:hover .me-lantern { animation: meSwingLantern 4s ease-in-out infinite; }
+[data-cs-theme="expedition"]:hover .me-compass { animation: meSpinCompass 10s linear infinite; }

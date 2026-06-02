@@ -227,22 +227,48 @@ export default function About() {
               <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 20 }}>Crestone &<br />the San Luis Valley</h2>
               <div className="divider" />
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 16 }}>
-                Crestone sits in the heart of the San Luis Valley—one of the most anomaly-rich corridors in North America. Surrounded by the Sangre de Cristo mountains, it draws spiritual seekers, researchers, and the simply curious from around the world.
+                Crestone sits at 7,930 ft in the heart of the San Luis Valley — the largest alpine valley in the world, stretching 122 miles long and 74 miles wide across 8,000 square miles. Surrounded by the Sangre de Cristo mountains, it draws spiritual seekers, researchers, and the simply curious from around the world.
               </p>
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>
                 The Valley has logged more UAP reports per capita than almost anywhere in the U.S. The land holds centuries of Indigenous history. The mountains contain ruins that haven't been fully documented. This is where we work.
               </p>
-              <div style={{ display: 'flex', gap: 24 }}>
+
+              {/* Stats */}
+              <div style={{ display: 'flex', gap: 24, marginBottom: 32 }}>
                 {[
-                  { value: '7,500\'', label: 'Elevation' },
-                  { value: '122mi', label: 'Valley Length' },
-                  { value: '14', label: 'Peaks Above 14k ft' },
+                  { value: "7,930'", label: 'Crestone Elevation' },
+                  { value: '8,000 sq mi', label: 'Valley Area' },
+                  { value: '10', label: 'Sangre de Cristo 14ers' },
                 ].map(stat => (
                   <div key={stat.label}>
                     <p style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--accent)', marginBottom: 2 }}>{stat.value}</p>
                     <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>{stat.label}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Fourteeners grid */}
+              <div>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 10 }}>Sangre de Cristo Fourteeners</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px 16px' }}>
+                  {[
+                    ['Blanca Peak', '14,351 ft'],
+                    ['Ellingwood Point', '14,042 ft'],
+                    ['Little Bear Peak', '14,037 ft'],
+                    ['Mount Lindsey', '14,042 ft'],
+                    ['Crestone Peak', '14,297 ft'],
+                    ['Crestone Needle', '14,197 ft'],
+                    ['Kit Carson Peak', '14,165 ft'],
+                    ['Challenger Point', '14,081 ft'],
+                    ['Humboldt Peak', '14,064 ft'],
+                    ['Culebra Peak', '14,053 ft'],
+                  ].map(([name, elev]) => (
+                    <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '5px 0', borderBottom: '1px solid var(--border)', gap: 6 }}>
+                      <span style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+                      <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, color: 'var(--accent)', letterSpacing: '0.04em', flexShrink: 0 }}>{elev}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>

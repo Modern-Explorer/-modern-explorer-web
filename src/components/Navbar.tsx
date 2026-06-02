@@ -56,9 +56,15 @@ export default function Navbar() {
                 color: isActive ? 'var(--accent)' : 'var(--text-muted)',
                 borderRadius: 3,
                 transition: 'color 0.15s',
+                position: 'relative',
               })}
             >
-              {l.label}
+              {({ isActive }) => (
+                <>
+                  {l.label}
+                  {isActive && <span className="nav-active-line" />}
+                </>
+              )}
             </NavLink>
           ))}
         </div>

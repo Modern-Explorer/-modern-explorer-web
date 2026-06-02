@@ -6,7 +6,7 @@ const products = [
   { id: 3, name: 'Cryptid Research Hoodie', price: '$68', category: 'Apparel', tag: 'Limited', desc: 'fleece-lined, chest & back graphics', img: IMG('Cryptids', 'di86V.jpg'), colors: ['#0b0f1c', '#3a2a1a'] },
   { id: 4, name: 'Explorer Field Journal', price: '$22', category: 'Gear', tag: null, desc: 'A5 dotted pages, water-resistant cover', img: IMG('History', '20231110_154447.jpg'), colors: [] },
   { id: 5, name: 'ME Logo Sticker Pack (5)', price: '$10', category: 'Accessories', tag: null, desc: 'die-cut vinyl, weatherproof', img: IMG('Crestone', '20250810_093123-EDIT.jpg'), colors: [] },
-  { id: 6, name: 'San Luis Valley Print', price: '$45', category: 'Art', tag: 'Signed', desc: '11×17 archival print by Glenn Norberg', img: IMG('Crestone', 'DJI_0289 edit.png'), colors: [] },
+  { id: 6, name: 'San Luis Valley Print', price: '$45', category: 'Art', tag: 'Signed', desc: '11×17 archival print by Glenn Norberg', img: IMG('Crestone', 'DJI_0289 edit.jpg'), colors: [] },
 ];
 
 export default function MerchStore() {

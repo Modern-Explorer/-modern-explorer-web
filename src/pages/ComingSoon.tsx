@@ -69,7 +69,7 @@ export default function ComingSoon() {
 
       {/* HERO */}
       <section style={{ position: 'relative', padding: '100px 0 80px', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', 'DJI_0289 edit.png')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.22)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', 'DJI_0289 edit.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.22)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(203,243,110,0.05) 0%, transparent 65%)' }} />
         <div className="container-narrow" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">Beyond the Tours</span>
