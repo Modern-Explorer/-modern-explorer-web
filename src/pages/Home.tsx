@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useRef, useEffect } from 'react';
-import { OrbIcon, CompassIcon, FootprintIcon, LanternIcon } from '../components/Icons';
+import { OrbIcon, CompassIcon, LanternIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
