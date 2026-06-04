@@ -22,7 +22,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
   name: 'Modern Explorer',
   description: 'Immersive small-group guided tours in Crestone, Colorado exploring UFO hotspots, Spanish treasure legends, paranormal history, and the mysteries of the San Luis Valley and Sangre de Cristo mountains.',
   url: 'https://modernexplorer.me',
-  telephone: '(719) 000-0000',
+  telephone: '(719) 331-4200',
   email: 'admin@modernexplorer.me',
   image: 'https://modernexplorer.me/assets/images/content/Logo/ME Logo Draft 5.png',
   priceRange: '$$',

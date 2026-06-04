@@ -491,8 +491,8 @@ export default function Contact() {
                   {
                     icon: '☎',
                     label: 'Phone',
-                    value: '(719) 000-0000',
-                    href: 'tel:+17190000000',
+                    value: '(719) 331-4200',
+                    href: 'tel:+17193314200',
                   },
                 ].map(item => (
                   <a
