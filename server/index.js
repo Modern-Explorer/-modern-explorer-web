@@ -385,32 +385,37 @@ app.get('/api/reviews', async (_req, res) => {
   }
 
   try {
-    const url = `https://maps.googleapis.com/maps/api/place/details/json` +
-      `?place_id=${encodeURIComponent(PLACE_ID)}` +
-      `&fields=name,rating,user_ratings_total,reviews` +
-      `&reviews_sort=newest` +
-      `&key=${API_KEY}`;
-
-    const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    // Places API (New) — place details with reviews
+    const resp = await fetch(
+      `https://places.googleapis.com/v1/places/${encodeURIComponent(PLACE_ID)}`,
+      {
+        headers: {
+          'X-Goog-Api-Key':   API_KEY,
+          'X-Goog-FieldMask': 'id,displayName,rating,userRatingCount,reviews',
+        },
+        signal: AbortSignal.timeout(8000),
+      }
+    );
     const json = await resp.json();
 
-    if (json.status !== 'OK') {
-      console.warn('Places API error:', json.status, json.error_message || '');
-      return res.json({ reviews: [], rating: 0, total: 0, configured: true, error: json.status });
+    if (json.error) {
+      console.warn('Places API (New) error:', json.error.status, json.error.message?.slice(0, 120));
+      return res.json({ reviews: [], rating: 0, total: 0, configured: true, error: json.error.status });
     }
 
+    // Map Places API (New) response shape to our interface
     const data = {
       configured: true,
-      rating:  json.result.rating              || 0,
-      total:   json.result.user_ratings_total  || 0,
-      reviews: (json.result.reviews || []).map(r => ({
-        author:  r.author_name,
-        url:     r.author_url,
-        photo:   r.profile_photo_url,
-        rating:  r.rating,
-        ago:     r.relative_time_description,
-        time:    r.time,
-        text:    r.text,
+      rating:  json.rating         || 0,
+      total:   json.userRatingCount || 0,
+      reviews: (json.reviews || []).map(r => ({
+        author: r.authorAttribution?.displayName  || 'Anonymous',
+        url:    r.authorAttribution?.uri           || '',
+        photo:  r.authorAttribution?.photoUri      || '',
+        rating: r.rating                           || 5,
+        ago:    r.relativePublishTimeDescription   || '',
+        time:   r.publishTime ? Math.floor(new Date(r.publishTime).getTime() / 1000) : 0,
+        text:   r.text?.text || r.originalText?.text || '',
       })),
     };
 
