@@ -103,7 +103,7 @@ const posts = [
     id: 12, tag: 'Expedition News',
     title: "La Caverna del Oro: The Cave of Gold at 13,000 Feet",
     date: 'Feb 2026', author: 'Modern Explorer', readTime: '8 min',
-    img: IMG('History', 'Spanish Map.jpg'),
+    img: IMG('History', '20250602_154545-EDIT.jpg'),
     excerpt: "At 13,266 feet, Marble Mountain holds the highest-elevation significant cave in the United States. In 1541 Spanish monks used Native American slave labor to extract gold from within it. Around 1900 explorer Elisha Horn found a skeleton in Spanish armor at the entrance. In 1932 a second skeleton was found chained by the neck to an interior wall. The cave has never been fully surveyed. The gold has never been found.",
   },
   {
