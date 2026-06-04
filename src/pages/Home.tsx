@@ -107,7 +107,7 @@ export default function Home() {
   return (
     <main>
       {/* HERO */}
-      <section ref={heroRef} style={{
+      <section id="mesa-hero" ref={heroRef} style={{
         position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden',
       }}>
         {/* Background — parallax layer (moves with cursor) */}
@@ -209,7 +209,7 @@ export default function Home() {
       </section>
 
       {/* TOURS */}
-      <section className="section">
+      <section id="mesa-tours" className="section">
         <div className="container">
 
           <div data-reveal style={{ textAlign: 'center', marginBottom: 64 }}>
@@ -350,7 +350,7 @@ export default function Home() {
       </section>
 
       {/* FIELD REPORTS PREVIEW */}
-      <section className="section" style={{ background: 'var(--bg-section)' }}>
+      <section id="mesa-reports" className="section" style={{ background: 'var(--bg-section)' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
             <div data-reveal>
@@ -372,6 +372,70 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ANOMALY MAP TEASER */}
+      <section style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '72px 0' }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <span className="eyebrow">Field Intelligence</span>
+              <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 42px)', lineHeight: 1.1, marginBottom: 8 }}>
+                1,000+ Events.<br />One Valley.
+              </h2>
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, maxWidth: 440, lineHeight: 1.65 }}>
+                Christopher O'Brien spent 30 years mapping the paranormal hotspots of the San Luis Valley. This is his life's work.
+              </p>
+            </div>
+            <Link to="/field-reports" className="btn btn-outline" style={{ fontSize: 13, whiteSpace: 'nowrap', flexShrink: 0 }}>
+              Explore the Full Anomaly Map →
+            </Link>
+          </div>
+
+          {/* Teaser map */}
+          <div style={{
+            position: 'relative',
+            border: '1px solid rgba(203,243,110,.22)',
+            borderRadius: 6,
+            overflow: 'hidden',
+            boxShadow: '0 0 32px rgba(203,243,110,.06)',
+          }}>
+            {/* Top bar */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+              background: 'linear-gradient(to bottom, rgba(2,8,4,.9), transparent)',
+              padding: '10px 14px 24px',
+              display: 'flex', alignItems: 'center', gap: 8,
+              pointerEvents: 'none',
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 5px #4ade80', display: 'inline-block' }} />
+              <span style={{ fontFamily: "'Courier New', monospace", fontSize: 9, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(203,243,110,.65)', textTransform: 'uppercase' }}>
+                SLV ANOMALY MAP — C. O'BRIEN (1952–2024)
+              </span>
+            </div>
+            <iframe
+              src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1"
+              title="SLV Anomaly Map"
+              style={{ display: 'block', width: '100%', height: 320, border: 'none' }}
+              loading="lazy"
+            />
+            {/* Fade + CTA overlay at bottom */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
+              background: 'linear-gradient(to top, rgba(11,15,28,.92) 30%, transparent)',
+              padding: '40px 24px 20px',
+              display: 'flex', justifyContent: 'center',
+              pointerEvents: 'none',
+            }}>
+              <Link to="/field-reports"
+                className="btn btn-outline"
+                style={{ fontSize: 12, pointerEvents: 'auto', backdropFilter: 'blur(4px)' }}
+              >
+                Explore the Full Anomaly Map →
+              </Link>
+            </div>
           </div>
         </div>
       </section>

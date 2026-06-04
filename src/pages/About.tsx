@@ -47,7 +47,7 @@ export default function About() {
       </section>
 
       {/* FOUNDER */}
-      <section className="section">
+      <section id="mesa-about" className="section">
         <div className="container">
           <div className="grid-2" style={{ alignItems: 'center', gap: 64 }}>
             <div style={{ position: 'relative' }}>

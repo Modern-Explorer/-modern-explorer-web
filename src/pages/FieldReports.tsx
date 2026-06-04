@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useYouTubeVideos } from '../hooks/useYouTubeVideos';
+import AnomalyFeed from '../components/AnomalyFeed';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -7,75 +9,93 @@ const categories = ['All', 'Field Report', 'Skills & Gear', 'Community', 'Expedi
 const posts = [
   {
     id: 1, tag: 'Field Report',
-    title: 'Strange Lights Over the Baca: A Night in the San Luis Valley',
-    date: 'May 2025', author: 'Mateo Argüello', readTime: '6 min',
-    img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'),
-    excerpt: "We set up camp just south of the Baca Wildlife Refuge at 8pm. By midnight, we had logged four separate light events that matched none of the typical aircraft signatures we track. Here's what we documented.",
+    title: "Lady (Snippy): The World's First Documented Animal Mutilation — San Luis Valley, 1967",
+    date: 'May 2025', author: 'Modern Explorer', readTime: '7 min',
+    img: IMG('Animals', 'snippy-1967-dan-anderson.jpg'),
+    excerpt: "On September 9, 1967, a three-year-old Appaloosa mare was found on the King Ranch at the base of the Blanca Massif — head and neck stripped to bone with surgical precision, heart and brain absent, not a drop of blood on the ground. Tracks ended 100 feet from the carcass. A Superior Court judge and his wife reported three reddish-orange rings moving in triangular formation the same evening. No official explanation has ever been issued.",
   },
   {
-    id: 2, tag: 'Skills & Gear',
-    title: "What's In Our Pack: The Definitive Field Research Kit",
-    date: 'Apr 2025', author: 'Glenn Norberg', readTime: '8 min',
-    img: IMG('Mateo', '20250421_075338-EDIT.jpg'),
-    excerpt: "After years of field work, we've settled on a core kit that balances documentation capability, survival readiness, and packability. Here's everything we bring—and why.",
+    id: 2, tag: 'Field Report',
+    title: "Over 1,000 Events Logged: The San Luis Valley's Documented Paranormal Record",
+    date: 'Apr 2025', author: 'Modern Explorer', readTime: '8 min',
+    img: IMG('UFOs', 'ufo-watchtower-hooper.jpg'),
+    excerpt: "Author Christopher O'Brien has cataloged more than 1,000 paranormal events in the San Luis Valley since 1992. The UFO Watchtower in Hooper alone has logged over 304 documented sightings. Two sheriff's deputies were followed by an orange sphere. A college student's rear tires blew out as he approached an unidentified object sitting in a field. The CIA has formally documented reports from this region.",
   },
   {
-    id: 3, tag: 'Expedition News',
-    title: 'New Route: Crestone Ruins & High-Country Anomaly Corridor',
-    date: 'Apr 2025', author: 'Mateo Argüello', readTime: '4 min',
-    img: IMG('Crestone', '20250810_093514-EDIT.jpg'),
-    excerpt: "We're launching a new route through the high country above Crestone. The trail passes three documented ruin sites and a ridge that has generated consistent unexplained reports since the early 2000s.",
+    id: 3, tag: 'Field Report',
+    title: "Two Skeptics Near Ute Mountain: The Encounter That Changed Everything (2019)",
+    date: 'Mar 2025', author: 'Modern Explorer', readTime: '6 min',
+    img: IMG('Nature', '20250518_185929-EDIT.jpg'),
+    excerpt: "They went in as skeptics. In 2019, two hunters operating near Ute Mountain just south of the Colorado border encountered two extremely tall hooded figures with oversized heads. Before leaving the area, they came across a 50-to-60-foot structure resembling a circus tent with no reason to exist in that location. 'We're a couple of guys that don't believe in much,' said witness Josh Brinkley. 'But we believe now.'",
   },
   {
-    id: 4, tag: 'Community',
-    title: "Interview: A Crestone Mystic on the Valley's Energy Vortexes",
-    date: 'Mar 2025', author: 'Mateo Argüello', readTime: '10 min',
-    img: IMG('Crestone', '20250810_092926-EDIT.jpg'),
-    excerpt: "We sat down with a long-time Crestone resident who has spent 20 years cataloging the area's anomalous phenomena. Their perspective challenged some of our own assumptions.",
+    id: 4, tag: 'Field Report',
+    title: "Contact on US-160: The Documented Telepathic Encounters of Robert Whitting",
+    date: 'Mar 2025', author: 'Modern Explorer', readTime: '5 min',
+    img: IMG('Nature', '20250531_201055-EDIT.jpg'),
+    excerpt: "Alamosa Episcopal minister Robert Whitting was driving US-160 at night when a craft appeared alongside his vehicle and a voice warned him of a dead animal in the road ahead. He found it exactly where described. Whitting went on to report multiple subsequent encounters and began publishing a bi-monthly record of anomalous activity across the San Luis Valley.",
   },
   {
     id: 5, tag: 'Field Report',
-    title: 'Footprint Cast Analysis: Sangre de Cristo High Country',
-    date: 'Mar 2025', author: 'Glenn Norberg', readTime: '7 min',
-    img: IMG('Cryptids', 'TqSDS.jpg'),
-    excerpt: "During our March high-altitude sweep, we recovered three track impressions at 11,400 feet. The stride pattern and depth are inconsistent with known wildlife in the region. We sent casts to two independent analysts.",
+    title: "Sasquatch on Blanca Peak: The August 2000 ATV Encounter",
+    date: 'Feb 2025', author: 'Modern Explorer', readTime: '5 min',
+    img: IMG('Cryptids', 'Sasquatch.jpg'),
+    excerpt: "In August 2000, two ATV operators on the Blanca Peaks filed a formal report with the Bigfoot Research Organization describing a close encounter with a large bipedal creature. The Blanca Massif has generated consistent large-creature reports spanning decades — a pattern that remains unaccounted for by wildlife biologists familiar with the region.",
   },
   {
-    id: 6, tag: 'Skills & Gear',
-    title: 'Night Sky Observation: A Protocol for UAP Documentation',
-    date: 'Feb 2025', author: 'Glenn Norberg', readTime: '9 min',
-    img: IMG('UFOs', 'KaTU7.jpg'),
-    excerpt: "Consistent documentation starts with consistent protocol. We've refined our sky watch procedure over 40+ sessions. This is the framework we use—and what we teach on every expedition.",
+    id: 6, tag: 'Community',
+    title: "Why the World Comes to Crestone: North America's Most Concentrated Spiritual Hub",
+    date: 'Jan 2025', author: 'Modern Explorer', readTime: '6 min',
+    img: IMG('Crestone', 'DJI_0286 edit.jpg'),
+    excerpt: "Crestone is home to more than 20 active spiritual centers representing Buddhist, Hindu, Carmelite, Sufi, and other traditions — all within a few square miles at the foot of the Sangre de Cristo Mountains. The annual Energy Fair draws seekers from across the country. We looked into why this particular valley keeps drawing people searching for something they can't quite name.",
+  },
+
+  // ── Community ──────────────────────────────────────────────────────────────────
+
+  {
+    id: 7, tag: 'Community', pinnedEvent: true,
+    title: "Crestone Energy Fair 2026 — September 11–13",
+    date: 'Jun 2026', author: 'Modern Explorer', readTime: '4 min',
+    img: IMG('Crestone', '20250810_095413-EDIT.jpg'),
+    excerpt: "Now in its nearly fourth decade, the Crestone Energy Fair returns September 11–13, 2026 in Saguache County — where minimal building codes have enabled decades of hands-on experimentation in sustainable living, producing one of the highest concentrations of natural and regenerative homes in the country. Features home tours, workshops, and speakers on sustainable building, renewable energy, water systems, and food sovereignty. Free and open to all.",
   },
   {
-    id: 7, tag: 'Field Report',
-    title: 'Animal Behavior Anomalies Near Crestone: What the Wildlife Is Telling Us',
-    date: 'Feb 2025', author: 'Mateo Argüello', readTime: '5 min',
-    img: IMG('Animals', 'pexels-brett-sayles-1467808.jpg'),
-    excerpt: "One of the most consistent early indicators of something unusual in the field is animal behavior. Elk, deer, and birds often react before any human does. Here's what we've documented over three seasons.",
-  },
-  {
-    id: 8, tag: 'Expedition News',
-    title: 'Crestone Fall Season: What to Expect on Tour This Year',
-    date: 'Jan 2025', author: 'Mateo Argüello', readTime: '4 min',
-    img: IMG('Crestone', '20250810_091639-EDIT.jpg'),
-    excerpt: "Fall is our favorite season in the San Luis Valley. The light is extraordinary, the crowds thin out, and the phenomena reports tend to spike. Here's what we're planning for the fall 2025 schedule.",
+    id: 8, tag: 'Community',
+    title: "Crestone Vortex Festival — August 8–9, 2026",
+    date: 'Aug 2026', author: 'Modern Explorer', readTime: '4 min',
+    img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'),
+    excerpt: "Presented by Dark Sky Astrology — founded by astrologers, for astrologers, focused on harmonizing astrology and astronomy with archetypal wisdom and myth. The Crestone Vortex Festival runs August 8–9, 2026 at 187 W Silver Ave, Crestone, CO. Features vendors, main stage speakers, community yoga, classes, food trucks, and a Kid's Zone — plus the first annual Dark Sky Astrology Retreat held in conjunction with the festival. Crestone is set to be named one of the few international Dark Sky communities in the world. 'We welcome everyone to come experience the magical Vortex for yourself.' Website: darkskyvortex.com · darkskyvortex@gmail.com",
   },
   {
     id: 9, tag: 'Community',
-    title: 'Oral History Project: Documenting the Voices of Old Colorado',
-    date: 'Dec 2024', author: 'Glenn Norberg', readTime: '8 min',
-    img: IMG('History', '20221122_163904.jpg'),
-    excerpt: "We've started recording long-form conversations with locals who hold knowledge that isn't written anywhere. Stories of unexplained cattle incidents and traditions that predate written records.",
+    title: "The Vortex of Crestone: What It Is, Why It Draws the World, and What Visitors Experience",
+    date: 'May 2026', author: 'Modern Explorer', readTime: '6 min',
+    img: IMG('Crestone', '20250810_091639-EDIT.jpg'),
+    excerpt: "More than 20 active spiritual centers — Buddhist monasteries, Hindu ashrams, a Carmelite hermitage, Sufi circles, and Native ceremonial sites — within a few square miles at the base of the Sangres. Multiple esoteric traditions locate converging ley lines beneath this valley. Visitors from six continents describe the same thing: something shifts when they arrive. The Vortex of Crestone is not one phenomenon. It is the cumulative weight of centuries of intentional human seeking, concentrated in one place.",
+  },
+
+  // ── Skills & Gear ─────────────────────────────────────────────────────────────
+
+  {
+    id: 10, tag: 'Skills & Gear',
+    title: "Wilderness Survival in the Sangre de Cristos: A Field Guide",
+    date: 'Apr 2026', author: 'Modern Explorer', readTime: '8 min',
+    img: IMG('Nature', 'sangre-de-cristo-topo.jpg'),
+    excerpt: "At 14,000 feet, a clear morning becomes a dangerous lightning storm in under an hour. The Sangres are unforgiving: loose scree, false ridges, unmarked drainages, weather that kills without announcement. This field guide covers what actually matters — reading terrain and high-altitude weather, finding shelter and water, navigating without cell service, recognizing altitude sickness before it becomes an emergency, and understanding why conditions above treeline are categorically different from anything below.",
+  },
+
+  // ── Expedition News ───────────────────────────────────────────────────────────
+
+  {
+    id: 11, tag: 'Expedition News',
+    title: "Dead Man's Cave: The Spanish Treasure Expedition",
+    date: 'Mar 2026', author: 'Modern Explorer', readTime: '9 min',
+    img: IMG('History', 'Spanish Map.jpg'),
+    excerpt: "October 1880. Three Silver Cliff prospectors crawl through a four-foot opening during a blizzard. Inside: five skeletons — and a second chamber with 400 gold bars stamped with Spanish colonial mint marks. They carry out five bars, assayed at $900 each, and become local celebrities. Then they go back and can't find the cave. Two years of LiDAR research, historical mapping, and rastra location data have pointed us to a specific slope in the Sangres. That slope has no LiDAR coverage. We're going anyway.",
   },
 ];
 
 // ─── Mock social data ──────────────────────────────────────────────────────────
-const ytVideos = [
-  { id: 1, title: 'Night Watch: San Luis Valley Sky Anomalies', views: '4.2K', duration: '18:34', ago: '3 days ago', thumb: IMG('UFOs', 'KaTU7.jpg') },
-  { id: 2, title: 'Field Guide: How We Cast Cryptid Tracks', views: '2.8K', duration: '11:52', ago: '2 weeks ago', thumb: IMG('Cryptids', 'TqSDS.jpg') },
-  { id: 3, title: 'Crestone Tour Walkthrough — Full Route', views: '6.1K', duration: '24:07', ago: '1 month ago', thumb: IMG('Crestone', '20250810_095413-EDIT.jpg') },
-];
 
 const igPosts = [
   { id: 1, img: IMG('Crestone', '20250810_090739-EDIT.jpg'), likes: 312, caption: 'Golden hour above Crestone. The valley floor from up here is something else. 🌄 #SanLuisValley' },
@@ -111,7 +131,7 @@ function PlatformHeader({ color, label, handle, url }: { color: string; label: s
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 32, height: 32, borderRadius: 6, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
-          {label === 'YouTube' ? '▶' : label === 'Instagram' ? '◈' : '𝑓'}
+          {label === 'YouTube' ? '▶' : label === 'Instagram' ? '◈' : label === 'X / Twitter' ? '𝕏' : '𝑓'}
         </div>
         <div>
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', lineHeight: 1 }}>{label}</p>
@@ -129,10 +149,10 @@ function PlatformHeader({ color, label, handle, url }: { color: string; label: s
   );
 }
 
-function MockBadge() {
+function MockBadge({ label = 'Mock Data' }: { label?: string }) {
   return (
     <span style={{ display: 'inline-block', padding: '2px 8px', background: 'rgba(203,243,110,0.08)', border: '1px solid rgba(203,243,110,0.2)', borderRadius: 2, fontSize: 10, fontFamily: 'var(--font-alt)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', opacity: 0.7 }}>
-      Mock Data
+      {label}
     </span>
   );
 }
@@ -141,7 +161,10 @@ function MockBadge() {
 
 export default function FieldReports() {
   const [active, setActive] = useState('All');
-  const filtered = active === 'All' ? posts : posts.filter(p => p.tag === active);
+  const showEventBanner = active === 'All' || active === 'Community';
+  const baseFiltered = active === 'All' ? posts : posts.filter(p => p.tag === active);
+  const filtered = showEventBanner ? baseFiltered.filter(p => !p.pinnedEvent) : baseFiltered;
+  const { videos: ytVideos, loading: ytLoading, error: ytError } = useYouTubeVideos('ModernExplorer');
 
   return (
     <main style={{ paddingTop: 72 }}>
@@ -177,25 +200,105 @@ export default function FieldReports() {
         </div>
       </section>
 
-      {/* FEATURED POST */}
+      {/* ── FEATURED EVENT BANNER ─────────────────────────────────────────────── */}
+      {showEventBanner && (
+        <section style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-section)' }}>
+          <div className="container" style={{ padding: '40px 24px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '340px 1fr',
+              borderRadius: 8,
+              overflow: 'hidden',
+              border: '1px solid rgba(203,243,110,0.3)',
+              boxShadow: '0 0 48px rgba(203,243,110,0.07)',
+              background: 'var(--bg-card)',
+            }}>
+              {/* Image */}
+              <div style={{ position: 'relative', minHeight: 260 }}>
+                <img
+                  src={IMG('Crestone', '20250810_095413-EDIT.jpg')}
+                  alt="Crestone Energy Fair 2026"
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.15), rgba(12,16,28,0.7) 100%)' }} />
+                {/* Date badge over image */}
+                <div style={{
+                  position: 'absolute', bottom: 20, left: 20,
+                  background: 'var(--accent)', color: 'var(--bg)',
+                  borderRadius: 4, padding: '8px 16px',
+                  fontFamily: 'var(--font-heading)', fontSize: 13, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
+                  lineHeight: 1.3,
+                }}>
+                  SEP 11–13<br />
+                  <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>2026 · FREE EVENT</span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '32px 36px' }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
+                  <span style={{
+                    padding: '4px 12px',
+                    background: 'var(--accent)', color: '#0b0f1c',
+                    borderRadius: 3,
+                    fontSize: 10, fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase',
+                  }}>
+                    Featured Event
+                  </span>
+                  <span className="tag">Community</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>4 min read</span>
+                </div>
+
+                <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 30px)', marginBottom: 16, lineHeight: 1.15 }}>
+                  Crestone Energy Fair 2026
+                </h2>
+
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.75, marginBottom: 10 }}>
+                  Now in its nearly fourth decade, the Crestone Energy Fair is one of the longest-running free sustainability events in the country. Saguache County's minimal building codes have allowed decades of hands-on experimentation in sustainable living — giving rise to one of the highest concentrations of natural and regenerative homes in Colorado.
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.75, marginBottom: 24 }}>
+                  The fair features home tours, workshops, and speakers covering sustainable building, renewable energy, water systems, and food sovereignty. Hands-on learning throughout. Free and open to all.
+                </p>
+
+                <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <a
+                    href="https://crestoneenergyfair.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                    style={{ fontSize: 13 }}
+                  >
+                    Visit crestoneenergyfair.org →
+                  </a>
+                  <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>
+                    By Modern Explorer · Jun 2026
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FEATURED POST (All view only) */}
       {active === 'All' && (
         <section style={{ borderBottom: '1px solid var(--border)' }}>
           <div className="container" style={{ padding: '48px 24px' }}>
             <div className="grid-2" style={{ gap: 48, alignItems: 'center' }}>
               <div style={{ position: 'relative', paddingTop: '60%', borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)' }}>
-                <img src={IMG('Crestone', '20250810_093828-EDIT.jpg')} alt="Featured" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={IMG('Animals', 'snippy-1967-dan-anderson.jpg')} alt="Featured" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="tag">Featured</span>
                 <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', margin: '16px 0 16px', lineHeight: 1.15 }}>
-                  The Crestone Phenomenon: Six Months of Field Documentation
+                  Lady (Snippy): The World's First Documented Animal Mutilation
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-alt)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>
-                  A comprehensive look at what we've observed, recorded, and measured across six months of consistent field work in the San Luis Valley. This is our most complete public report to date.
+                  September 9, 1967. King Ranch, Alamosa County. A three-year-old Appaloosa mare is found with her head and neck stripped to bone — surgical precision, zero blood, tracks ending 100 feet out. The case became the first formally documented large-animal mutilation in history, and it happened right here in the San Luis Valley. It remains officially unexplained.
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
-                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>By Mateo Argüello · Jun 2025</span>
-                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>12 min read</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>By Modern Explorer · May 2025</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>7 min read</span>
                 </div>
                 <button className="btn btn-outline" style={{ fontSize: 13 }}>Read Full Report →</button>
               </div>
@@ -205,7 +308,7 @@ export default function FieldReports() {
       )}
 
       {/* POSTS GRID */}
-      <section className="section">
+      <section id="mesa-sasquatch" className="section">
         <div className="container">
           <div className="grid-3">
             {filtered.map(post => (
@@ -236,6 +339,99 @@ export default function FieldReports() {
         </div>
       </section>
 
+      {/* ── SLV ANOMALY MAP + LIVE FEED ──────────────────────────────────────── */}
+      <section id="mesa-map" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '72px 0' }}>
+        <div className="container">
+
+          {/* Section header */}
+          <div style={{ marginBottom: 32 }}>
+            <span className="eyebrow">Field Intelligence</span>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <h2 style={{ fontSize: 'clamp(22px, 3vw, 38px)', marginBottom: 6, lineHeight: 1.1, letterSpacing: '0.02em' }}>
+                  SLV Anomaly Field Map
+                </h2>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Compiled by Christopher O'Brien (1952–2024)
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', maxWidth: 540, lineHeight: 1.6 }}>
+                  Over 1,000 documented paranormal events in the greater San Luis Valley region, alongside a live feed of current reports from NUFORC, BFRO, and field archives.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Two-column: map left, feed right */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20, alignItems: 'stretch' }}>
+
+            {/* Map */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{
+                position: 'relative', flex: 1,
+                border: '1px solid rgba(203,243,110,0.28)',
+                borderRadius: 6, overflow: 'hidden',
+                boxShadow: '0 0 48px rgba(203,243,110,0.07)',
+                minHeight: 520,
+              }}>
+                {/* Top bar */}
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+                  background: 'linear-gradient(to bottom, rgba(2,8,4,.92), transparent)',
+                  padding: '12px 16px 28px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  pointerEvents: 'none',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80', display: 'inline-block', flexShrink: 0 }} />
+                    <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(203,243,110,.75)', textTransform: 'uppercase' }}>
+                      O'BRIEN HOTSPOT MAP — HISTORICAL
+                    </span>
+                  </div>
+                  <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, color: 'rgba(203,243,110,.4)', letterSpacing: '.08em' }}>
+                    37°39′N · 105°52′W
+                  </span>
+                </div>
+                <iframe
+                  src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1"
+                  title="SLV Anomaly Field Map — Christopher O'Brien"
+                  style={{ display: 'block', width: '100%', height: '100%', minHeight: 520, border: 'none' }}
+                  allowFullScreen
+                  loading="lazy"
+                />
+                <div style={{
+                  position: 'absolute', bottom: 12, left: 12, zIndex: 10,
+                  background: 'rgba(2,10,3,.88)', backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(203,243,110,.2)', borderRadius: 3,
+                  padding: '5px 11px',
+                  fontFamily: "'Courier New',monospace", fontSize: 9,
+                  color: 'rgba(203,243,110,.6)', letterSpacing: '.08em',
+                  pointerEvents: 'none',
+                }}>
+                  SLV · SAGUACHE COUNTY · SANGRE DE CRISTOS
+                </div>
+              </div>
+
+              {/* Credit */}
+              <div style={{
+                padding: '14px 18px',
+                background: 'rgba(203,243,110,.02)',
+                border: '1px solid rgba(203,243,110,.1)',
+                borderLeft: '3px solid rgba(203,243,110,.35)',
+                borderRadius: 4,
+              }}>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, margin: 0 }}>
+                  This map represents decades of field research by author and investigator Christopher O'Brien, one of the most dedicated researchers of San Luis Valley phenomena. His work continues to guide researchers and explorers in this region. Live feed reports appear in the panel to the right.
+                </p>
+              </div>
+            </div>
+
+            {/* Live feed */}
+            <AnomalyFeed />
+
+          </div>
+        </div>
+      </section>
+
       {/* ── SOCIAL MEDIA DASHBOARD ────────────────────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
@@ -245,7 +441,7 @@ export default function FieldReports() {
               <span className="eyebrow">Follow the Expedition</span>
               <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)' }}>Social Activity</h2>
             </div>
-            <MockBadge />
+            <MockBadge label="IG & FB Mock" />
           </div>
 
           {/* YOUTUBE */}
@@ -256,30 +452,37 @@ export default function FieldReports() {
               handle="@ModernExplorer"
               url="https://www.youtube.com/@ModernExplorer"
             />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-              {ytVideos.map(v => (
-                <div key={v.id} style={{ cursor: 'pointer' }}
-                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-                >
-                  <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 4, overflow: 'hidden', marginBottom: 10, background: 'var(--bg)' }}>
-                    <img src={v.thumb} alt={v.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                    {/* Play button overlay */}
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' }}>
-                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', paddingLeft: 3 }}>
-                        ▶
+            {ytLoading && (
+              <p style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', padding: '12px 0' }}>Loading videos…</p>
+            )}
+            {ytError && (
+              <p style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', padding: '12px 0' }}>Could not load videos: {ytError}</p>
+            )}
+            {!ytLoading && !ytError && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                {ytVideos.map(v => (
+                  <a key={v.id} href={v.url} target="_blank" rel="noopener noreferrer"
+                    style={{ textDecoration: 'none', color: 'inherit', transition: 'opacity 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                  >
+                    <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 4, overflow: 'hidden', marginBottom: 10, background: 'var(--bg)' }}>
+                      <img src={v.thumbnail} alt={v.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' }}>
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', paddingLeft: 3 }}>
+                          ▶
+                        </div>
+                      </div>
+                      <div style={{ position: 'absolute', bottom: 6, right: 8, background: 'rgba(0,0,0,0.82)', borderRadius: 2, padding: '2px 6px', fontSize: 11, fontFamily: 'var(--font-alt)', fontWeight: 600, color: '#fff' }}>
+                        {v.duration}
                       </div>
                     </div>
-                    {/* Duration badge */}
-                    <div style={{ position: 'absolute', bottom: 6, right: 8, background: 'rgba(0,0,0,0.82)', borderRadius: 2, padding: '2px 6px', fontSize: 11, fontFamily: 'var(--font-alt)', fontWeight: 600, color: '#fff' }}>
-                      {v.duration}
-                    </div>
-                  </div>
-                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, fontWeight: 600, lineHeight: 1.35, color: 'var(--text)', marginBottom: 4 }}>{v.title}</p>
-                  <p style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{v.views} views · {v.ago}</p>
-                </div>
-              ))}
-            </div>
+                    <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, fontWeight: 600, lineHeight: 1.35, color: 'var(--text)', marginBottom: 4 }}>{v.title}</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{v.viewCount} views · {v.ago}</p>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* INSTAGRAM + FACEBOOK side by side */}
@@ -342,12 +545,66 @@ export default function FieldReports() {
             </div>
           </div>
 
+          {/* X / TWITTER */}
+          <div style={{ marginTop: 24, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px' }}>
+            <PlatformHeader
+              color="#000"
+              label="X / Twitter"
+              handle="@ModernExplorer5"
+              url="https://x.com/ModernExplorer5"
+            />
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: 20, padding: '48px 24px',
+              background: 'var(--bg)', borderRadius: 6, border: '1px solid var(--border)',
+              textAlign: 'center',
+            }}>
+              {/* X logo */}
+              <div style={{
+                width: 56, height: 56, borderRadius: '50%',
+                background: '#000', border: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 26, color: '#fff', fontWeight: 700, fontFamily: 'serif',
+                flexShrink: 0,
+              }}>
+                𝕏
+              </div>
+
+              <div>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 700, letterSpacing: '0.04em', color: 'var(--text)', marginBottom: 4 }}>
+                  Modern Explorer
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-dim)', marginBottom: 0 }}>
+                  @ModernExplorer5
+                </p>
+              </div>
+
+              <p style={{
+                fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)',
+                lineHeight: 1.65, maxWidth: 380,
+              }}>
+                Follow us for field updates, sighting reports, and expedition news.
+              </p>
+
+              <a
+                href="https://x.com/ModernExplorer5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline"
+                style={{ fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 8 }}
+              >
+                <span style={{ fontFamily: 'serif', fontWeight: 700, fontSize: 15, lineHeight: 1 }}>𝕏</span>
+                Follow on X
+              </a>
+            </div>
+          </div>
+
           {/* API Note */}
           <div style={{ marginTop: 20, padding: '14px 20px', background: 'rgba(203,243,110,0.04)', border: '1px dashed rgba(203,243,110,0.15)', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 16, opacity: 0.6 }}>🔌</span>
             <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', lineHeight: 1.5 }}>
-              <strong style={{ color: 'var(--text-muted)' }}>Live API integration pending.</strong>{' '}
-              This dashboard currently shows mock data. Real-time posts will populate once YouTube Data API, Instagram Graph API, and Facebook Graph API are connected.
+              <strong style={{ color: 'var(--text-muted)' }}>Instagram & Facebook integration pending.</strong>{' '}
+              Those feeds currently show mock data. Real-time posts will populate once Instagram Graph API and Facebook Graph API are connected.
             </p>
           </div>
         </div>

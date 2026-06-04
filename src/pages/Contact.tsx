@@ -1,162 +1,587 @@
 import { useState } from 'react';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
+
+// ─── Compass widget ────────────────────────────────────────────────────────────
+
+function CompassWidget() {
+  const ticks = [0, 45, 90, 135, 180, 225, 270, 315];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0 24px' }}>
+      <svg viewBox="0 0 120 120" width="108" height="108" style={{ overflow: 'visible' }}>
+        {/* Outer pulsing rings */}
+        <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(203,243,110,0.07)" strokeWidth="1" className="me-pulse-ring" />
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(203,243,110,0.15)" strokeWidth="0.75" strokeDasharray="2.5 3.5" />
+        <circle cx="60" cy="60" r="43" fill="none" stroke="rgba(203,243,110,0.08)" strokeWidth="0.5" />
+        {/* Tick marks */}
+        {ticks.map(deg => {
+          const major = deg % 90 === 0;
+          const r1 = major ? 39 : 41;
+          const angle = (deg * Math.PI) / 180;
+          return (
+            <line key={deg}
+              x1={60 + r1 * Math.sin(angle)}    y1={60 - r1 * Math.cos(angle)}
+              x2={60 + 43 * Math.sin(angle)}    y2={60 - 43 * Math.cos(angle)}
+              stroke={`rgba(203,243,110,${major ? 0.55 : 0.2})`}
+              strokeWidth={major ? 1.5 : 0.75}
+            />
+          );
+        })}
+        {/* Cardinal labels */}
+        <text x="60" y="7"   textAnchor="middle" fill="rgba(203,243,110,0.95)" fontSize="9" fontFamily="'Courier New',monospace" fontWeight="bold">N</text>
+        <text x="60" y="118" textAnchor="middle" fill="rgba(203,243,110,0.3)"  fontSize="7" fontFamily="'Courier New',monospace">S</text>
+        <text x="117" y="64" textAnchor="middle" fill="rgba(203,243,110,0.3)"  fontSize="7" fontFamily="'Courier New',monospace">E</text>
+        <text x="3"   y="64" textAnchor="middle" fill="rgba(203,243,110,0.3)"  fontSize="7" fontFamily="'Courier New',monospace">W</text>
+        {/* Crosshair lines */}
+        <line x1="60" y1="16" x2="60" y2="36" stroke="rgba(203,243,110,0.18)" strokeWidth="0.5" />
+        <line x1="60" y1="84" x2="60" y2="104" stroke="rgba(203,243,110,0.18)" strokeWidth="0.5" />
+        <line x1="16" y1="60" x2="36" y2="60" stroke="rgba(203,243,110,0.18)" strokeWidth="0.5" />
+        <line x1="84" y1="60" x2="104" y2="60" stroke="rgba(203,243,110,0.18)" strokeWidth="0.5" />
+        {/* Needle */}
+        <g className="me-needle-float" style={{ transformOrigin: '60px 60px' }}>
+          <polygon points="60,18 57,60 60,63 63,60" fill="rgba(203,243,110,0.88)" />
+          <polygon points="60,102 57,60 60,57 63,60" fill="rgba(203,243,110,0.18)" />
+        </g>
+        {/* Centre */}
+        <circle cx="60" cy="60" r="5.5" fill="none" stroke="rgba(203,243,110,0.35)" strokeWidth="1" />
+        <circle cx="60" cy="60" r="3"   fill="rgba(203,243,110,0.8)" />
+      </svg>
+
+      <p className="me-coord-pulse" style={{
+        fontFamily: "'Courier New', monospace",
+        fontSize: 11,
+        letterSpacing: '0.06em',
+        color: 'rgba(203,243,110,0.55)',
+        marginTop: 14,
+        lineHeight: 1.8,
+        textAlign: 'center',
+      }}>
+        37°59′N · 105°41′W<br />
+        <span style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>
+          Crestone, CO · 7,936 ft
+        </span>
+      </p>
+    </div>
+  );
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', interest: '', message: '' });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [field]: e.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '13px 16px',
-    background: 'var(--bg-card)',
-    border: '1px solid var(--border)',
-    borderRadius: 4,
-    color: 'var(--text)',
-    fontFamily: 'var(--font-body)',
-    fontSize: 15,
-    outline: 'none',
-    transition: 'border-color 0.15s',
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Submission failed.');
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const sageVars = {
-    '--bg':          '#1c3020',
-    '--bg-section':  '#172919',
-    '--bg-card':     '#274030',
-    '--border':      'rgba(140, 185, 130, 0.18)',
-    '--border-accent': 'rgba(203, 243, 110, 0.4)',
-    '--text-muted':  '#96ba8a',
-    '--accent-dim':  'rgba(140, 185, 130, 0.15)',
-    background:      '#1c3020',
+    '--bg':           '#18281c',
+    '--bg-section':   '#131f16',
+    '--bg-card':      '#1f3324',
+    '--border':       'rgba(130, 175, 120, 0.16)',
+    '--border-accent':'rgba(203, 243, 110, 0.42)',
+    '--text-muted':   '#92b486',
+    '--text-dim':     '#6a8f60',
+    '--accent-dim':   'rgba(130, 175, 120, 0.12)',
+    background:       '#18281c',
   } as React.CSSProperties;
+
 
   return (
     <main style={{ paddingTop: 72, ...sageVars }}>
-      {/* HERO */}
-      <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Crestone/20250810_093828-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+      {/* ── KEYFRAMES ─────────────────────────────────────────────────────────── */}
+      <style>{`
+        @keyframes meNeedleFloat {
+          0%, 100% { transform: rotate(0deg);   }
+          30%       { transform: rotate(4deg);   }
+          70%       { transform: rotate(-4deg);  }
+        }
+        @keyframes meCoordPulse {
+          0%, 80%, 100% { opacity: 1;   }
+          40%            { opacity: 0.4; }
+        }
+        @keyframes mePulseRing {
+          0%, 100% { r: 56; opacity: 0.07; }
+          50%       { r: 60; opacity: 0.18; }
+        }
+        @keyframes meContactGlow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(203,243,110,0.0); }
+          50%       { box-shadow: 0 0 18px 0 rgba(203,243,110,0.07); }
+        }
+        .me-needle-float { animation: meNeedleFloat 5s ease-in-out infinite; }
+        .me-coord-pulse  { animation: meCoordPulse 5s ease-in-out infinite; }
+        .me-pulse-ring   { animation: mePulseRing 5s ease-in-out infinite; }
+        .me-contact-card { animation: meContactGlow 5s ease-in-out infinite; }
+
+        /* ── Terminal form fields ────────────────────────────────────────── */
+        @keyframes cfScan {
+          0%,6%    { top:0%;   opacity:0; }
+          9%       { top:0%;   opacity:.75; }
+          88%      { top:100%; opacity:.2; }
+          94%,100% { top:100%; opacity:0; }
+        }
+        @keyframes cfSubmitPulse {
+          0%,100% { filter:drop-shadow(0 0 7px rgba(203,243,110,.35)) drop-shadow(0 0 0 transparent); }
+          50%     { filter:drop-shadow(0 0 20px rgba(203,243,110,.85)) drop-shadow(0 0 40px rgba(203,243,110,.3)); }
+        }
+        .cf-outer {
+          filter: drop-shadow(-2px 0 8px rgba(203,243,110,.06)) drop-shadow(0 0 0 transparent);
+          transition: filter .22s ease;
+        }
+        .cf-outer:focus-within {
+          filter: drop-shadow(-4px 0 18px rgba(203,243,110,.6)) drop-shadow(0 0 28px rgba(203,243,110,.12));
+        }
+        .cf-inner {
+          position: relative;
+          overflow: hidden;
+          clip-path: polygon(0 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%);
+          background: rgba(3,14,5,.75);
+          backdrop-filter: blur(12px);
+          border-left: 3px solid rgba(203,243,110,.3);
+          border-top: 1px solid rgba(203,243,110,.07);
+          border-right: 1px solid rgba(203,243,110,.05);
+          border-bottom: 1px solid rgba(203,243,110,.05);
+          transition: border-left-color .22s ease;
+        }
+        .cf-outer:focus-within .cf-inner {
+          border-left-color: rgba(203,243,110,.92);
+        }
+        .cf-inner::after {
+          content: '';
+          position: absolute;
+          left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, rgba(203,243,110,.8) 0%, rgba(203,243,110,.25) 60%, transparent 100%);
+          pointer-events: none;
+          opacity: 0;
+          top: 0;
+        }
+        .cf-outer:focus-within .cf-inner::after {
+          animation: cfScan 2.8s ease-in-out infinite;
+        }
+        .cf-input {
+          width: 100%;
+          padding: 14px 16px;
+          background: transparent;
+          border: none;
+          outline: none;
+          color: rgba(203,243,110,.88);
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+          letter-spacing: .04em;
+          caret-color: rgba(203,243,110,.9);
+          box-sizing: border-box;
+        }
+        .cf-input::placeholder {
+          color: rgba(100,155,75,.42);
+          font-size: 11px;
+          letter-spacing: .1em;
+        }
+        .cf-input option {
+          background: #0c200e;
+          color: rgba(203,243,110,.85);
+        }
+        .cf-submit {
+          clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), calc(100% - 11px) 100%, 0 100%);
+          background: rgba(203,243,110,.92);
+          color: #030d04;
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: .2em;
+          text-transform: uppercase;
+          padding: 15px 44px;
+          border: none;
+          cursor: pointer;
+          filter: drop-shadow(0 0 7px rgba(203,243,110,.3)) drop-shadow(0 0 0 transparent);
+          transition: filter .2s ease, transform .15s ease;
+        }
+        .cf-submit:hover {
+          animation: cfSubmitPulse 1s ease-in-out infinite;
+          transform: translateY(-2px);
+        }
+        .cf-submit:disabled {
+          opacity: .45;
+          cursor: not-allowed;
+          animation: none;
+          transform: none;
+        }
+        .cf-label {
+          display: block;
+          font-family: 'Courier New', monospace;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: .18em;
+          text-transform: uppercase;
+          color: rgba(130,175,100,.55);
+          margin-bottom: 8px;
+        }
+      `}</style>
+
+      {/* ── HERO ──────────────────────────────────────────────────────────────── */}
+      <section style={{ position: 'relative', padding: '96px 0 80px', borderBottom: '1px solid var(--border)' }}>
+        {/* Background image */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url('${IMG('Nature', '20250729_200506-EDIT.jpg')}')`,
+          backgroundSize: 'cover', backgroundPosition: 'center 40%',
+          filter: 'brightness(0.22) saturate(0.7)',
+        }} />
+        {/* Sage green overlay for depth */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, rgba(18,40,20,0.82) 0%, rgba(10,20,12,0.55) 50%, rgba(18,28,22,0.9) 100%)',
+        }} />
+        {/* Noise texture overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.04\'/%3E%3C/svg%3E")',
+          opacity: 0.6,
+        }} />
+        {/* Bottom fade */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
+          background: 'linear-gradient(to bottom, transparent, var(--bg-section))',
+        }} />
+
         <div className="container" style={{ position: 'relative' }}>
-          <span className="eyebrow">Get in Touch</span>
-          <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', marginBottom: 20 }}>Contact Us</h1>
-          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 18, color: 'var(--text-muted)', maxWidth: 520, lineHeight: 1.65 }}>
-            Questions about tours, private groups, field research partnerships, or media? We read every message.
+          {/* Coordinates eyebrow */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            marginBottom: 24,
+          }}>
+            <span style={{
+              fontFamily: "'Courier New', monospace", fontSize: 11,
+              color: 'rgba(203,243,110,0.55)', letterSpacing: '0.1em',
+            }}>
+              37°59′N · 105°41′W
+            </span>
+            <span style={{ width: 20, height: 1, background: 'rgba(203,243,110,0.3)' }} />
+            <span className="eyebrow" style={{ margin: 0 }}>Crestone, Colorado</span>
+          </div>
+
+          <h1 style={{ fontSize: 'clamp(42px, 6.5vw, 80px)', marginBottom: 20, lineHeight: 1.0, letterSpacing: '-0.01em' }}>
+            Begin Your<br />
+            <span style={{ color: 'var(--accent)' }}>Expedition</span>
+          </h1>
+          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 18, color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.7, marginBottom: 0 }}>
+            Whether you're booking a tour, planning a private group, or chasing something unknown — start here. We read every message.
           </p>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <div className="grid-2" style={{ gap: 64, alignItems: 'flex-start' }}>
+      {/* ── FORM + SIDEBAR ────────────────────────────────────────────────────── */}
+      <section id="mesa-contact" style={{ background: 'var(--bg-section)', padding: '72px 0 80px' }}>
+        {/* Subtle texture */}
+        <div style={{
+          position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
+          background: 'radial-gradient(ellipse 60% 50% at 75% 60%, rgba(30,60,30,0.35) 0%, transparent 70%)',
+        }} />
 
-            {/* FORM */}
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 56, alignItems: 'flex-start' }}>
+
+            {/* ── LEFT: FORM ──────────────────────────────────────────────── */}
             <div>
-              <h2 style={{ fontSize: 32, marginBottom: 8 }}>Send a Message</h2>
-              <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-alt)', fontSize: 15, marginBottom: 36 }}>
-                We typically respond within 24–48 hours.
+              {/* Section label */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
+                <div style={{ width: 3, height: 40, background: 'var(--accent)', borderRadius: 2, flexShrink: 0 }} />
+                <div>
+                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 4 }}>
+                    Expedition Briefing Request
+                  </p>
+                  <h2 style={{ fontSize: 'clamp(24px, 3vw, 34px)', lineHeight: 1.1 }}>
+                    Tell Us What You're<br />Planning
+                  </h2>
+                </div>
+              </div>
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, marginBottom: 40, lineHeight: 1.65 }}>
+                We respond within 24–48 hours. For same-day tour booking, use the button in the sidebar.
               </p>
 
               {sent ? (
-                <div style={{ padding: '40px 36px', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 6, textAlign: 'center' }}>
-                  <p style={{ fontSize: 40, marginBottom: 16 }}>🗺️</p>
-                  <h3 style={{ fontSize: 24, marginBottom: 12 }}>Message Received</h3>
-                  <p style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-alt)', fontSize: 15 }}>
-                    We'll get back to you within 24–48 hours. In the meantime, feel free to browse our upcoming tours.
+                <div style={{
+                  padding: '48px 40px', textAlign: 'center',
+                  background: 'rgba(2,12,4,.55)',
+                  border: '1px solid rgba(203,243,110,0.25)',
+                  clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%)',
+                  boxShadow: '0 0 40px rgba(203,243,110,0.06)',
+                }}>
+                  <p style={{ fontFamily: "'Courier New',monospace", fontSize: 11, color: 'rgba(203,243,110,.4)', letterSpacing: '.18em', marginBottom: 20 }}>▸ TRANSMISSION RECEIVED</p>
+                  <h3 style={{ fontFamily: "'Courier New',monospace", fontSize: 22, color: 'rgba(203,243,110,.9)', marginBottom: 14, letterSpacing: '.06em' }}>SIGNAL CONFIRMED</h3>
+                  <p style={{ color: 'var(--text-muted)', fontFamily: "'Courier New',monospace", fontSize: 12, lineHeight: 1.75, maxWidth: 360, margin: '0 auto 28px', letterSpacing: '.03em' }}>
+                    Message logged. Response inbound within 24–48 hours.<br />Stand by, Explorer.
                   </p>
+                  <a href="/upcoming" className="btn btn-outline" style={{ fontSize: 12, fontFamily: "'Courier New',monospace", letterSpacing: '.12em' }}>
+                    VIEW UPCOMING TOURS →
+                  </a>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  <div className="grid-2" style={{ gap: 16 }}>
+
+                  {/* Name + Email */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     <div>
-                      <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Name</label>
-                      <input type="text" required value={form.name} onChange={update('name')} placeholder="Your name" style={inputStyle}
-                        onFocus={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
-                        onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-                      />
+                      <label className="cf-label">
+                        <span style={{ color: 'rgba(203,243,110,.22)', marginRight: 6 }}>▸</span>Name *
+                      </label>
+                      <div className="cf-outer">
+                        <div className="cf-inner">
+                          <input type="text" required value={form.name} onChange={update('name')}
+                            placeholder="IDENTIFY YOURSELF" className="cf-input" />
+                        </div>
+                      </div>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Email</label>
-                      <input type="email" required value={form.email} onChange={update('email')} placeholder="your@email.com" style={inputStyle}
-                        onFocus={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
-                        onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-                      />
+                      <label className="cf-label">
+                        <span style={{ color: 'rgba(203,243,110,.22)', marginRight: 6 }}>▸</span>Email *
+                      </label>
+                      <div className="cf-outer">
+                        <div className="cf-inner">
+                          <input type="email" required value={form.email} onChange={update('email')}
+                            placeholder="TRANSMISSION ADDRESS" className="cf-input" />
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Phone */}
                   <div>
-                    <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Subject</label>
-                    <select value={form.subject} onChange={update('subject')} required style={{ ...inputStyle, cursor: 'pointer' }}
-                      onFocus={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
-                      onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-                    >
-                      <option value="">Select a topic…</option>
-                      <option>Tour Booking Question</option>
-                      <option>Private / Group Tours</option>
-                      <option>Field Research Partnership</option>
-                      <option>Media & Press</option>
-                      <option>Merchandise</option>
-                      <option>General Inquiry</option>
-                    </select>
+                    <label className="cf-label">
+                      <span style={{ color: 'rgba(203,243,110,.22)', marginRight: 6 }}>▸</span>
+                      Phone
+                      <span style={{ color: 'rgba(100,155,75,.4)', marginLeft: 8, fontSize: 9, letterSpacing: '.12em' }}>OPTIONAL</span>
+                    </label>
+                    <div className="cf-outer">
+                      <div className="cf-inner">
+                        <input type="tel" value={form.phone} onChange={update('phone')}
+                          placeholder="SECONDARY CHANNEL (OPTIONAL)" className="cf-input" />
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Interest dropdown */}
                   <div>
-                    <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Message</label>
-                    <textarea required value={form.message} onChange={update('message')} rows={6} placeholder="Tell us what you're looking for…"
-                      style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.65 }}
-                      onFocus={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
-                      onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
-                    />
+                    <label className="cf-label">
+                      <span style={{ color: 'rgba(203,243,110,.22)', marginRight: 6 }}>▸</span>Mission Type *
+                    </label>
+                    <div className="cf-outer">
+                      <div className="cf-inner" style={{ position: 'relative' }}>
+                        <select value={form.interest} onChange={update('interest')} required
+                          className="cf-input"
+                          style={{ appearance: 'none', cursor: 'pointer', paddingRight: 38 } as React.CSSProperties}>
+                          <option value="">SELECT MISSION TYPE</option>
+                          <option value="general-tour">General Walking Tour</option>
+                          <option value="specialty-tours">Future Specialty Tours</option>
+                          <option value="private-group">Private Group Booking</option>
+                          <option value="expedition">Expedition Interest</option>
+                          <option value="media">Media &amp; Press</option>
+                          <option value="other">Other</option>
+                        </select>
+                        <span style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(203,243,110,.45)', fontSize: 11, pointerEvents: 'none', fontFamily: "'Courier New',monospace" }}>▾</span>
+                      </div>
+                    </div>
                   </div>
-                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', fontSize: 14 }}>
-                    Send Message
-                  </button>
+
+                  {/* Message */}
+                  <div>
+                    <label className="cf-label">
+                      <span style={{ color: 'rgba(203,243,110,.22)', marginRight: 6 }}>▸</span>Field Report *
+                    </label>
+                    <div className="cf-outer">
+                      <div className="cf-inner">
+                        <textarea required value={form.message} onChange={update('message')} rows={7}
+                          placeholder="ENTER FIELD REPORT OR INQUIRY"
+                          className="cf-input"
+                          style={{ resize: 'none', lineHeight: 1.7 }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Error */}
+                  {error && (
+                    <div style={{
+                      padding: '11px 16px',
+                      background: 'rgba(220,50,50,.07)',
+                      border: '1px solid rgba(220,50,50,.28)',
+                      fontFamily: "'Courier New',monospace",
+                      fontSize: 12, color: 'rgba(220,120,120,.9)',
+                      letterSpacing: '.03em', lineHeight: 1.55,
+                    }}>
+                      <span style={{ marginRight: 8, opacity: .6 }}>⚠</span>{error}
+                    </div>
+                  )}
+
+                  {/* Submit row */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 22, paddingTop: 4 }}>
+                    <button type="submit" disabled={loading} className="cf-submit">
+                      {loading ? 'TRANSMITTING...' : 'SEND TRANSMISSION'}
+                    </button>
+                    <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, color: 'rgba(100,155,75,.45)', letterSpacing: '.1em' }}>
+                      RESPONSE // 24–48 HRS
+                    </span>
+                  </div>
                 </form>
               )}
             </div>
 
-            {/* SIDEBAR */}
-            <div>
-              <div style={{ padding: '28px 30px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, marginBottom: 24 }}>
-                <h3 style={{ fontSize: 20, marginBottom: 20 }}>Quick Links</h3>
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 12, fontSize: 14 }}>
-                  Book a Tour Now
-                </a>
-                <a href="https://instagram.com/modern._explorer" target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center', fontSize: 14 }}>
-                  Follow on Instagram
-                </a>
+            {/* ── RIGHT: SIDEBAR ──────────────────────────────────────────── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+              {/* Compass + coordinates */}
+              <div className="me-contact-card" style={{
+                background: 'rgba(0,0,0,0.22)',
+                border: '1px solid rgba(203,243,110,0.15)',
+                borderRadius: 8,
+                overflow: 'hidden',
+              }}>
+                <CompassWidget />
               </div>
 
-              <div style={{ padding: '28px 30px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, marginBottom: 24 }}>
-                <h3 style={{ fontSize: 20, marginBottom: 16 }}>Based In</h3>
+              {/* Direct contact */}
+              <div style={{
+                background: 'rgba(0,0,0,0.2)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '24px 26px',
+              }}>
+                <p style={{
+                  fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700,
+                  letterSpacing: '0.18em', textTransform: 'uppercase',
+                  color: 'var(--text-dim)', marginBottom: 18,
+                }}>
+                  Direct Contact
+                </p>
+
                 {[
-                  { place: 'Crestone, Colorado', detail: 'Saguache County · San Luis Valley' },
-                  { place: 'San Luis Valley, Colorado', detail: 'Saguache County · Sangre de Cristo range' },
-                ].map(loc => (
-                  <div key={loc.place} style={{ paddingBottom: 16, marginBottom: 16, borderBottom: '1px solid var(--border)' }}>
-                    <p style={{ fontFamily: 'var(--font-heading)', fontSize: 15, marginBottom: 4 }}>{loc.place}</p>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'var(--font-alt)' }}>{loc.detail}</p>
-                  </div>
+                  {
+                    icon: '✉',
+                    label: 'Email',
+                    value: 'admin@modernexplorer.me',
+                    href: 'mailto:admin@modernexplorer.me',
+                  },
+                  {
+                    icon: '☎',
+                    label: 'Phone',
+                    value: '(719) 000-0000',
+                    href: 'tel:+17190000000',
+                  },
+                ].map(item => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 14,
+                      padding: '14px 0',
+                      borderBottom: item.label === 'Email' ? '1px solid var(--border)' : 'none',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'color 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}
+                  >
+                    <span style={{
+                      width: 34, height: 34, flexShrink: 0,
+                      borderRadius: 6,
+                      background: 'rgba(203,243,110,0.07)',
+                      border: '1px solid rgba(203,243,110,0.15)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14, color: 'rgba(203,243,110,0.6)',
+                    }}>
+                      {item.icon}
+                    </span>
+                    <div>
+                      <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 3 }}>
+                        {item.label}
+                      </p>
+                      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1.3 }}>
+                        {item.value}
+                      </p>
+                    </div>
+                  </a>
                 ))}
               </div>
 
-              <div style={{ padding: '28px 30px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6 }}>
-                <h3 style={{ fontSize: 20, marginBottom: 16 }}>Follow the Expedition</h3>
+              {/* Book now CTA */}
+              <div style={{
+                background: 'rgba(203,243,110,0.05)',
+                border: '1px solid rgba(203,243,110,0.2)',
+                borderRadius: 8,
+                padding: '22px 24px',
+              }}>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 10 }}>
+                  Ready to Book?
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.55 }}>
+                  Skip the form — reserve your spot directly through our booking system.
+                </p>
+                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 13 }}>
+                  Book a Tour Now
+                </a>
+              </div>
+
+              {/* Location */}
+              <div style={{
+                background: 'rgba(0,0,0,0.18)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '22px 24px',
+              }}>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 14 }}>
+                  Based In
+                </p>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 15, marginBottom: 4 }}>Crestone, Colorado</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'var(--font-alt)', lineHeight: 1.55 }}>
+                  Saguache County · San Luis Valley<br />
+                  Sangre de Cristo Mountains
+                </p>
+              </div>
+
+              {/* Social */}
+              <div style={{
+                background: 'rgba(0,0,0,0.18)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '22px 24px',
+              }}>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 14 }}>
+                  Follow the Expedition
+                </p>
                 {[
                   { name: 'Instagram', handle: '@modern._explorer', href: 'https://instagram.com/modern._explorer' },
-                  { name: 'YouTube', handle: '@ModernExplorer', href: 'https://www.youtube.com/@ModernExplorer' },
+                  { name: 'YouTube',   handle: '@ModernExplorer',   href: 'https://www.youtube.com/@ModernExplorer' },
+                  { name: 'X',         handle: '@ModernExplorer5',  href: 'https://x.com/ModernExplorer5' },
                 ].map(s => (
                   <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', transition: 'color 0.15s' }}
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s', fontSize: 13 }}
                     onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
                     onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
-                    <span style={{ fontFamily: 'var(--font-alt)', fontWeight: 600, fontSize: 14 }}>{s.name}</span>
-                    <span style={{ fontSize: 13 }}>{s.handle} →</span>
+                    <span style={{ fontFamily: 'var(--font-alt)', fontWeight: 600 }}>{s.name}</span>
+                    <span style={{ fontFamily: "'Courier New', monospace", fontSize: 11, opacity: 0.7 }}>{s.handle} →</span>
                   </a>
                 ))}
               </div>

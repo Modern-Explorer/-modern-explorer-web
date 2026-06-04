@@ -192,7 +192,7 @@ export default function Upcoming() {
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* SECTION 2 — SPECIALTY WALKING TOURS (COMING SOON)                   */}
       {/* ══════════════════════════════════════════════════════════════════════ */}
-      <section className="section">
+      <section id="mesa-upcoming" className="section">
         <div className="container">
 
           {/* Section label */}
@@ -271,7 +271,7 @@ export default function Upcoming() {
           </div>
 
           {/* ─ DEAD MAN'S TREASURE — FEATURED EXPEDITION ──────────────────── */}
-          <div style={{ border: '1px solid rgba(203,243,110,0.2)', borderRadius: 8, overflow: 'hidden', marginBottom: 56, background: 'var(--bg-card)' }}>
+          <div id="mesa-treasure" style={{ border: '1px solid rgba(203,243,110,0.2)', borderRadius: 8, overflow: 'hidden', marginBottom: 56, background: 'var(--bg-card)' }}>
 
             {/* Map image — large, atmospheric */}
             <div style={{ position: 'relative', paddingTop: '42%', overflow: 'hidden' }}>
@@ -314,7 +314,7 @@ export default function Upcoming() {
                 </p>
 
                 {/* Legend I */}
-                <div style={{ borderLeft: '2px solid rgba(203,243,110,0.35)', paddingLeft: 22, marginBottom: 36 }}>
+                <div id="mesa-caverna" style={{ borderLeft: '2px solid rgba(203,243,110,0.35)', paddingLeft: 22, marginBottom: 36 }}>
                   <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', opacity: 0.7, marginBottom: 6 }}>Legend I</p>
                   <h3 style={{ fontSize: 'clamp(18px, 2.2vw, 24px)', marginBottom: 14, letterSpacing: '0.04em' }}>Spanish Cave — <em style={{ fontWeight: 400, fontSize: '0.88em' }}>La Caverna del Oro</em></h3>
                   <p style={{ fontFamily: 'var(--font-alt)', color: 'rgba(240,244,255,0.68)', fontSize: 14, lineHeight: 1.85, marginBottom: 14 }}>
