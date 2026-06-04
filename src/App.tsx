@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Mesa from './components/Mesa';
+import Analytics from './components/Analytics';
+import StructuredData, { LOCAL_BUSINESS_SCHEMA } from './components/StructuredData';
 import Home from './pages/Home';
 import About from './pages/About';
 import FieldReports from './pages/FieldReports';
@@ -15,6 +17,10 @@ import FAQ from './pages/FAQ';
 export default function App() {
   return (
     <BrowserRouter>
+      {/* Site-wide: analytics + LocalBusiness structured data */}
+      <Analytics />
+      <StructuredData data={LOCAL_BUSINESS_SCHEMA} />
+
       <ScrollToTop />
       <Navbar />
       <Routes>

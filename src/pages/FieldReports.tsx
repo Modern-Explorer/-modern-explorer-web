@@ -3,6 +3,7 @@ import { useYouTubeVideos } from '../hooks/useYouTubeVideos';
 import AnomalyFeed from '../components/AnomalyFeed';
 import { ARTICLES } from '../data/fieldReportArticles';
 import SEO from '../components/SEO';
+import StructuredData, { articleSchema } from '../components/StructuredData';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -208,6 +209,15 @@ export default function FieldReports() {
         url="/field-reports"
         keywords="San Luis Valley UFO sightings, cattle mutilation Colorado, Sasquatch Blanca Peak, Great Sand Dunes paranormal, Crestone vortex, Dead Man's Cave Colorado, La Caverna del Oro, Christopher O'Brien, UFO Watchtower Hooper Colorado"
       />
+      {/* Article structured data for key field reports */}
+      {[1,2,3,5,10,11,13].map(id => ARTICLES[id] && (
+        <StructuredData key={id} data={articleSchema(
+          ARTICLES[id].title,
+          posts.find(p => p.id === id)?.excerpt?.slice(0, 160) || ARTICLES[id].title,
+          ARTICLES[id].date,
+          `https://modernexplorer.me/field-reports`,
+        )} />
+      ))}
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_095422-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />

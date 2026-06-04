@@ -9,6 +9,7 @@ interface SEOProps {
 }
 
 const SITE_NAME  = 'Modern Explorer';
+const GSC_ID     = import.meta.env.VITE_GSC_VERIFICATION as string | undefined;
 const DEFAULT_IMG = '/assets/images/content/Logo/ME Logo Draft 5.png';
 const BASE_URL   = 'https://modernexplorer.me';
 const DEFAULT_KW = 'Crestone Colorado tours, San Luis Valley, Great Sand Dunes, Sangre de Cristo mountains, UFO tours Colorado, paranormal tours, cryptozoology, Spanish treasure, Sasquatch expedition, guided tours Colorado, supernatural Colorado';
@@ -37,6 +38,9 @@ export default function SEO({ title, description, keywords, image, url }: SEOPro
       <meta name="twitter:title"       content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image"       content={`${BASE_URL}${img}`} />
+
+      {/* Google Search Console verification */}
+      {GSC_ID && <meta name="google-site-verification" content={GSC_ID} />}
 
       {/* Geo */}
       <meta name="geo.region"      content="US-CO" />

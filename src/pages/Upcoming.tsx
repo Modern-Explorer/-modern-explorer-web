@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { LockPulseIcon, FootprintIcon, GhostEyeIcon, MountainIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
+import StructuredData, { TOURIST_TRIP_SCHEMA, ENERGY_FAIR_EVENT_SCHEMA, VORTEX_FESTIVAL_EVENT_SCHEMA } from '../components/StructuredData';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
@@ -92,6 +93,9 @@ export default function Upcoming() {
         description="Specialty tours and expeditions launching soon in Crestone, Colorado — 30 miles from Great Sand Dunes National Park. UFO/UAP tours, paranormal investigations, Dead Man's Cave treasure expeditions, and more in the San Luis Valley."
         url="/upcoming"
       />
+      <StructuredData data={TOURIST_TRIP_SCHEMA} />
+      <StructuredData data={ENERGY_FAIR_EVENT_SCHEMA} />
+      <StructuredData data={VORTEX_FESTIVAL_EVENT_SCHEMA} />
 
       {/* ── PAGE HERO ─────────────────────────────────────────────────────────── */}
       <section style={{ position: 'relative', padding: '90px 0 70px' }}>
