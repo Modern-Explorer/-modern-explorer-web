@@ -260,18 +260,12 @@ export default function FieldReports() {
               </span>
               <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>Crestone · Summer–Fall 2026</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div className="featured-events-grid">
               {posts.filter(p => p.pinnedEvent).map(p => {
                 const isEnergyFair = p.id === 7;
                 return (
-                  <div key={p.id} style={{
-                    display: 'grid', gridTemplateColumns: '180px 1fr',
-                    borderRadius: 8, overflow: 'hidden',
-                    border: '1px solid rgba(203,243,110,0.28)',
-                    boxShadow: '0 0 32px rgba(203,243,110,0.06)',
-                    background: 'var(--bg-card)',
-                  }}>
-                    <div style={{ position: 'relative', minHeight: 220 }}>
+                  <div key={p.id} className="featured-event-card">
+                    <div className="fec-image" style={{ position: 'relative', minHeight: 220 }}>
                       <img src={p.img} alt={p.title}
                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.1), rgba(12,16,28,0.65))' }} />
@@ -648,7 +642,7 @@ export default function FieldReports() {
               }}
             >
               {/* Modal header */}
-              <div style={{ padding: '28px 36px 24px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+              <div className="article-modal-header" style={{ padding: '28px 36px 24px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
@@ -678,7 +672,7 @@ export default function FieldReports() {
               </div>
 
               {/* Modal body — scrollable */}
-              <div style={{ overflowY: 'auto', padding: '32px 36px 48px', flex: 1 }}>
+              <div className="article-modal-body" style={{ overflowY: 'auto', padding: '32px 36px 48px', flex: 1 }}>
                 {article.body.split('\n\n').map((para, i) => (
                   <p key={i} style={{
                     fontFamily: 'var(--font-alt)',

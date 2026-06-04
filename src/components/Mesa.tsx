@@ -223,7 +223,7 @@ export default function Mesa() {
         .mesa-dot-3 { animation:mesaDot 1.4s .44s ease-in-out infinite; }
         .mesa-chat {
           position:fixed; bottom:100px; right:24px; z-index:9998;
-          width:400px; height:530px;
+          width:min(400px, calc(100vw - 48px)); height:530px;
           background:#020c03;
           border:1px solid rgba(203,243,110,.22);
           border-radius:8px;
@@ -240,7 +240,7 @@ export default function Mesa() {
 
       {/* ── FIELD NOTE ───────────────────────────────────────────────────── */}
       {fieldNote && !open && (
-        <div style={{
+        <div className="mesa-field-note-box" style={{
           position:'fixed', bottom:100, right:24, zIndex:9997,
           maxWidth:320, padding:'14px 18px',
           background:'rgba(1,14,2,.96)',

@@ -300,14 +300,8 @@ export default function Contact() {
 
       {/* ── FORM + SIDEBAR ────────────────────────────────────────────────────── */}
       <section id="mesa-contact" style={{ background: 'var(--bg-section)', padding: '72px 0 80px' }}>
-        {/* Subtle texture */}
-        <div style={{
-          position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
-          background: 'radial-gradient(ellipse 60% 50% at 75% 60%, rgba(30,60,30,0.35) 0%, transparent 70%)',
-        }} />
-
-        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 56, alignItems: 'flex-start' }}>
+        <div className="container">
+          <div className="contact-layout">
 
             {/* ── LEFT: FORM ──────────────────────────────────────────────── */}
             <div>
@@ -348,7 +342,7 @@ export default function Contact() {
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
                   {/* Name + Email */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div className="form-row-2">
                     <div>
                       <label className="cf-label">
                         <span style={{ color: 'rgba(203,243,110,.22)', marginRight: 6 }}>▸</span>Name *

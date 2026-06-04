@@ -236,3 +236,88 @@ h1, h2, h3, h4, h5 {
 
 /* Expedition — compass always spins */
 [data-cs-theme="expedition"] .me-compass { animation: meSpinCompass 10s linear infinite; }
+
+/* ── Responsive layout classes ──────────────────────────────────────────────*/
+
+/* Contact page: 2-col (form + sidebar) → single col on tablet/mobile */
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 56px;
+  align-items: flex-start;
+}
+@media (max-width: 900px) {
+  .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* Featured event cards: 2-up → single col */
+.featured-events-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .featured-events-grid { grid-template-columns: 1fr; }
+}
+
+/* Each event card inner: image | content → stack image on top */
+.featured-event-card {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(203,243,110,0.28);
+  box-shadow: 0 0 32px rgba(203,243,110,0.06);
+  background: var(--bg-card);
+}
+@media (max-width: 500px) {
+  .featured-event-card { grid-template-columns: 1fr; }
+  .featured-event-card .fec-image { min-height: 160px !important; }
+}
+
+/* Name+Email 2-col inside the contact form → stack on very small */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 520px) {
+  .form-row-2 { grid-template-columns: 1fr; }
+}
+
+/* Article modal — reduce padding on small screens */
+@media (max-width: 640px) {
+  .article-modal-header { padding: 20px 20px 18px !important; }
+  .article-modal-body   { padding: 24px 20px 36px !important; }
+}
+
+/* MESA: full-width chat + adjusted orb on phones */
+@media (max-width: 480px) {
+  .mesa-chat {
+    width: calc(100vw - 24px) !important;
+    right: 12px !important;
+    left: 12px !important;
+    bottom: 88px !important;
+  }
+  .mesa-orb { right: 12px !important; bottom: 12px !important; }
+}
+
+/* MESA field note: full-width on phones */
+@media (max-width: 480px) {
+  .mesa-field-note-box {
+    max-width: calc(100vw - 24px) !important;
+    right: 12px !important;
+    left: 12px !important;
+  }
+}
+
+/* Upcoming: active tour 2-col → stack */
+@media (max-width: 700px) {
+  .upcoming-tour-grid { grid-template-columns: 1fr !important; }
+}
+
+/* General mobile utility */
+@media (max-width: 640px) {
+  .hide-mobile { display: none !important; }
+  .stack-mobile { flex-direction: column !important; align-items: flex-start !important; }
+}
