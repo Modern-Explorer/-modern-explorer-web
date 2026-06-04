@@ -549,21 +549,61 @@ export default function Contact() {
                 </a>
               </div>
 
-              {/* Location */}
+              {/* Location map */}
               <div style={{
                 background: 'rgba(0,0,0,0.18)',
-                border: '1px solid var(--border)',
+                border: '1px solid rgba(203,243,110,0.25)',
                 borderRadius: 8,
-                padding: '22px 24px',
+                overflow: 'hidden',
+                boxShadow: '0 0 32px rgba(203,243,110,0.06)',
               }}>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 14 }}>
-                  Based In
-                </p>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 15, marginBottom: 4 }}>Crestone, Colorado</p>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'var(--font-alt)', lineHeight: 1.55 }}>
-                  Saguache County · San Luis Valley<br />
-                  Sangre de Cristo Mountains
-                </p>
+                {/* Map header */}
+                <div style={{ padding: '14px 18px 10px', borderBottom: '1px solid rgba(203,243,110,0.12)', background: 'rgba(1,8,2,0.9)' }}>
+                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 4 }}>
+                    Based In
+                  </p>
+                  <p style={{ fontFamily: 'var(--font-heading)', fontSize: 15, marginBottom: 1 }}>Crestone, Colorado</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: "'Courier New', monospace", letterSpacing: '0.05em' }}>
+                    37°59′N · 105°41′W · 7,936 ft
+                  </p>
+                </div>
+
+                {/* Map iframe with lime green pin overlay */}
+                <div style={{ position: 'relative', height: 240 }}>
+                  <iframe
+                    src="https://maps.google.com/maps?q=37.9933215,-105.695489&z=14&output=embed"
+                    title="Modern Explorer — Crestone, Colorado"
+                    style={{ display: 'block', width: '100%', height: '100%', border: 'none', filter: 'grayscale(0.3) brightness(0.88)' }}
+                    loading="lazy"
+                  />
+                  {/* Lime green custom pin — centered over the business location */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%', left: '50%',
+                    transform: 'translate(-50%, -100%)',
+                    pointerEvents: 'none',
+                    zIndex: 10,
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.7))',
+                  }}>
+                    <svg width="32" height="42" viewBox="0 0 32 42" fill="none">
+                      <path d="M16 0C7.16 0 0 7.16 0 16c0 11.08 14.24 24.64 15.18 25.54a1.14 1.14 0 0 0 1.64 0C17.76 40.64 32 27.08 32 16 32 7.16 24.84 0 16 0z" fill="#CBF36E"/>
+                      <circle cx="16" cy="16" r="6" fill="#0b0f1c"/>
+                      <circle cx="16" cy="16" r="3" fill="#CBF36E" opacity="0.9"/>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Directions link */}
+                <a
+                  href="https://maps.google.com/maps?q=Modern+Explorer+Crestone+Colorado&z=14"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '11px', background: 'rgba(203,243,110,0.05)', borderTop: '1px solid rgba(203,243,110,0.12)', color: 'var(--accent)', fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', textDecoration: 'none', transition: 'background 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(203,243,110,0.1)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'rgba(203,243,110,0.05)')}
+                >
+                  Get Directions →
+                </a>
               </div>
 
               {/* Social */}
