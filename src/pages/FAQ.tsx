@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SEO from '../components/SEO';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 
@@ -47,6 +48,11 @@ export default function FAQ() {
 
   return (
     <main style={{ paddingTop: 72 }}>
+      <SEO
+        title="FAQ | Modern Explorer — Crestone, Colorado Tours"
+        description="Frequently asked questions about Modern Explorer guided tours in Crestone, Colorado. What to expect, how to book, group sizes, difficulty, and what makes the San Luis Valley and Sangre de Cristo mountains unique."
+        url="/faq"
+      />
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Nature/20250510_091707-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />

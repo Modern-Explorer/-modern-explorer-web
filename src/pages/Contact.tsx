@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SEO from '../components/SEO';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
@@ -112,6 +113,11 @@ export default function Contact() {
 
   return (
     <main style={{ paddingTop: 72, ...sageVars }}>
+      <SEO
+        title="Contact Modern Explorer — Book a Tour in Crestone, Colorado"
+        description="Plan your expedition with Modern Explorer. Book guided tours in Crestone, Colorado — 30 miles from Great Sand Dunes National Park, in the heart of the San Luis Valley and Sangre de Cristo mountains."
+        url="/contact"
+      />
       {/* ── KEYFRAMES ─────────────────────────────────────────────────────────── */}
       <style>{`
         @keyframes meNeedleFloat {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useYouTubeVideos } from '../hooks/useYouTubeVideos';
 import AnomalyFeed from '../components/AnomalyFeed';
 import { ARTICLES } from '../data/fieldReportArticles';
+import SEO from '../components/SEO';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -83,6 +84,16 @@ const posts = [
     date: 'Apr 2026', author: 'Modern Explorer', readTime: '8 min',
     img: IMG('Nature', 'sangre-de-cristo-topo.jpg'),
     excerpt: "At 14,000 feet, a clear morning becomes a dangerous lightning storm in under an hour. The Sangres are unforgiving: loose scree, false ridges, unmarked drainages, weather that kills without announcement. This field guide covers what actually matters — reading terrain and high-altitude weather, finding shelter and water, navigating without cell service, recognizing altitude sickness before it becomes an emergency, and understanding why conditions above treeline are categorically different from anything below.",
+  },
+
+  // ── Field Report (Sand Dunes) ─────────────────────────────────────────────────
+
+  {
+    id: 13, tag: 'Field Report',
+    title: "Great Sand Dunes: North America's Tallest Dunes and the Mysteries Surrounding Them",
+    date: 'Jun 2026', author: 'Modern Explorer', readTime: '7 min',
+    img: IMG('Nature', 'pexels-mohamedelaminemsiouri-2097442.jpg'),
+    excerpt: "At the eastern edge of the San Luis Valley, where the flatlands meet the Sangre de Cristo Mountains, the tallest sand dunes in North America rise 750 feet from an ancient lake bed. They've been here 440,000 years. The Pueblo peoples believed their ancestors emerged from the underworld through openings nearby. The UAP corridor between the dunes and Crestone — 25 miles apart — is one of the most documented in Christopher O'Brien's 30-year database. Most people visiting the dunes don't know Crestone is 30 miles away.",
   },
 
   // ── Expedition News ───────────────────────────────────────────────────────────
@@ -191,6 +202,12 @@ export default function FieldReports() {
 
   return (
     <main style={{ paddingTop: 72 }}>
+      <SEO
+        title="Field Reports | Modern Explorer — San Luis Valley Paranormal Research"
+        description="Documented UFO sightings, cattle mutilations, cryptid encounters, Great Sand Dunes mysteries, and the unexplained history of the San Luis Valley and Sangre de Cristo mountains. Research and field reports from Crestone, Colorado."
+        url="/field-reports"
+        keywords="San Luis Valley UFO sightings, cattle mutilation Colorado, Sasquatch Blanca Peak, Great Sand Dunes paranormal, Crestone vortex, Dead Man's Cave Colorado, La Caverna del Oro, Christopher O'Brien, UFO Watchtower Hooper Colorado"
+      />
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_095422-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />

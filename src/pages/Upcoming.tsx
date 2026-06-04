@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LockPulseIcon, FootprintIcon, GhostEyeIcon, MountainIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
+import SEO from '../components/SEO';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
@@ -86,6 +87,11 @@ export default function Upcoming() {
   useReveal();
   return (
     <main style={{ paddingTop: 72 }}>
+      <SEO
+        title="Upcoming Tours & Expeditions | Modern Explorer — Crestone, Colorado"
+        description="Specialty tours and expeditions launching soon in Crestone, Colorado — 30 miles from Great Sand Dunes National Park. UFO/UAP tours, paranormal investigations, Dead Man's Cave treasure expeditions, and more in the San Luis Valley."
+        url="/upcoming"
+      />
 
       {/* ── PAGE HERO ─────────────────────────────────────────────────────────── */}
       <section style={{ position: 'relative', padding: '90px 0 70px' }}>
@@ -95,7 +101,7 @@ export default function Upcoming() {
           <span className="eyebrow">Book · Preview · Dream</span>
           <h1 style={{ fontSize: 'clamp(48px, 8vw, 90px)', marginBottom: 20 }}>Upcoming Tours</h1>
           <p style={{ fontFamily: 'var(--font-alt)', fontSize: 19, color: 'rgba(240,244,255,0.75)', maxWidth: 580, margin: '0 auto', lineHeight: 1.6 }}>
-            One tour running now. More launching soon. Expeditions in the works. Here's everything on the frontier.
+            One tour running now. More launching soon. Expeditions in the works. Here's everything on the frontier. Crestone sits 30 miles north of Great Sand Dunes National Park — the same valley, the same mountains, and a completely different kind of mystery.
           </p>
         </div>
       </section>

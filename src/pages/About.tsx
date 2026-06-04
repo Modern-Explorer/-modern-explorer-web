@@ -1,3 +1,5 @@
+import SEO from '../components/SEO';
+
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -33,6 +35,11 @@ const guidePlaceholders = [
 export default function About() {
   return (
     <main style={{ paddingTop: 72 }}>
+      <SEO
+        title="About Modern Explorer — Crestone, Colorado"
+        description="Modern Explorer is led by founder Mateo Argüello, a former Marine Corps intelligence operator based in Crestone, Colorado — 30 miles from Great Sand Dunes National Park. Small-group guided tours through the mysteries of the San Luis Valley and Sangre de Cristo mountains."
+        url="/about"
+      />
       {/* PAGE HERO */}
       <section style={{ position: 'relative', padding: '100px 0 80px' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_093514-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
@@ -227,7 +234,7 @@ export default function About() {
               <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 20 }}>Crestone &<br />the San Luis Valley</h2>
               <div className="divider" />
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 16 }}>
-                Crestone sits at 7,930 ft in the heart of the San Luis Valley — the largest alpine valley in the world, stretching 122 miles long and 74 miles wide across 8,000 square miles. Surrounded by the Sangre de Cristo mountains, it draws spiritual seekers, researchers, and the simply curious from around the world.
+                Crestone sits at 7,930 ft in the heart of the San Luis Valley — the largest alpine valley in the world, stretching 122 miles long and 74 miles wide across 8,000 square miles. Located 30 miles north of Great Sand Dunes National Park and surrounded by the Sangre de Cristo mountains, it draws spiritual seekers, researchers, and the simply curious from around the world.
               </p>
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>
                 The Valley has logged more UAP reports per capita than almost anywhere in the U.S. The land holds centuries of Indigenous history. The mountains contain ruins that haven't been fully documented. This is where we work.

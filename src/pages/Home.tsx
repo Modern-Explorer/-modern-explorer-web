@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useRef, useEffect } from 'react';
 import { OrbIcon, CompassIcon, LanternIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
+import SEO from '../components/SEO';
 
 const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
 
@@ -106,6 +107,11 @@ export default function Home() {
 
   return (
     <main>
+      <SEO
+        title="Modern Explorer | Guided Tours in Crestone, Colorado & the San Luis Valley"
+        description="Immersive small-group guided tours in Crestone, Colorado. Explore UFO hotspots, Spanish treasure legends, paranormal history, and the mysteries of the San Luis Valley and Sangre de Cristo mountains. Located 30 miles from Great Sand Dunes National Park."
+        url="/"
+      />
       {/* HERO */}
       <section id="mesa-hero" ref={heroRef} style={{
         position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden',
@@ -165,7 +171,7 @@ export default function Home() {
             textTransform: 'uppercase',
             marginBottom: 52,
           }}>
-            Colorado · Crestone · San Luis Valley
+            Colorado · Crestone · San Luis Valley · Near Great Sand Dunes National Park
           </p>
 
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>

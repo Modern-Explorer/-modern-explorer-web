@@ -1,8 +1,15 @@
+import SEO from '../components/SEO';
+
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 export default function MerchStore() {
   return (
     <main style={{ paddingTop: 72 }}>
+      <SEO
+        title="Store | Modern Explorer — Gear for Explorers"
+        description="Modern Explorer merchandise. Apparel, gear, and art for explorers who take their curiosity seriously. Every purchase supports field research in the San Luis Valley and Sangre de Cristo mountains of Colorado."
+        url="/merch"
+      />
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_090547-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />

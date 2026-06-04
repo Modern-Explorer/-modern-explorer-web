@@ -94,7 +94,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Modern Explorer. All rights reserved.
           </p>
           <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)' }}>
-            Crestone · San Luis Valley, Colorado
+            Crestone · San Luis Valley, Colorado · Near Great Sand Dunes National Park
           </p>
         </div>
       </div>
