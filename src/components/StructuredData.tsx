@@ -62,6 +62,7 @@ export const TOURIST_TRIP_SCHEMA = {
   touristType: ['History enthusiast','Paranormal researcher','Nature lover','Adventure traveler','UFO enthusiast'],
   duration: 'PT1H',
   maximumAttendeeCapacity: 12,
+  minimumAttendeeCapacity: 2,
   provider: { '@type': 'LocalBusiness', name: 'Modern Explorer', url: 'https://modernexplorer.me' },
   offers: {
     '@type': 'Offer',

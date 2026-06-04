@@ -21,7 +21,7 @@ const sections = [
   {
     icon: '👥',
     title: 'Group Size',
-    body: `We cap every tour at 12 participants. This is a deliberate choice, not a logistical limitation.\n\nSmall groups mean you can actually hear the guide. You can ask questions without holding up the group. You can stop to look at something without the momentum of 30 people pushing you past it. The quality of the experience is meaningfully different at this scale.\n\nIf your group is larger than 12, contact us to arrange a private or split-group booking.`,
+    body: `Tours run with a minimum of 2 and a maximum of 12 participants. This is a deliberate choice, not a logistical limitation.\n\nSmall groups mean you can actually hear the guide. You can ask questions without holding up the group. You can stop to look at something without the momentum of 30 people pushing you past it. The quality of the experience is meaningfully different at this scale.\n\nIf your group is larger than 12, contact us to arrange a private or split-group booking.`,
   },
   {
     icon: '⏱',

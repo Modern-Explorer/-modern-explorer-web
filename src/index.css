@@ -199,18 +199,40 @@ h1, h2, h3, h4, h5 {
   animation: meNavLine 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
 }
 
-/* Coming-soon card hover effects */
+/* ── Continuous coming-soon card animations ──────────────────────────────── */
+
+/* UAP — orb drifts across card in a continuous loop */
+@keyframes meOrbDriftLoop {
+  0%   { opacity: 0;   transform: translateY(-50%) translateX(-40px) scale(0.35); }
+  12%  { opacity: 0.9; transform: translateY(-54%) translateX(10px)  scale(1);    }
+  48%  { opacity: 0.8; transform: translateY(-44%) translateX(140px) scale(0.88); }
+  78%  { opacity: 0.5; transform: translateY(-50%) translateX(260px) scale(0.65); }
+  92%  { opacity: 0;   transform: translateY(-52%) translateX(320px) scale(0.35); }
+  100% { opacity: 0;   transform: translateY(-50%) translateX(-40px) scale(0.35); }
+}
 .cs-drift-orb {
   position: absolute; top: 42%; left: 8%;
-  opacity: 0; pointer-events: none; z-index: 3;
+  pointer-events: none; z-index: 3;
+  animation: meOrbDriftLoop 8s ease-in-out infinite;
 }
-[data-cs-theme="uap"]:hover .cs-drift-orb { animation: meOrbDrift 5s ease-in-out forwards; }
 
+/* Paranormal — always-flickering overlay */
 .cs-flicker-layer {
   position: absolute; inset: 0;
-  background: rgba(80,40,160,0.07); pointer-events: none; z-index: 3; opacity: 0;
+  background: rgba(80,40,160,0.07); pointer-events: none; z-index: 3;
+  animation: meFlicker 3.2s linear infinite;
 }
-[data-cs-theme="paranormal"]:hover .cs-flicker-layer { animation: meFlicker 2.8s linear infinite; opacity: 1; }
 
-[data-cs-theme="mining"]:hover .me-lantern { animation: meSwingLantern 4s ease-in-out infinite; }
-[data-cs-theme="expedition"]:hover .me-compass { animation: meSpinCompass 10s linear infinite; }
+/* Ghost eye — continuous float + eerie glow */
+@keyframes meGhostEyeFloat {
+  0%, 100% { transform: translateY(0) scale(1);     filter: drop-shadow(0 0 8px rgba(160,100,240,0.5)); opacity: 0.8; }
+  30%       { transform: translateY(-8px) scale(1.05); filter: drop-shadow(0 0 18px rgba(180,110,255,0.75)); opacity: 1; }
+  70%       { transform: translateY(-4px) scale(0.96); filter: drop-shadow(0 0 12px rgba(140,80,220,0.6)); opacity: 0.85; }
+}
+.me-ghost-eye { animation: meGhostEyeFloat 5s ease-in-out infinite; }
+
+/* Mining — lantern always swings */
+[data-cs-theme="mining"] .me-lantern { animation: meSwingLantern 4s ease-in-out infinite; }
+
+/* Expedition — compass always spins */
+[data-cs-theme="expedition"] .me-compass { animation: meSpinCompass 10s linear infinite; }

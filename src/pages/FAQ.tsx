@@ -8,7 +8,7 @@ const faqs = [
     category: 'Tours & Booking',
     items: [
       { q: 'How do I book a tour?', a: 'All tour reservations are handled through FareHarbor. Click any "Book a Tour" button on the site and you\'ll be taken directly to the booking calendar. You can filter by tour type, date, and group size.' },
-      { q: 'How many people are on each tour?', a: 'We keep groups small—typically 6 to 12 participants. This is intentional. Small groups mean more access, more conversation with your guide, and a better overall experience.' },
+      { q: 'How many people are on each tour?', a: 'We keep groups small — minimum 2, maximum 12 participants. This is intentional. Small groups mean more access, more conversation with your guide, and a better overall experience.' },
       { q: 'What is your cancellation policy?', a: 'Full refunds are available up to 72 hours before your tour. Cancellations within 72 hours may be rescheduled but are not eligible for a refund. Weather-related cancellations initiated by us are always fully refunded or rescheduled.' },
       { q: 'Can I book a private group tour?', a: 'Yes. We offer private bookings for groups of 4 or more. Contact us directly to discuss custom itineraries, dates, and pricing.' },
       { q: 'Do you offer gift cards or gift bookings?', a: 'Not yet, but this is on our roadmap. Sign up on the Coming Soon page and we\'ll notify you when gift options are available.' },

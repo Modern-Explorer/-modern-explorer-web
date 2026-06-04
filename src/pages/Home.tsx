@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useRef, useEffect } from 'react';
-import { OrbIcon, CompassIcon, LanternIcon } from '../components/Icons';
+import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
 
@@ -9,7 +9,7 @@ const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-ite
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 const features = [
-  { icon: '/assets/images/compass.png', label: 'Small Groups', desc: 'Intimate 6–12 person expeditions for a real, personal experience.' },
+  { icon: '/assets/images/compass.png', label: 'Small Groups', desc: 'Intimate 2–12 person expeditions for a real, personal experience.' },
   { icon: '/assets/images/maps-and-flags.png', label: 'Authentic Local Experiences', desc: 'Every tour is rooted in genuine local history, legend, and lore.' },
   { icon: '/assets/images/backpack.png', label: 'Curated Immersive Travel', desc: 'Thoughtfully designed journeys that go far beyond the typical tour.' },
 ];
@@ -18,7 +18,7 @@ const activeTour = {
   img: IMG('Crestone', '20250810_090739-EDIT.jpg'),
   stats: [
     { label: 'Duration', value: '45–60 min' },
-    { label: 'Group Size', value: '6–12' },
+    { label: 'Group Size', value: '2–12' },
     { label: 'Difficulty', value: 'Easy' },
   ],
   topics: [
@@ -89,8 +89,9 @@ const csTheme: Record<string, string> = {
 };
 
 const iconMap: Record<string, React.ReactNode> = {
-  'UFO / UAP Tour':    <OrbIcon className="me-orb" />,
-  'Mining & History':  <LanternIcon />,
+  'UFO / UAP Tour':     <OrbIcon className="me-orb" />,
+  'Paranormal & Ghosts': <GhostEyeIcon className="me-ghost-eye" />,
+  'Mining & History':   <LanternIcon />,
   'Future Expeditions': <CompassIcon className="me-compass" />,
 };
 
@@ -215,10 +216,12 @@ export default function Home() {
           </div>
           <p style={{
             fontFamily: 'var(--font-alt)',
-            fontSize: 'clamp(16px, 1.8vw, 22px)',
-            color: 'rgba(240,244,255,0.65)',
+            fontSize: 'clamp(15px, 1.8vw, 20px)',
+            color: '#ffffff',
+            fontWeight: 600,
             letterSpacing: '0.06em',
             marginTop: 52,
+            textShadow: '0 1px 10px rgba(0,0,0,0.9), 0 0 28px rgba(0,0,0,0.6)',
           }}>
             Immersive Small-Group Tours Designed For Curious Travelers.
           </p>
@@ -315,7 +318,7 @@ export default function Home() {
                 <div>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$45</span>
                   <span style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', marginLeft: 6 }}>/ person</span>
-                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Groups of 6–12 · 45–60 min · All ages</p>
+                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Groups of 2–12 · 45–60 min · All ages</p>
                 </div>
                 <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '15px 36px' }}>
                   Book This Tour →

@@ -141,7 +141,7 @@ export default function Upcoming() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {[
                   { label: 'Duration', value: '45–60 min' },
-                  { label: 'Group Size', value: '6–12' },
+                  { label: 'Group Size', value: '2–12' },
                   { label: 'Difficulty', value: 'Easy' },
                 ].map(s => (
                   <div key={s.label} style={{ padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 4, textAlign: 'center' }}>

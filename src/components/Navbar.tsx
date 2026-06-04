@@ -32,7 +32,8 @@ export default function Navbar() {
       transition: 'all 0.3s ease',
     }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', height: 72, gap: 32 }}>
-        <Link to="/" style={{ flexShrink: 0 }}>
+        <Link to="/" style={{ flexShrink: 0 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <img
             src="/assets/images/content/Logo/ME Logo Draft 5.png"
             alt="Modern Explorer"
@@ -46,6 +47,7 @@ export default function Navbar() {
               key={l.to}
               to={l.to}
               end={l.to === '/'}
+              onClick={l.to === '/' ? () => window.scrollTo({ top: 0, behavior: 'smooth' }) : undefined}
               style={({ isActive }) => ({
                 padding: '6px 14px',
                 fontFamily: 'var(--font-heading)',
