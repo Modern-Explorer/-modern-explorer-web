@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Review {
   author: string;
@@ -98,6 +98,27 @@ function ReviewCard({ r }: { r: Review }) {
   );
 }
 
+// ── Mobile carousel hook ──────────────────────────────────────────────────────
+function useMobileCarousel(count: number) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const scrollTo = useCallback((idx: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollTo({ left: idx * el.offsetWidth, behavior: 'smooth' });
+    setActiveIdx(idx);
+  }, []);
+
+  const onScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setActiveIdx(Math.round(el.scrollLeft / el.offsetWidth));
+  }, []);
+
+  return { trackRef, activeIdx, scrollTo, onScroll, count };
+}
+
 export default function GoogleReviews() {
   const [data, setData]       = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -128,12 +149,72 @@ export default function GoogleReviews() {
 
   const reviews = data?.reviews || [];
   const hasReviews = reviews.length > 0;
+  const carousel  = useMobileCarousel(reviews.length || 3);
 
   return (
     <>
+      <style>{`
+        /* Desktop/tablet: show grid, hide carousel controls */
+        .gr-desktop { display: block; }
+        .gr-mobile  { display: none; }
+        /* Mobile: show carousel, hide grid */
+        @media (max-width: 767px) {
+          .gr-desktop { display: none !important; }
+          .gr-mobile  { display: block !important; }
+          .gr-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 0;
+          }
+          .gr-track::-webkit-scrollbar { display: none; }
+          .gr-slide {
+            min-width: 100%;
+            max-width: 100%;
+            scroll-snap-align: start;
+            padding: 0 4px;
+            box-sizing: border-box;
+          }
+          .gr-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+          }
+          .gr-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--border);
+            border: none; cursor: pointer; padding: 0;
+            transition: background .2s, transform .2s;
+          }
+          .gr-dot.active { background: var(--accent); transform: scale(1.25); }
+          .gr-arrows {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+          }
+          .gr-arrow {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid var(--border-accent);
+            background: var(--accent-dim);
+            color: var(--accent);
+            font-size: 18px; line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .15s;
+          }
+          .gr-arrow:disabled { opacity: .3; cursor: not-allowed; }
+          .gr-rating-bar { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+          .gr-leave-link { margin-left: 0 !important; }
+        }
+      `}</style>
+
       {/* Overall rating bar */}
       {hasReviews && data && data.rating > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36, flexWrap: 'wrap' }}>
+        <div className="gr-rating-bar" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 48, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.02em', lineHeight: 1 }}>
               {data.rating.toFixed(1)}
@@ -148,18 +229,18 @@ export default function GoogleReviews() {
               Updates automatically as new reviews come in
             </p>
           </div>
-          <a href={`https://search.google.com/local/writereview?placeid=${encodeURIComponent(data?.total?.toString() || '')}`}
+          <a href="https://search.google.com/local/writereview"
             target="_blank" rel="noopener noreferrer"
-            className="btn btn-ghost"
+            className="btn btn-ghost gr-leave-link"
             style={{ fontSize: 12, marginLeft: 'auto' }}>
             Leave a Review →
           </a>
         </div>
       )}
 
-      {/* Review grid */}
+      {/* ── DESKTOP/TABLET: grid ── */}
       {hasReviews ? (
-        <>
+        <div className="gr-desktop">
           <div className="grid-3" style={{ marginBottom: reviews.length > 3 ? 20 : 0 }}>
             {reviews.slice(0, 3).map((r, i) => <ReviewCard key={i} r={r} />)}
           </div>
@@ -168,26 +249,65 @@ export default function GoogleReviews() {
               {reviews.slice(3).map((r, i) => <ReviewCard key={i} r={r} />)}
             </div>
           )}
-        </>
+        </div>
       ) : (
-        /* No reviews yet — show a "Be the first" CTA */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-          {[
-            'Share what brought you to Crestone and what you discovered.',
-            'Tell us about the moment the valley changed how you see things.',
-            'Help future explorers know what to expect on their first visit.',
-          ].map((prompt, i) => (
-            <div key={i} style={{ padding: '28px 24px', background: 'var(--bg-section)', border: '1px dashed rgba(203,243,110,0.2)', borderRadius: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
-              <span style={{ fontSize: 28, opacity: 0.4 }}>{'★'.repeat(5)}</span>
-              <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.65 }}>{prompt}</p>
-              <a href="https://g.page/r/review" target="_blank" rel="noopener noreferrer"
-                style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600 }}>
-                Write a Google review →
-              </a>
-            </div>
-          ))}
+        <div className="gr-desktop">
+          {/* No reviews CTA — desktop */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+            {[
+              'Share what brought you to Crestone and what you discovered.',
+              'Tell us about the moment the valley changed how you see things.',
+              'Help future explorers know what to expect on their first visit.',
+            ].map((prompt, i) => (
+              <div key={i} style={{ padding: '28px 24px', background: 'var(--bg-section)', border: '1px dashed rgba(203,243,110,0.2)', borderRadius: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
+                <span style={{ fontSize: 28, opacity: 0.4 }}>{'★'.repeat(5)}</span>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.65 }}>{prompt}</p>
+                <a href="https://g.page/r/review" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600 }}>
+                  Write a Google review →
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
+      {/* ── MOBILE: carousel ── */}
+      <div className="gr-mobile">
+        <div className="gr-track" ref={carousel.trackRef} onScroll={carousel.onScroll}>
+          {hasReviews ? reviews.map((r, i) => (
+            <div key={i} className="gr-slide">
+              <ReviewCard r={r} />
+            </div>
+          )) : (
+            ['Share what brought you to Crestone.', 'Tell us what you discovered here.', 'Help future explorers know what to expect.'].map((prompt, i) => (
+              <div key={i} className="gr-slide">
+                <div style={{ padding: '28px 20px', background: 'var(--bg-section)', border: '1px dashed rgba(203,243,110,0.2)', borderRadius: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
+                  <span style={{ fontSize: 24, opacity: 0.4 }}>★★★★★</span>
+                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.65 }}>{prompt}</p>
+                  <a href="https://g.page/r/review" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600 }}>Write a Google review →</a>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Arrows */}
+        <div className="gr-arrows">
+          <button className="gr-arrow" disabled={carousel.activeIdx === 0}
+            onClick={() => carousel.scrollTo(carousel.activeIdx - 1)}>‹</button>
+          <button className="gr-arrow" disabled={carousel.activeIdx >= (hasReviews ? reviews.length : 3) - 1}
+            onClick={() => carousel.scrollTo(carousel.activeIdx + 1)}>›</button>
+        </div>
+
+        {/* Dots */}
+        <div className="gr-dots">
+          {(hasReviews ? reviews : [1,2,3]).map((_, i) => (
+            <button key={i} className={`gr-dot${carousel.activeIdx === i ? ' active' : ''}`}
+              onClick={() => carousel.scrollTo(i)} />
+          ))}
+        </div>
+      </div>
 
       {/* Google attribution (required by ToS) */}
       <p style={{ textAlign: 'right', marginTop: 16, fontFamily: 'var(--font-alt)', fontSize: 11, color: 'var(--text-dim)', opacity: 0.6 }}>

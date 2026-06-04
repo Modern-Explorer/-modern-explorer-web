@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useYouTubeVideos } from '../hooks/useYouTubeVideos';
 import AnomalyFeed from '../components/AnomalyFeed';
 import { ARTICLES } from '../data/fieldReportArticles';
@@ -182,6 +182,8 @@ function MockBadge({ label = 'Mock Data' }: { label?: string }) {
 export default function FieldReports() {
   const [active, setActive]   = useState('All');
   const [modalId, setModalId] = useState<number | null>(null);
+  const carouselRef  = useRef<HTMLDivElement>(null);
+  const [carouselIdx, setCarouselIdx] = useState(0);
   const showEventBanner = active === 'All' || active === 'Community';
   const baseFiltered = active === 'All' ? posts : posts.filter(p => p.tag === active);
   const filtered = showEventBanner ? baseFiltered.filter(p => !p.pinnedEvent) : baseFiltered;
@@ -333,7 +335,9 @@ export default function FieldReports() {
       {/* POSTS GRID */}
       <section id="mesa-sasquatch" className="section">
         <div className="container">
-          <div className="grid-3">
+
+          {/* ── Desktop/tablet: standard 3-col grid ── */}
+          <div className="fr-posts-desktop grid-3">
             {filtered.map(post => (
               <article key={post.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
@@ -360,6 +364,65 @@ export default function FieldReports() {
               </article>
             ))}
           </div>
+
+          {/* ── Mobile: swipe carousel ── */}
+          <div className="fr-posts-mobile">
+            {/* Track */}
+            <div className="fr-carousel-track" ref={carouselRef}
+              onScroll={() => {
+                const el = carouselRef.current;
+                if (el) setCarouselIdx(Math.round(el.scrollLeft / el.offsetWidth));
+              }}>
+              {filtered.map(post => (
+                <div key={post.id} className="fr-carousel-slide">
+                  <article className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div style={{ position: 'relative', paddingTop: '56%', overflow: 'hidden' }}>
+                      <img src={post.img} alt={post.title}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <div style={{ padding: '16px 18px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 10 }}>
+                        <span className="tag">{post.tag}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{post.readTime}</span>
+                      </div>
+                      <h3 style={{ fontSize: 16, lineHeight: 1.25, marginBottom: 8 }}>{post.title}</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: 13, lineHeight: 1.6, flex: 1, marginBottom: 16 }}>
+                        {post.excerpt.slice(0, 120)}…
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{post.date}</span>
+                        <button onClick={() => setModalId(post.id)}
+                          style={{ fontSize: 11, color: 'var(--accent)', fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer' }}>
+                          Read →
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              ))}
+            </div>
+
+            {/* Arrow nav */}
+            <div className="fr-carousel-arrows">
+              <button className="fr-carousel-arrow" disabled={carouselIdx === 0}
+                onClick={() => { const el = carouselRef.current; if (el) el.scrollTo({ left: (carouselIdx-1)*el.offsetWidth, behavior:'smooth'}); }}>‹</button>
+              <span style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)' }}>
+                {carouselIdx + 1} / {filtered.length}
+              </span>
+              <button className="fr-carousel-arrow" disabled={carouselIdx >= filtered.length - 1}
+                onClick={() => { const el = carouselRef.current; if (el) el.scrollTo({ left: (carouselIdx+1)*el.offsetWidth, behavior:'smooth'}); }}>›</button>
+            </div>
+
+            {/* Dots */}
+            <div className="fr-carousel-dots">
+              {filtered.map((_, i) => (
+                <button key={i}
+                  className={`fr-carousel-dot${carouselIdx === i ? ' active' : ''}`}
+                  onClick={() => { const el = carouselRef.current; if (el) el.scrollTo({ left: i*el.offsetWidth, behavior:'smooth'}); }} />
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 

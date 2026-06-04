@@ -257,7 +257,7 @@ export default function About() {
               {/* Fourteeners grid */}
               <div>
                 <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 10 }}>Sangre de Cristo Fourteeners</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px 16px' }}>
+                <div className="fourteeners-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px 16px' }}>
                   {[
                     ['Blanca Peak', '14,351 ft'],
                     ['Ellingwood Point', '14,042 ft'],
@@ -281,7 +281,7 @@ export default function About() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
               {[
                 IMG('Crestone', '20250810_093131-EDIT.jpg'),
-                IMG('Crestone', '20250810_093137-EDIT.jpg'),
+                IMG('Crestone', '20250810_091206-EDIT.jpg'),
                 IMG('Crestone', '20250810_093528-EDIT.jpg'),
                 IMG('Nature', '20250510_100646-EDIT.jpg'),
               ].map((src, i) => (
