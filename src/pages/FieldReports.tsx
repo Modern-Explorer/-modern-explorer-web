@@ -463,7 +463,7 @@ export default function FieldReports() {
               <p style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', padding: '12px 0' }}>Could not load videos: {ytError}</p>
             )}
             {!ytLoading && !ytError && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              <div className="social-yt-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {ytVideos.map(v => (
                   <a key={v.id} href={v.url} target="_blank" rel="noopener noreferrer"
                     style={{ textDecoration: 'none', color: 'inherit', transition: 'opacity 0.2s' }}
@@ -490,7 +490,7 @@ export default function FieldReports() {
           </div>
 
           {/* INSTAGRAM + FACEBOOK side by side */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          <div className="social-ig-fb-grid">
 
             {/* INSTAGRAM */}
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px' }}>

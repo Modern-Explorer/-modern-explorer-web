@@ -321,3 +321,134 @@ h1, h2, h3, h4, h5 {
   .hide-mobile { display: none !important; }
   .stack-mobile { flex-direction: column !important; align-items: flex-start !important; }
 }
+
+/* ── Comprehensive mobile fixes (max-width: 768px) ──────────────────────────
+   Desktop styles are NOT touched. All rules here only apply to mobile/tablet.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Prevent ALL horizontal overflow */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  main, section, .container, .container-narrow {
+    max-width: 100% !important;
+    overflow-x: hidden;
+  }
+  /* Tighter container padding on phones */
+  .container, .container-narrow { padding-left: 16px !important; padding-right: 16px !important; }
+}
+
+/* ── Homepage: active tour card (inline 1fr/1fr grid) ── */
+.home-tour-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+@media (max-width: 768px) {
+  .home-tour-card {
+    grid-template-columns: 1fr !important;
+    margin-bottom: 48px;
+  }
+  .home-tour-image {
+    min-height: 260px !important;
+    /* gradient changes direction so it fades down not right */
+  }
+  .home-tour-image .tour-gradient-overlay {
+    background: linear-gradient(to bottom, transparent 50%, var(--bg-card)) !important;
+  }
+  .home-tour-stats {
+    position: static !important;
+    display: flex !important;
+    gap: 10px;
+    padding: 16px 16px 0 !important;
+    background: var(--bg-card);
+    flex-wrap: wrap;
+  }
+  .home-tour-content {
+    padding: 20px 20px 28px !important;
+  }
+  .home-tour-booking {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .home-tour-booking .btn { width: 100% !important; justify-content: center; text-align: center; }
+}
+
+/* ── Homepage: coming-soon grid ── */
+@media (max-width: 768px) {
+  .home-coming-soon { grid-template-columns: 1fr !important; }
+}
+
+/* ── FieldReports: social section grids ── */
+.social-ig-fb-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .social-ig-fb-grid { grid-template-columns: 1fr !important; gap: 16px; }
+  .social-yt-grid    { grid-template-columns: 1fr !important; }
+  .social-yt-grid > a { display: flex; gap: 12px; align-items: flex-start; }
+  .social-yt-grid > a > div:first-child { min-width: 120px; max-width: 120px; padding-top: 0 !important; height: 80px !important; }
+}
+
+/* ── Upcoming: Dead Man's Cave / expedition editorial grid ── */
+.expedition-editorial {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 52px;
+  align-items: start;
+  padding: 44px 48px 52px;
+}
+@media (max-width: 768px) {
+  .expedition-editorial {
+    grid-template-columns: 1fr !important;
+    padding: 24px 20px 32px !important;
+    gap: 32px !important;
+  }
+}
+
+/* ── Upcoming: tour stats 3-col ── */
+@media (max-width: 768px) {
+  .tour-stats-3col { grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; }
+}
+
+/* ── About page grids ── */
+@media (max-width: 768px) {
+  .about-founder-grid { grid-template-columns: 1fr !important; }
+  .about-images-grid  { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* ── WhatToExpect grid ── */
+@media (max-width: 768px) {
+  .wte-section { grid-template-columns: 1fr !important; }
+}
+
+/* ── Buttons: full-width on mobile for key CTAs ── */
+@media (max-width: 480px) {
+  .btn-full-mobile { width: 100% !important; justify-content: center; text-align: center; display: block; }
+}
+
+/* ── Text: no overflow, proper wrapping ── */
+@media (max-width: 768px) {
+  h1, h2, h3, h4 { overflow-wrap: break-word; word-break: break-word; hyphens: auto; }
+  p, li, span     { overflow-wrap: break-word; }
+  /* Prevent wide absolute-positioned overlays from causing scroll */
+  [style*="position: absolute"], [style*="position:absolute"] { max-width: 100%; }
+}
+
+/* ── FieldReports: filter bar scroll ── */
+@media (max-width: 768px) {
+  .fr-filter-bar { padding: 12px 16px !important; }
+  .fr-filter-bar button { padding: 6px 12px !important; font-size: 11px !important; }
+}
+
+/* ── General: any inline 2-col or 3-col grid with class helpers ── */
+@media (max-width: 768px) {
+  .mob-stack { display: flex !important; flex-direction: column !important; }
+  .mob-full  { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
+}

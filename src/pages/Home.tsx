@@ -232,15 +232,15 @@ export default function Home() {
           </div>
 
           {/* Active tour card */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', marginBottom: 80 }}>
+          <div className="home-tour-card">
             {/* Image side */}
-            <div style={{ position: 'relative', minHeight: 440 }}>
+            <div className="home-tour-image" style={{ position: 'relative', minHeight: 440 }}>
               <img
                 src={activeTour.img}
                 alt="Crestone Walking Tour"
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 50%, var(--bg-card))' }} />
+              <div className="tour-gradient-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 50%, var(--bg-card))' }} />
               <div style={{ position: 'absolute', top: 20, left: 20 }}>
                 <span style={{ display: 'inline-block', padding: '5px 14px', background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.4)', borderRadius: 3 }}>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#4ade80' }}>Available Now</span>
@@ -249,7 +249,7 @@ export default function Home() {
               <div style={{ position: 'absolute', top: 18, right: 20, opacity: 0.7 }}>
                 <CompassIcon className="me-compass-active" />
               </div>
-              <div style={{ position: 'absolute', bottom: 24, left: 20, display: 'flex', gap: 10 }}>
+              <div className="home-tour-stats" style={{ position: 'absolute', bottom: 24, left: 20, display: 'flex', gap: 10 }}>
                 {activeTour.stats.map(s => (
                   <div key={s.label} style={{ padding: '10px 14px', background: 'rgba(11,15,28,0.88)', border: '1px solid var(--border)', borderRadius: 4, backdropFilter: 'blur(8px)', textAlign: 'center' }}>
                     <p style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 700, color: 'var(--accent)', marginBottom: 1 }}>{s.value}</p>
@@ -260,7 +260,7 @@ export default function Home() {
             </div>
 
             {/* Content side */}
-            <div style={{ padding: '44px 44px 44px 40px' }}>
+            <div className="home-tour-content" style={{ padding: '44px 44px 44px 40px' }}>
               <span className="eyebrow">The Original Tour</span>
               <h2 style={{ fontSize: 'clamp(26px, 3vw, 42px)', marginBottom: 16, lineHeight: 1.1 }}>The Crestone<br />Walking Tour</h2>
               <div className="divider" />
@@ -278,7 +278,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+              <div className="home-tour-booking" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
                 <div>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$45</span>
                   <span style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', marginLeft: 6 }}>/ person</span>
@@ -305,7 +305,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid-2" style={{ marginBottom: 40 }}>
+          <div className="grid-2 home-coming-soon" style={{ marginBottom: 40 }}>
             {comingSoon.map(tour => (
               <div key={tour.title} data-cs-theme={csTheme[tour.title] || ''} style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--bg-card)' }}>
                 <div style={{ position: 'relative', paddingTop: '48%', overflow: 'hidden' }}>

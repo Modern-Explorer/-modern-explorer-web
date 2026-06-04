@@ -138,7 +138,7 @@ export default function Upcoming() {
                 </div>
               </div>
               {/* Quick stats row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <div className="tour-stats-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {[
                   { label: 'Duration', value: '45–60 min' },
                   { label: 'Group Size', value: '2–12' },
@@ -310,7 +310,7 @@ export default function Upcoming() {
             </div>
 
             {/* Editorial content */}
-            <div style={{ padding: '44px 48px 52px', display: 'grid', gridTemplateColumns: '1fr 340px', gap: 52, alignItems: 'start' }}>
+            <div className="expedition-editorial">
 
               {/* Left — body copy */}
               <div>
