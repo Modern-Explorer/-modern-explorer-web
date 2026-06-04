@@ -103,6 +103,8 @@ export default function AnomalyFeed() {
   const [liveLoaded, setLiveLoaded]       = useState(false);
   const [lastUpdated, setLastUpdated]     = useState<Date | null>(null);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set(['ufo','cryptid','mutilation','paranormal']));
+  const [hoveredId, setHoveredId]         = useState<string | null>(null);
+  const [tappedIds, setTappedIds]         = useState<Set<string>>(new Set());
   const prevIdsRef                        = useRef<Set<string>>(new Set(BASELINE.map(r => r.id)));
   const seenFirstLoad                     = useRef(false);
 
@@ -229,15 +231,25 @@ export default function AnomalyFeed() {
           )}
           {visible.map((r, i) => {
             const cfg = CAT_CONFIG[r.category];
+            const expanded = hoveredId === r.id || tappedIds.has(r.id);
             return (
               <div key={r.id} className="af-row" style={{
-                padding:'9px 14px',
-                borderBottom:'1px solid rgba(203,243,110,.04)',
-                borderLeft:`2px solid ${i === 0 ? cfg.color : 'transparent'}`,
-                transition:'border-left-color .18s, background .18s',
+                padding:'10px 14px',
+                borderBottom:'1px solid rgba(203,243,110,.05)',
+                borderLeft:`2px solid ${expanded || i === 0 ? cfg.color : 'transparent'}`,
+                background: expanded ? 'rgba(203,243,110,.03)' : 'transparent',
+                maxHeight: expanded ? '400px' : '92px',
+                overflow: 'hidden',
+                transition: 'max-height .35s ease, background .18s, border-left-color .18s',
+                cursor: 'pointer',
               }}
-                onMouseEnter={e => { e.currentTarget.style.borderLeftColor = cfg.color; e.currentTarget.style.background = 'rgba(203,243,110,.02)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderLeftColor = i === 0 ? cfg.color : 'transparent'; e.currentTarget.style.background = 'transparent'; }}
+                onMouseEnter={() => setHoveredId(r.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={() => setTappedIds(prev => {
+                  const next = new Set(prev);
+                  next.has(r.id) ? next.delete(r.id) : next.add(r.id);
+                  return next;
+                })}
               >
                 <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:4, flexWrap:'wrap' }}>
                   <span style={{ fontFamily:"'Courier New',monospace", fontSize:8, fontWeight:700, letterSpacing:'.08em', color:cfg.color, background:cfg.bg, padding:'1px 6px', borderRadius:2 }}>
@@ -250,17 +262,17 @@ export default function AnomalyFeed() {
                     <span style={{ fontFamily:"'Courier New',monospace", fontSize:8, color:'rgba(120,150,110,.4)' }}>· {r.shape}</span>
                   )}
                 </div>
-                <div style={{ display:'flex', alignItems:'baseline', marginBottom:3 }}>
-                  <span style={{ fontFamily:"'Courier New',monospace", fontSize:10, fontWeight:700, color:'rgba(203,243,110,.8)', letterSpacing:'.03em' }}>
+                <div style={{ display:'flex', alignItems:'baseline', marginBottom:4 }}>
+                  <span style={{ fontFamily:"'Courier New',monospace", fontSize:expanded ? 12 : 10, fontWeight:700, color:'rgba(203,243,110,.85)', letterSpacing:'.03em', transition:'font-size .2s ease' }}>
                     {r.location}
                   </span>
                   <CoordBadge lat={r.lat} lng={r.lng} />
                 </div>
-                <p style={{ fontFamily:"'Courier New',monospace", fontSize:10, color:'rgba(155,195,135,.6)', lineHeight:1.55, margin:'0 0 4px' }}>
+                <p style={{ fontFamily:"'Courier New',monospace", fontSize: expanded ? 14 : 11, color: expanded ? 'rgba(185,220,165,.82)' : 'rgba(155,195,135,.6)', lineHeight: expanded ? 1.7 : 1.5, margin:'0 0 5px', transition:'font-size .2s ease, color .2s ease' }}>
                   {r.summary}
                 </p>
-                <span style={{ fontFamily:"'Courier New',monospace", fontSize:8, color:'rgba(90,130,70,.38)', letterSpacing:'.07em' }}>
-                  SRC: {r.source}
+                <span style={{ fontFamily:"'Courier New',monospace", fontSize:8, color:'rgba(90,130,70,.4)', letterSpacing:'.07em' }}>
+                  SRC: {r.source}{expanded ? '' : ' · hover to expand'}
                 </span>
               </div>
             );

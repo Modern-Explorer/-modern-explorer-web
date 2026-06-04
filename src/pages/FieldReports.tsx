@@ -379,52 +379,19 @@ export default function FieldReports() {
 
           {/* Map — full width */}
           <div style={{
-            position: 'relative',
             border: '1px solid rgba(203,243,110,0.28)',
             borderRadius: 6,
             overflow: 'hidden',
             boxShadow: '0 0 48px rgba(203,243,110,0.07)',
             marginBottom: 16,
           }}>
-            {/* Top tactical bar */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
-              background: 'linear-gradient(to bottom, rgba(2,8,4,.92), transparent)',
-              padding: '12px 18px 30px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              pointerEvents: 'none',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80', display: 'inline-block', flexShrink: 0 }} />
-                <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(203,243,110,.8)', textTransform: 'uppercase' }}>
-                  O'Brien Hotspot Map — Historical Record
-                </span>
-              </div>
-              <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, color: 'rgba(203,243,110,.4)', letterSpacing: '.08em' }}>
-                37°39′N · 105°52′W
-              </span>
-            </div>
-
             <iframe
-              src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1"
+              src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ll=37.7749,-105.5183&z=9"
               title="SLV Anomaly Field Map — Christopher O'Brien"
               style={{ display: 'block', width: '100%', height: 600, border: 'none' }}
               allowFullScreen
               loading="lazy"
             />
-
-            {/* Bottom coordinate badge */}
-            <div style={{
-              position: 'absolute', bottom: 14, left: 14, zIndex: 10,
-              background: 'rgba(2,10,3,.88)', backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(203,243,110,.18)', borderRadius: 3,
-              padding: '5px 12px',
-              fontFamily: "'Courier New',monospace", fontSize: 9,
-              color: 'rgba(203,243,110,.6)', letterSpacing: '.08em',
-              pointerEvents: 'none',
-            }}>
-              SLV · SAGUACHE COUNTY · SANGRE DE CRISTOS
-            </div>
           </div>
 
           {/* Credit block — full width below the map */}
