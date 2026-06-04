@@ -326,7 +326,7 @@ export default function Home() {
           </div>
 
           <div style={{ textAlign: 'center' }}>
-            <Link to="/upcoming" className="btn btn-ghost" style={{ fontSize: 14, padding: '12px 28px' }}>
+            <Link to="/upcoming#mesa-upcoming" className="btn btn-ghost" style={{ fontSize: 14, padding: '12px 28px' }}>
               See What's Coming →
             </Link>
           </div>
@@ -389,7 +389,7 @@ export default function Home() {
                 Christopher O'Brien spent 30 years mapping the paranormal hotspots of the San Luis Valley. This is his life's work.
               </p>
             </div>
-            <Link to="/field-reports" className="btn btn-outline" style={{ fontSize: 13, whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <Link to="/field-reports#mesa-map" className="btn btn-outline" style={{ fontSize: 13, whiteSpace: 'nowrap', flexShrink: 0 }}>
               Explore the Full Anomaly Map →
             </Link>
           </div>
@@ -416,7 +416,7 @@ export default function Home() {
               </span>
             </div>
             <iframe
-              src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1"
+              src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1&ll=37.9947,-105.5183&z=10"
               title="SLV Anomaly Map"
               style={{ display: 'block', width: '100%', height: 320, border: 'none' }}
               loading="lazy"
@@ -429,7 +429,7 @@ export default function Home() {
               display: 'flex', justifyContent: 'center',
               pointerEvents: 'none',
             }}>
-              <Link to="/field-reports"
+              <Link to="/field-reports#mesa-map"
                 className="btn btn-outline"
                 style={{ fontSize: 12, pointerEvents: 'auto', backdropFilter: 'blur(4px)' }}
               >

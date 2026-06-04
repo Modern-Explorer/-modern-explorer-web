@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useYouTubeVideos } from '../hooks/useYouTubeVideos';
 import AnomalyFeed from '../components/AnomalyFeed';
+import { ARTICLES } from '../data/fieldReportArticles';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -60,7 +61,7 @@ const posts = [
     excerpt: "Now in its nearly fourth decade, the Crestone Energy Fair returns September 11–13, 2026 in Saguache County — where minimal building codes have enabled decades of hands-on experimentation in sustainable living, producing one of the highest concentrations of natural and regenerative homes in the country. Features home tours, workshops, and speakers on sustainable building, renewable energy, water systems, and food sovereignty. Free and open to all.",
   },
   {
-    id: 8, tag: 'Community',
+    id: 8, tag: 'Community', pinnedEvent: true,
     title: "Crestone Vortex Festival — August 8–9, 2026",
     date: 'Aug 2026', author: 'Modern Explorer', readTime: '4 min',
     img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'),
@@ -86,6 +87,13 @@ const posts = [
 
   // ── Expedition News ───────────────────────────────────────────────────────────
 
+  {
+    id: 12, tag: 'Expedition News',
+    title: "La Caverna del Oro: The Cave of Gold at 13,000 Feet",
+    date: 'Feb 2026', author: 'Modern Explorer', readTime: '8 min',
+    img: IMG('History', 'Spanish Map.jpg'),
+    excerpt: "At 13,266 feet, Marble Mountain holds the highest-elevation significant cave in the United States. In 1541 Spanish monks used Native American slave labor to extract gold from within it. Around 1900 explorer Elisha Horn found a skeleton in Spanish armor at the entrance. In 1932 a second skeleton was found chained by the neck to an interior wall. The cave has never been fully surveyed. The gold has never been found.",
+  },
   {
     id: 11, tag: 'Expedition News',
     title: "Dead Man's Cave: The Spanish Treasure Expedition",
@@ -160,11 +168,26 @@ function MockBadge({ label = 'Mock Data' }: { label?: string }) {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function FieldReports() {
-  const [active, setActive] = useState('All');
+  const [active, setActive]   = useState('All');
+  const [modalId, setModalId] = useState<number | null>(null);
   const showEventBanner = active === 'All' || active === 'Community';
   const baseFiltered = active === 'All' ? posts : posts.filter(p => p.tag === active);
   const filtered = showEventBanner ? baseFiltered.filter(p => !p.pinnedEvent) : baseFiltered;
   const { videos: ytVideos, loading: ytLoading, error: ytError } = useYouTubeVideos('ModernExplorer');
+
+  // ESC key closes modal
+  useEffect(() => {
+    if (!modalId) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setModalId(null); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [modalId]);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = modalId ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [modalId]);
 
   return (
     <main style={{ paddingTop: 72 }}>
@@ -200,81 +223,60 @@ export default function FieldReports() {
         </div>
       </section>
 
-      {/* ── FEATURED EVENT BANNER ─────────────────────────────────────────────── */}
+      {/* ── FEATURED EVENTS ───────────────────────────────────────────────────── */}
       {showEventBanner && (
         <section style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-section)' }}>
           <div className="container" style={{ padding: '40px 24px' }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '340px 1fr',
-              borderRadius: 8,
-              overflow: 'hidden',
-              border: '1px solid rgba(203,243,110,0.3)',
-              boxShadow: '0 0 48px rgba(203,243,110,0.07)',
-              background: 'var(--bg-card)',
-            }}>
-              {/* Image */}
-              <div style={{ position: 'relative', minHeight: 260 }}>
-                <img
-                  src={IMG('Crestone', '20250810_095413-EDIT.jpg')}
-                  alt="Crestone Energy Fair 2026"
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.15), rgba(12,16,28,0.7) 100%)' }} />
-                {/* Date badge over image */}
-                <div style={{
-                  position: 'absolute', bottom: 20, left: 20,
-                  background: 'var(--accent)', color: 'var(--bg)',
-                  borderRadius: 4, padding: '8px 16px',
-                  fontFamily: 'var(--font-heading)', fontSize: 13, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
-                  lineHeight: 1.3,
-                }}>
-                  SEP 11–13<br />
-                  <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>2026 · FREE EVENT</span>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div style={{ padding: '32px 36px' }}>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
-                  <span style={{
-                    padding: '4px 12px',
-                    background: 'var(--accent)', color: '#0b0f1c',
-                    borderRadius: 3,
-                    fontSize: 10, fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase',
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <span style={{ padding: '4px 12px', background: 'var(--accent)', color: '#0b0f1c', borderRadius: 3, fontSize: 10, fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                Featured Events
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>Crestone · Summer–Fall 2026</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              {posts.filter(p => p.pinnedEvent).map(p => {
+                const isEnergyFair = p.id === 7;
+                return (
+                  <div key={p.id} style={{
+                    display: 'grid', gridTemplateColumns: '180px 1fr',
+                    borderRadius: 8, overflow: 'hidden',
+                    border: '1px solid rgba(203,243,110,0.28)',
+                    boxShadow: '0 0 32px rgba(203,243,110,0.06)',
+                    background: 'var(--bg-card)',
                   }}>
-                    Featured Event
-                  </span>
-                  <span className="tag">Community</span>
-                  <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>4 min read</span>
-                </div>
-
-                <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 30px)', marginBottom: 16, lineHeight: 1.15 }}>
-                  Crestone Energy Fair 2026
-                </h2>
-
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.75, marginBottom: 10 }}>
-                  Now in its nearly fourth decade, the Crestone Energy Fair is one of the longest-running free sustainability events in the country. Saguache County's minimal building codes have allowed decades of hands-on experimentation in sustainable living — giving rise to one of the highest concentrations of natural and regenerative homes in Colorado.
-                </p>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.75, marginBottom: 24 }}>
-                  The fair features home tours, workshops, and speakers covering sustainable building, renewable energy, water systems, and food sovereignty. Hands-on learning throughout. Free and open to all.
-                </p>
-
-                <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <a
-                    href="https://crestoneenergyfair.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary"
-                    style={{ fontSize: 13 }}
-                  >
-                    Visit crestoneenergyfair.org →
-                  </a>
-                  <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>
-                    By Modern Explorer · Jun 2026
-                  </span>
-                </div>
-              </div>
+                    <div style={{ position: 'relative', minHeight: 220 }}>
+                      <img src={p.img} alt={p.title}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.1), rgba(12,16,28,0.65))' }} />
+                      <div style={{
+                        position: 'absolute', bottom: 14, left: 14,
+                        background: 'var(--accent)', color: 'var(--bg)',
+                        borderRadius: 3, padding: '6px 12px',
+                        fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1.35,
+                      }}>
+                        {isEnergyFair ? <>SEP 11–13<br /><span style={{ fontSize: 9 }}>FREE EVENT</span></> : <>AUG 8–9<br /><span style={{ fontSize: 9 }}>CRESTONE</span></>}
+                      </div>
+                    </div>
+                    <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column' }}>
+                      <span className="tag" style={{ alignSelf: 'flex-start', marginBottom: 10 }}>Community</span>
+                      <h3 style={{ fontSize: 'clamp(15px, 1.6vw, 19px)', marginBottom: 10, lineHeight: 1.2 }}>{p.title}</h3>
+                      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, flex: 1, marginBottom: 16 }}>
+                        {p.excerpt.slice(0, 180)}…
+                      </p>
+                      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                        <button onClick={() => setModalId(p.id)} className="btn btn-primary" style={{ fontSize: 12 }}>
+                          Read Full Article →
+                        </button>
+                        <a href={isEnergyFair ? 'https://crestoneenergyfair.org' : 'https://darkskyvortex.com'}
+                          target="_blank" rel="noopener noreferrer"
+                          className="btn btn-outline" style={{ fontSize: 12 }}>
+                          Website →
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -300,7 +302,7 @@ export default function FieldReports() {
                   <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>By Modern Explorer · May 2025</span>
                   <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>7 min read</span>
                 </div>
-                <button className="btn btn-outline" style={{ fontSize: 13 }}>Read Full Report →</button>
+                <button className="btn btn-outline" style={{ fontSize: 13 }} onClick={() => setModalId(1)}>Read Full Report →</button>
               </div>
             </div>
           </div>
@@ -328,8 +330,9 @@ export default function FieldReports() {
                   <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.65, flex: 1, marginBottom: 20 }}>{post.excerpt}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 14 }}>
                     <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>By {post.author} · {post.date}</span>
-                    <button style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                      Read →
+                    <button onClick={() => setModalId(post.id)}
+                      style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      Read Full Report →
                     </button>
                   </div>
                 </div>
@@ -339,96 +342,109 @@ export default function FieldReports() {
         </div>
       </section>
 
-      {/* ── SLV ANOMALY MAP + LIVE FEED ──────────────────────────────────────── */}
-      <section id="mesa-map" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '72px 0' }}>
+      {/* ── SLV ANOMALY MAP ──────────────────────────────────────────────────── */}
+      <section id="mesa-map" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '72px 0 56px' }}>
         <div className="container">
 
-          {/* Section header */}
-          <div style={{ marginBottom: 32 }}>
+          {/* Header — full width, clearly above the map */}
+          <div style={{ marginBottom: 36 }}>
             <span className="eyebrow">Field Intelligence</span>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-              <div>
-                <h2 style={{ fontSize: 'clamp(22px, 3vw, 38px)', marginBottom: 6, lineHeight: 1.1, letterSpacing: '0.02em' }}>
-                  SLV Anomaly Field Map
-                </h2>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 10 }}>
-                  Compiled by Christopher O'Brien (1952–2024)
-                </p>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', maxWidth: 540, lineHeight: 1.6 }}>
-                  Over 1,000 documented paranormal events in the greater San Luis Valley region, alongside a live feed of current reports from NUFORC, BFRO, and field archives.
-                </p>
+            <h2 style={{ fontSize: 'clamp(22px, 3vw, 38px)', marginBottom: 8, lineHeight: 1.1 }}>
+              SLV Anomaly Field Map
+            </h2>
+            <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 12 }}>
+              Compiled by Christopher O'Brien (1952–2024)
+            </p>
+            <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', maxWidth: 600, lineHeight: 1.65, marginBottom: 0 }}>
+              Over 1,000 documented paranormal events in the greater San Luis Valley region. Hotspots, cattle mutilation sites, UAP corridors, and cryptid encounter zones mapped across three decades of field investigation.
+            </p>
+          </div>
+
+          {/* Map — full width */}
+          <div style={{
+            position: 'relative',
+            border: '1px solid rgba(203,243,110,0.28)',
+            borderRadius: 6,
+            overflow: 'hidden',
+            boxShadow: '0 0 48px rgba(203,243,110,0.07)',
+            marginBottom: 16,
+          }}>
+            {/* Top tactical bar */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+              background: 'linear-gradient(to bottom, rgba(2,8,4,.92), transparent)',
+              padding: '12px 18px 30px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              pointerEvents: 'none',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80', display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(203,243,110,.8)', textTransform: 'uppercase' }}>
+                  O'Brien Hotspot Map — Historical Record
+                </span>
               </div>
+              <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, color: 'rgba(203,243,110,.4)', letterSpacing: '.08em' }}>
+                37°39′N · 105°52′W
+              </span>
+            </div>
+
+            <iframe
+              src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1"
+              title="SLV Anomaly Field Map — Christopher O'Brien"
+              style={{ display: 'block', width: '100%', height: 600, border: 'none' }}
+              allowFullScreen
+              loading="lazy"
+            />
+
+            {/* Bottom coordinate badge */}
+            <div style={{
+              position: 'absolute', bottom: 14, left: 14, zIndex: 10,
+              background: 'rgba(2,10,3,.88)', backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(203,243,110,.18)', borderRadius: 3,
+              padding: '5px 12px',
+              fontFamily: "'Courier New',monospace", fontSize: 9,
+              color: 'rgba(203,243,110,.6)', letterSpacing: '.08em',
+              pointerEvents: 'none',
+            }}>
+              SLV · SAGUACHE COUNTY · SANGRE DE CRISTOS
             </div>
           </div>
 
-          {/* Two-column: map left, feed right */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20, alignItems: 'stretch' }}>
-
-            {/* Map */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{
-                position: 'relative', flex: 1,
-                border: '1px solid rgba(203,243,110,0.28)',
-                borderRadius: 6, overflow: 'hidden',
-                boxShadow: '0 0 48px rgba(203,243,110,0.07)',
-                minHeight: 520,
-              }}>
-                {/* Top bar */}
-                <div style={{
-                  position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
-                  background: 'linear-gradient(to bottom, rgba(2,8,4,.92), transparent)',
-                  padding: '12px 16px 28px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  pointerEvents: 'none',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80', display: 'inline-block', flexShrink: 0 }} />
-                    <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(203,243,110,.75)', textTransform: 'uppercase' }}>
-                      O'BRIEN HOTSPOT MAP — HISTORICAL
-                    </span>
-                  </div>
-                  <span style={{ fontFamily: "'Courier New',monospace", fontSize: 10, color: 'rgba(203,243,110,.4)', letterSpacing: '.08em' }}>
-                    37°39′N · 105°52′W
-                  </span>
-                </div>
-                <iframe
-                  src="https://www.google.com/maps/d/embed?mid=1JrJi16Sso3iOS1Qy2_1NNLLxKis&ehbc=2E312F&noprof=1"
-                  title="SLV Anomaly Field Map — Christopher O'Brien"
-                  style={{ display: 'block', width: '100%', height: '100%', minHeight: 520, border: 'none' }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-                <div style={{
-                  position: 'absolute', bottom: 12, left: 12, zIndex: 10,
-                  background: 'rgba(2,10,3,.88)', backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(203,243,110,.2)', borderRadius: 3,
-                  padding: '5px 11px',
-                  fontFamily: "'Courier New',monospace", fontSize: 9,
-                  color: 'rgba(203,243,110,.6)', letterSpacing: '.08em',
-                  pointerEvents: 'none',
-                }}>
-                  SLV · SAGUACHE COUNTY · SANGRE DE CRISTOS
-                </div>
-              </div>
-
-              {/* Credit */}
-              <div style={{
-                padding: '14px 18px',
-                background: 'rgba(203,243,110,.02)',
-                border: '1px solid rgba(203,243,110,.1)',
-                borderLeft: '3px solid rgba(203,243,110,.35)',
-                borderRadius: 4,
-              }}>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7, margin: 0 }}>
-                  This map represents decades of field research by author and investigator Christopher O'Brien, one of the most dedicated researchers of San Luis Valley phenomena. His work continues to guide researchers and explorers in this region. Live feed reports appear in the panel to the right.
-                </p>
-              </div>
-            </div>
-
-            {/* Live feed */}
-            <AnomalyFeed />
-
+          {/* Credit block — full width below the map */}
+          <div style={{
+            padding: '16px 20px',
+            background: 'rgba(203,243,110,.02)',
+            border: '1px solid rgba(203,243,110,.1)',
+            borderLeft: '3px solid rgba(203,243,110,.35)',
+            borderRadius: 4,
+          }}>
+            <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.75, margin: 0 }}>
+              This map represents decades of field research by author and investigator Christopher O'Brien, one of the most dedicated researchers of San Luis Valley phenomena. His work continues to guide researchers and explorers in this region.
+            </p>
           </div>
+
+        </div>
+      </section>
+
+      {/* ── LIVE ANOMALY FEED ────────────────────────────────────────────────── */}
+      <section style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)', padding: '56px 0 72px' }}>
+        <div className="container">
+
+          {/* Feed header */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <span className="eyebrow">Documented Events</span>
+              <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 32px)', marginBottom: 6, lineHeight: 1.1 }}>
+                Field Report Archive
+              </h2>
+              <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-muted)', maxWidth: 500, lineHeight: 1.6, marginBottom: 0 }}>
+                Reports from NUFORC, BFRO, O'Brien field archives, and MUFON — filtered for the San Luis Valley and surrounding Sangre de Cristos. Toggle categories to filter.
+              </p>
+            </div>
+          </div>
+
+          <AnomalyFeed />
+
         </div>
       </section>
 
@@ -609,6 +625,85 @@ export default function FieldReports() {
           </div>
         </div>
       </section>
+
+      {/* ── ARTICLE MODAL ─────────────────────────────────────────────────────── */}
+      {modalId !== null && (() => {
+        const article = ARTICLES[modalId];
+        if (!article) return null;
+        return (
+          <div
+            onClick={() => setModalId(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9990,
+              background: 'rgba(0,0,0,0.88)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '24px 16px',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                width: '100%', maxWidth: 760, maxHeight: '90vh',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                overflow: 'hidden',
+                display: 'flex', flexDirection: 'column',
+                boxShadow: '0 32px 80px rgba(0,0,0,0.7)',
+              }}
+            >
+              {/* Modal header */}
+              <div style={{ padding: '28px 36px 24px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
+                      <span className="tag">{article.category}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{article.readTime}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{article.date}</span>
+                    </div>
+                    <h2 style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', lineHeight: 1.15, marginBottom: 8 }}>{article.title}</h2>
+                    <p style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>By {article.author}</p>
+                  </div>
+                  <button
+                    onClick={() => setModalId(null)}
+                    style={{
+                      flexShrink: 0, width: 36, height: 36, borderRadius: '50%',
+                      border: '1px solid var(--border)', background: 'var(--bg-section)',
+                      color: 'var(--text-muted)', cursor: 'pointer', fontSize: 20, lineHeight: 1,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'border-color 0.15s, color 0.15s',
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-accent)'; (e.currentTarget as HTMLElement).style.color = 'var(--accent)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)'; }}
+                    aria-label="Close article"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal body — scrollable */}
+              <div style={{ overflowY: 'auto', padding: '32px 36px 48px', flex: 1 }}>
+                {article.body.split('\n\n').map((para, i) => (
+                  <p key={i} style={{
+                    fontFamily: 'var(--font-alt)',
+                    fontSize: 16, lineHeight: 1.8,
+                    color: para === para.toUpperCase() && para.length < 60
+                      ? 'var(--text-muted)' : 'var(--text)',
+                    fontWeight: para === para.toUpperCase() && para.length < 60 ? 700 : 400,
+                    letterSpacing: para === para.toUpperCase() && para.length < 60 ? '0.06em' : 0,
+                    marginBottom: para === para.toUpperCase() && para.length < 60 ? 12 : 22,
+                    marginTop: para === para.toUpperCase() && para.length < 60 ? (i > 0 ? 32 : 0) : 0,
+                  }}>
+                    {para}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </main>
   );
 }
