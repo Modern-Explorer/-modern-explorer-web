@@ -123,6 +123,9 @@ export default function GoogleReviews() {
   const [data, setData]       = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // ALL hooks must be called before any conditional return
+  const carousel = useMobileCarousel(data?.reviews?.length || 3);
+
   useEffect(() => {
     fetch('/api/reviews')
       .then(r => r.json())
@@ -147,9 +150,8 @@ export default function GoogleReviews() {
     );
   }
 
-  const reviews = data?.reviews || [];
+  const reviews    = data?.reviews || [];
   const hasReviews = reviews.length > 0;
-  const carousel  = useMobileCarousel(reviews.length || 3);
 
   return (
     <>
