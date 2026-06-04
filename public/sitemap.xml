@@ -43,4 +43,22 @@
     <priority>0.7</priority>
   </url>
 
+  <url>
+    <loc>https://modernexplorer.me/what-to-expect</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://modernexplorer.me/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://modernexplorer.me/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
 </urlset>

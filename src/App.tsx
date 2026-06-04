@@ -13,11 +13,13 @@ import Upcoming from './pages/Upcoming';
 import ComingSoon from './pages/ComingSoon';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
+import WhatToExpect from './pages/WhatToExpect';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 
 export default function App() {
   return (
     <BrowserRouter>
-      {/* Site-wide: analytics + LocalBusiness structured data */}
       <Analytics />
       <StructuredData data={LOCAL_BUSINESS_SCHEMA} />
 
@@ -32,6 +34,9 @@ export default function App() {
         <Route path="/coming-soon" element={<ComingSoon />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/what-to-expect" element={<WhatToExpect />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
       </Routes>
       <Footer />
       <Mesa />

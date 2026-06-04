@@ -26,18 +26,27 @@ const faqs = [
   {
     category: 'The Experience',
     items: [
-      { q: 'How much of the tour is actually about cryptids and the paranormal?', a: 'It varies by tour. All of our tours blend local history, geology, and folklore—the "unexplained" is one thread among many. We\'re not performance entertainers; we take the subject seriously and present what is documented without sensationalism.' },
-      { q: 'Are these tours "scary"?', a: 'Not intentionally. Our guides are knowledgeable and grounded. You\'ll hear genuinely strange and thought-provoking stories, but we prioritize curiosity over fear. If you\'re looking for a haunted house experience, this probably isn\'t it.' },
-      { q: 'What happens if nothing unusual is observed on a tour?', a: 'You still get a great hike, real local history, and a good story. We never manufacture experiences or create false anomalies. The authenticity is the point—and honestly, most tours surface something interesting regardless.' },
-      { q: 'Do you share your field research findings publicly?', a: 'Yes, through our Field Reports section and eventually through our forthcoming podcast and database. We believe in open documentation. Nothing gets locked behind a paywall.' },
+      { q: 'What makes Modern Explorer different from other Colorado tours?', a: 'Most tour companies present history at arm\'s length. We\'re active field researchers — the founder hiked the Sangre de Cristos for two months before settling in Crestone. Every route we run is terrain we know personally. We cover the documented paranormal record of this valley the same way a historian covers primary sources: with named events, dates, corroborating witnesses, and a deep respect for what is and isn\'t confirmed. We don\'t sensationalize. We don\'t manufacture experiences. We show you the valley as it actually is.' },
+      { q: 'How much of the tour is actually about the paranormal?', a: 'It varies by tour. All of our tours blend local history, geology, indigenous heritage, and documented unusual events — the "unexplained" is one thread woven through real history. We take the subject seriously and present only what is documented, without embellishment.' },
+      { q: 'What happens if nothing unusual is observed on a tour?', a: 'You still get a great walk, real local history, and stories you\'ll repeat for years. We never manufacture experiences or stage anomalies. The authenticity is the entire point — and the San Luis Valley tends to deliver something interesting regardless.' },
+      { q: 'Is photography allowed?', a: 'Absolutely — we encourage it. If you capture something unusual, share it with us. We document everything. We may also photograph tours for our own use; if you\'d prefer not to be photographed, tell your guide at the start.' },
+      { q: 'Do you share field research findings publicly?', a: 'Yes, through our Field Reports section on the website. We believe in open documentation. Nothing gets locked behind a paywall.' },
+    ],
+  },
+  {
+    category: 'Weather & Cancellations',
+    items: [
+      { q: 'What is your weather policy?', a: 'Tours run in most weather conditions — light rain, wind, cold. Crestone weather is part of the experience. If conditions become dangerous (lightning, severe storms, flash flood warnings), we will cancel and offer a full refund or free reschedule. The call is made by the guide on the day. Come prepared for variable conditions regardless of the forecast.' },
+      { q: 'What is your cancellation policy?', a: 'Full refunds are available up to 72 hours before your tour. Cancellations within 72 hours may be rescheduled but are not eligible for a refund. If we cancel for any reason, you receive a full refund or a reschedule at no charge.' },
     ],
   },
   {
     category: 'Practical Info',
     items: [
-      { q: 'Where do tours start? Is parking available?', a: 'Tour meeting points vary by route. All details including exact location, parking instructions, and what3words coordinates are included in your confirmation email. We recommend arriving 10–15 minutes early.' },
-      { q: 'Is there cell service at tour locations?', a: 'Some areas have spotty or no cell coverage. We operate with satellite communication on wilderness expeditions. If you have a condition that requires reliable emergency contact, let us know and we\'ll plan accordingly.' },
-      { q: 'Do you offer tours year-round?', a: 'Currently our walking tours run spring through fall (April–October). Winter tours and specialty events are in development. Sign up for updates to be notified when winter offerings launch.' },
+      { q: 'Where do tours start? Is parking available?', a: 'Tour meeting points vary by route. Exact location, parking instructions, and what3words coordinates are included in your booking confirmation. Arrive 10–15 minutes early — GPS can be inconsistent near Crestone.' },
+      { q: 'Is there cell service at tour locations?', a: 'Service is spotty or absent in some areas. On wilderness expeditions we carry satellite communication. If reliable emergency contact is a requirement for you, let us know before booking.' },
+      { q: 'Do you offer tours year-round?', a: 'Walking tours currently run April–October. Winter tours and specialty events are in development. Sign up on the Coming Soon page to be notified when new offerings launch.' },
+      { q: 'Are kids welcome?', a: 'Yes. Most tours are great for curious kids ages 10+. The content — history, mystery, landscape — tends to capture children well. Some night and wilderness tours are 16+; check individual listings. Children must be accompanied by a participating adult.' },
     ],
   },
 ];

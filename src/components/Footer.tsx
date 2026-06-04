@@ -68,8 +68,10 @@ export default function Footer() {
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20 }}>Info</p>
             {[
               { to: '/faq', label: 'FAQ' },
+              { to: '/what-to-expect', label: 'What to Expect' },
               { to: '/contact', label: 'Contact' },
-              { to: '/coming-soon', label: 'Coming Soon' },
+              { to: '/privacy-policy', label: 'Privacy Policy' },
+              { to: '/terms', label: 'Terms of Service' },
             ].map(l => (
               <Link key={l.to} to={l.to} style={{ display: 'block', color: 'var(--text-muted)', fontSize: 14, marginBottom: 12, transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}

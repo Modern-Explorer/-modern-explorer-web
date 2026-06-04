@@ -37,12 +37,43 @@ const comingSoon = [
   { title: 'Future Expeditions', subtitle: 'Multi-Day Field Operations', img: IMG('Nature', '20250510_124904-EDIT.jpg'), eta: 'In Development' },
 ];
 
-const testimonials = [
-  { quote: "Every step on these tours felt like peeling back a layer of Crestone's hidden history. I left with more questions—and a deeper respect for this extraordinary place.", name: 'Sarah K.', role: 'Historian & Adventurer' },
-  { quote: "I never imagined a walking tour could be this immersive. The stories, the landscapes, and the mysteries—each moment felt like a scene from a documentary.", name: 'Marcus T.', role: 'Outdoor Educator' },
-  { quote: "From ancient legends to unexplained lights in the sky, this experience made me see the world with new eyes. Absolutely life-changing.", name: 'Elena R.', role: 'Paranormal Researcher' },
-  { quote: "The guides blend knowledge, humor, and real adventure. I felt safe, challenged, and part of something bigger than myself.", name: 'David L.', role: 'Expedition Participant' },
+// ── Testimonials (replace placeholders with real reviews) ────────────────────
+const TESTIMONIALS = [
+  { id: 1, quote: 'Add your first review here — share what made your Modern Explorer experience stand out.', name: 'Your Name', location: 'City, State', initials: '?', stars: 5, placeholder: true },
+  { id: 2, quote: 'A second guest review goes here. What did you see, feel, or discover on the tour?', name: 'Guest Name', location: 'City, State', initials: '?', stars: 5, placeholder: true },
+  { id: 3, quote: 'Third review placeholder. Great place for a quote about the Sangre de Cristos, the valley, or the guide.', name: 'Guest Name', location: 'City, State', initials: '?', stars: 5, placeholder: true },
+  { id: 4, quote: 'Fourth review — perhaps from someone who came for the Sand Dunes and discovered Modern Explorer nearby.', name: 'Guest Name', location: 'City, State', initials: '?', stars: 5, placeholder: true },
+  { id: 5, quote: 'Fifth review. Could be about the paranormal angle, the history, or simply an unforgettable afternoon in the valley.', name: 'Guest Name', location: 'City, State', initials: '?', stars: 5, placeholder: true },
 ];
+
+function TestimonialCard({ t }: { t: typeof TESTIMONIALS[0] }) {
+  return (
+    <div style={{ padding: '28px 30px', background: 'var(--bg-section)', border: `1px solid ${t.placeholder ? 'rgba(203,243,110,0.15)' : 'var(--border)'}`, borderRadius: 6, display: 'flex', flexDirection: 'column' }}>
+      {/* Stars */}
+      <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
+        {Array.from({ length: t.stars }).map((_, i) => (
+          <span key={i} style={{ color: '#f59e0b', fontSize: 14 }}>★</span>
+        ))}
+      </div>
+      <div style={{ fontSize: 36, color: 'var(--accent)', fontFamily: 'Georgia, serif', lineHeight: 1, marginBottom: 12, opacity: 0.5 }}>"</div>
+      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: t.placeholder ? 'var(--text-dim)' : 'var(--text)', lineHeight: 1.7, marginBottom: 20, flex: 1, fontStyle: 'italic' }}>{t.quote}</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', background: t.placeholder ? 'rgba(203,243,110,0.06)' : 'var(--accent-dim)', border: `1px solid ${t.placeholder ? 'rgba(203,243,110,0.2)' : 'var(--border-accent)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, color: 'var(--accent)', flexShrink: 0 }}>
+          {t.initials}
+        </div>
+        <div>
+          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, letterSpacing: '0.05em' }}>{t.name}</p>
+          <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{t.location}</p>
+        </div>
+        {t.placeholder && (
+          <span style={{ marginLeft: 'auto', fontSize: 9, fontFamily: 'var(--font-heading)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(203,243,110,0.3)', border: '1px solid rgba(203,243,110,0.15)', borderRadius: 2, padding: '2px 7px' }}>
+            Placeholder
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const blogPreviews = [
   { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: IMG('Crestone', '20250810_093828-EDIT.jpg') },
@@ -280,9 +311,16 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '15px 36px' }}>
-                Book This Tour
-              </a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+                <div>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$45</span>
+                  <span style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', marginLeft: 6 }}>/ person</span>
+                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Groups of 6–12 · 45–60 min · All ages</p>
+                </div>
+                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '15px 36px' }}>
+                  Book This Tour →
+                </a>
+              </div>
             </div>
           </div>
 
@@ -451,24 +489,19 @@ export default function Home() {
         <div className="container">
           <div data-reveal style={{ textAlign: 'center', marginBottom: 56 }}>
             <span className="eyebrow">Explorer Stories</span>
-            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>Begin Your Next True Adventure</h2>
+            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>What Explorers Are Saying</h2>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, maxWidth: 480, margin: '12px auto 0', lineHeight: 1.65 }}>
+              Real experiences from real people. Replace these placeholders with your reviews.
+            </p>
           </div>
-          <div className="grid-2">
-            {testimonials.map(t => (
-              <div key={t.name} style={{ padding: '32px 36px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6 }}>
-                <div style={{ fontSize: 48, color: 'var(--accent)', fontFamily: 'Georgia, serif', lineHeight: 1, marginBottom: 16, opacity: 0.6 }}>"</div>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 17, color: 'var(--text)', lineHeight: 1.7, marginBottom: 24, fontStyle: 'italic' }}>{t.quote}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-heading)', fontSize: 14, color: 'var(--accent)' }}>
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, letterSpacing: '0.05em' }}>{t.name}</p>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-alt)' }}>{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+
+          {/* Row 1 — 3 cards */}
+          <div className="grid-3" style={{ marginBottom: 20 }}>
+            {TESTIMONIALS.slice(0, 3).map(t => <TestimonialCard key={t.id} t={t} />)}
+          </div>
+          {/* Row 2 — 2 cards centered */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20, maxWidth: 820, margin: '0 auto' }}>
+            {TESTIMONIALS.slice(3).map(t => <TestimonialCard key={t.id} t={t} />)}
           </div>
         </div>
       </section>
