@@ -132,9 +132,14 @@ export default function Navbar() {
       )}
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
           .nav-links-desktop { display: none !important; }
           .nav-hamburger { display: flex !important; }
+        }
+        /* Tablet: force desktop nav visible, hide hamburger */
+        @media (min-width: 768px) {
+          .nav-links-desktop { display: flex !important; }
+          .nav-hamburger { display: none !important; }
         }
       `}</style>
     </nav>

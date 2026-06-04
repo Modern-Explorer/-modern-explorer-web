@@ -452,3 +452,85 @@ h1, h2, h3, h4, h5 {
   .mob-stack { display: flex !important; flex-direction: column !important; }
   .mob-full  { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TABLET FIXES — 768px to 1024px ONLY
+   Desktop (>1024px) and mobile (<768px) styles are NOT touched here.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. grid-3: restore 3-column at tablet (overrides the ≤960px 2-col rule) */
+@media (min-width: 768px) and (max-width: 960px) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr) !important; gap: 20px !important; }
+}
+
+/* 2. Featured event cards: tighten image column width at tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .featured-event-card { grid-template-columns: 140px 1fr !important; }
+  .featured-event-card .fec-image { min-height: 180px !important; }
+}
+
+/* 3. Home tour card: tighter content padding at tablet */
+@media (min-width: 768px) and (max-width: 900px) {
+  .home-tour-content { padding: 28px 24px !important; }
+  .home-tour-content h2 { font-size: clamp(22px, 3vw, 32px) !important; }
+  .home-tour-booking { gap: 14px !important; }
+}
+
+/* 4. Container padding: comfortable tablet gutter */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container, .container-narrow { padding-left: 24px !important; padding-right: 24px !important; }
+}
+
+/* 5. Coming-soon card grid: 2-col is fine but ensure even at tablet */
+@media (min-width: 768px) and (max-width: 960px) {
+  .home-coming-soon { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+}
+
+/* 6. Field Reports: featured events outer grid — 2-col is fine at tablet */
+@media (min-width: 768px) and (max-width: 900px) {
+  .featured-events-grid { gap: 14px !important; }
+}
+
+/* 7. Social IG+FB: 2-col at tablet is fine, but tighten gap */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .social-ig-fb-grid { gap: 16px !important; }
+}
+
+/* 8. Expedition editorial: ensure proper layout at tablet range */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .expedition-editorial {
+    grid-template-columns: 1fr 300px !important;
+    gap: 36px !important;
+    padding: 32px 32px 40px !important;
+  }
+}
+
+/* 9. Contact layout: clean up at mid-tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .contact-layout { gap: 36px !important; }
+}
+
+/* 10. What to Expect icon + text rows: comfortable at tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .wte-section { gap: 20px !important; }
+}
+
+/* 11. Headings: clip large clamp values that overflow at tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  h1 { font-size: clamp(36px, 6vw, 64px) !important; }
+}
+
+/* 12. Section vertical padding: slightly less than desktop at tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section { padding: 72px 0 !important; }
+}
+
+/* 13. MESA chat: keep positioned well at tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mesa-chat { width: 400px !important; right: 24px !important; }
+}
+
+/* 14. Merch iframe: full viewport height at tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .merch-iframe { height: max(700px, calc(100vh - 160px)) !important; }
+}
