@@ -366,4 +366,61 @@ app.get('/api/anomaly-feed', async (_req, res) => {
   res.json(merged);
 });
 
+// ── GOOGLE REVIEWS ───────────────────────────────────────────────────────────
+
+let reviewsCache = { data: null, ts: 0 };
+const REVIEWS_TTL = 60 * 60 * 1000; // 1 hour
+
+app.get('/api/reviews', async (_req, res) => {
+  const PLACE_ID = process.env.GOOGLE_PLACE_ID;
+  const API_KEY  = process.env.GOOGLE_PLACES_API_KEY;
+
+  // Return empty gracefully when not configured — frontend falls back to CTA
+  if (!PLACE_ID || !API_KEY) {
+    return res.json({ reviews: [], rating: 0, total: 0, configured: false });
+  }
+
+  if (reviewsCache.data && Date.now() - reviewsCache.ts < REVIEWS_TTL) {
+    return res.json(reviewsCache.data);
+  }
+
+  try {
+    const url = `https://maps.googleapis.com/maps/api/place/details/json` +
+      `?place_id=${encodeURIComponent(PLACE_ID)}` +
+      `&fields=name,rating,user_ratings_total,reviews` +
+      `&reviews_sort=newest` +
+      `&key=${API_KEY}`;
+
+    const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const json = await resp.json();
+
+    if (json.status !== 'OK') {
+      console.warn('Places API error:', json.status, json.error_message || '');
+      return res.json({ reviews: [], rating: 0, total: 0, configured: true, error: json.status });
+    }
+
+    const data = {
+      configured: true,
+      rating:  json.result.rating              || 0,
+      total:   json.result.user_ratings_total  || 0,
+      reviews: (json.result.reviews || []).map(r => ({
+        author:  r.author_name,
+        url:     r.author_url,
+        photo:   r.profile_photo_url,
+        rating:  r.rating,
+        ago:     r.relative_time_description,
+        time:    r.time,
+        text:    r.text,
+      })),
+    };
+
+    reviewsCache = { data, ts: Date.now() };
+    console.log(`Reviews cached: ${data.reviews.length} reviews, ${data.rating}★ (${data.total} total)`);
+    res.json(data);
+  } catch (err) {
+    console.error('Reviews fetch error:', err.message);
+    res.json({ reviews: [], rating: 0, total: 0, configured: true, error: err.message });
+  }
+});
+
 app.listen(PORT, () => console.log(`API server → http://localhost:${PORT}`));
