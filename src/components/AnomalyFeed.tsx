@@ -123,12 +123,36 @@ export default function AnomalyFeed() {
     const tryLive = async () => {
       try {
         const ctrl = new AbortController();
-        const timeout = setTimeout(() => ctrl.abort(), 5000);
-        const res = await fetch('/api/anomaly-feed', { signal: ctrl.signal });
+        const timeout = setTimeout(() => ctrl.abort(), 8000);
+
+        // Try combined feed AND dedicated proxy endpoints in parallel
+        const [feedRes, ufoRes, bfroRes] = await Promise.allSettled([
+          fetch('/api/anomaly-feed',     { signal: ctrl.signal }),
+          fetch('/api/ufo-reports',      { signal: ctrl.signal }),
+          fetch('/api/bigfoot-reports',  { signal: ctrl.signal }),
+        ]);
         clearTimeout(timeout);
-        if (!res.ok) return;
-        const data: AnomalyReport[] = await res.json();
-        if (!Array.isArray(data) || data.length === 0) return;
+
+        // Collect all successfully parsed arrays
+        const all: AnomalyReport[] = [];
+        for (const result of [feedRes, ufoRes, bfroRes]) {
+          if (result.status === 'fulfilled' && result.value.ok) {
+            try {
+              const d: AnomalyReport[] = await result.value.json();
+              if (Array.isArray(d)) all.push(...d);
+            } catch { /* ignore parse errors */ }
+          }
+        }
+
+        // Deduplicate by id, keep newest first
+        const seen = new Set<string>();
+        const data = all.filter(r => {
+          if (seen.has(r.id)) return false;
+          seen.add(r.id);
+          return true;
+        }).sort((a, b) => (b.date > a.date ? 1 : -1));
+
+        if (data.length === 0) return;
 
         // Detect new entries vs what's already shown
         const newOnes = data.filter(r => !prevIdsRef.current.has(r.id));

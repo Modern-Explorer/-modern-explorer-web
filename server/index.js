@@ -144,17 +144,133 @@ app.post('/api/mesa', async (req, res) => {
   }
 });
 
-// ── ANOMALY FEED ─────────────────────────────────────────────────────────────
+// ── ANOMALY FEED — proxy helpers ─────────────────────────────────────────────
 
-// SLV-area cities to match against NUFORC city field
-const SLV_CITIES = [
-  'alamosa','monte vista','del norte','saguache','crestone','moffat','blanca',
-  'fort garland','hooper','center','san luis','antonito','la jara','manassa',
-  'romeo','conejos','capulin','villa grove','great sand dunes','baca',
-];
+const PROXY_TTL  = 2 * 60 * 60 * 1000; // 2 hours
+const FETCH_OPTS = { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }, signal: AbortSignal.timeout(12000) };
 
-// Real documented SLV reports (NUFORC / BFRO / historical record) used when
-// live scraping is unavailable or returns too few results
+// SLV-area cities / counties
+const SLV_CITIES   = ['alamosa','monte vista','del norte','saguache','crestone','moffat','blanca','fort garland','hooper','center','san luis','antonito','la jara','manassa','romeo','conejos','capulin','villa grove','great sand dunes','baca'];
+const SLV_COUNTIES = ['saguache','alamosa','costilla','conejos','rio grande','huerfano'];
+
+// ── NUFORC scraper ────────────────────────────────────────────────────────────
+async function fetchNUFORCColorado() {
+  const res  = await fetch('https://nuforc.org/webreports/ndxlCO.html', FETCH_OPTS);
+  const html = await res.text();
+  const rows = [];
+  const rowRx  = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  const cellRx = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+  let m;
+  while ((m = rowRx.exec(html)) !== null) {
+    const cells = [];
+    let c;
+    cellRx.lastIndex = 0;
+    while ((c = cellRx.exec(m[1])) !== null) {
+      cells.push(c[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').trim());
+    }
+    // NUFORC cols: status | date/time | city | state | country | shape | duration | summary | posted
+    if (cells.length >= 7 && cells[3] === 'CO') {
+      const city = (cells[2] || '').toLowerCase();
+      if (SLV_CITIES.some(s => city.includes(s))) {
+        const rawDate  = cells[1] || '';
+        const dateParts = rawDate.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        const iso = dateParts ? `${dateParts[3]}-${dateParts[1]}-${dateParts[2]}` : rawDate.slice(0, 10);
+        const shape = (cells[5] || '').toLowerCase();
+        rows.push({
+          id:       `nuforc-live-${iso}-${Math.random().toString(36).slice(2, 6)}`,
+          date:     iso,
+          location: `${cells[2]}, CO`,
+          county:   '',
+          category: shape.includes('track') || shape.includes('foot') ? 'cryptid' : 'ufo',
+          shape:    cells[5] || undefined,
+          summary:  cells[7] || cells[6] || '',
+          source:   'NUFORC',
+          lat:      undefined,
+          lng:      undefined,
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+// ── BFRO scraper ──────────────────────────────────────────────────────────────
+// BFRO county pages list reports as plain text lines:
+// "August 2000 (Class A) - Description of encounter"
+const BFRO_SLV_COUNTIES = ['Alamosa','Costilla','Conejos','Huerfano','Saguache'];
+const MONTH_MAP = { January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',
+                    July:'07',August:'08',September:'09',October:'10',November:'11',December:'12',
+                    Spring:'04',Summer:'07',Fall:'10',Winter:'01' };
+
+async function fetchBFROColorado() {
+  const results = await Promise.allSettled(
+    BFRO_SLV_COUNTIES.map(async (county) => {
+      const res  = await fetch(
+        `https://www.bfro.net/GDB/show_county_reports.asp?state=co&county=${county}`,
+        FETCH_OPTS
+      );
+      const html = await res.text();
+      const text = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+      const reports = [];
+      // Pattern: "Month Year (Class X) - Description"
+      const rx = /((?:January|February|March|April|May|June|July|August|September|October|November|December|Spring|Summer|Fall|Winter)\s+\d{4})\s+\(Class\s+([ABC])\)\s+-\s+([^(]{20,})/g;
+      let m;
+      while ((m = rx.exec(text)) !== null) {
+        const [, dateStr, cls, desc] = m;
+        const yr  = (dateStr.match(/\d{4}/) || ['0000'])[0];
+        const mon = MONTH_MAP[(dateStr.match(/^(\w+)/) || ['','Jan'])[1]] || '01';
+        reports.push({
+          id:       `bfro-${county.toLowerCase()}-${yr}-${Math.random().toString(36).slice(2,6)}`,
+          date:     `${yr}-${mon}-01`,
+          location: `${county} County, CO`,
+          county:   `${county} County`,
+          category: 'cryptid',
+          shape:    `Class ${cls}`,
+          summary:  desc.trim(),
+          source:   'BFRO',
+          lat:      undefined,
+          lng:      undefined,
+        });
+      }
+      return reports;
+    })
+  );
+  return results
+    .filter(r => r.status === 'fulfilled')
+    .flatMap(r => r.value);
+}
+
+// ── Per-source caches ─────────────────────────────────────────────────────────
+let ufoCache  = { data: null, ts: 0 };
+let bfroCache = { data: null, ts: 0 };
+
+app.get('/api/ufo-reports', async (_req, res) => {
+  if (ufoCache.data && Date.now() - ufoCache.ts < PROXY_TTL) return res.json(ufoCache.data);
+  try {
+    const reports = await fetchNUFORCColorado();
+    ufoCache = { data: reports, ts: Date.now() };
+    console.log(`NUFORC proxy: ${reports.length} SLV reports fetched`);
+    res.json(reports);
+  } catch (err) {
+    console.warn('NUFORC proxy failed:', err.message);
+    res.json(ufoCache.data || []);
+  }
+});
+
+app.get('/api/bigfoot-reports', async (_req, res) => {
+  if (bfroCache.data && Date.now() - bfroCache.ts < PROXY_TTL) return res.json(bfroCache.data);
+  try {
+    const reports = await fetchBFROColorado();
+    bfroCache = { data: reports, ts: Date.now() };
+    console.log(`BFRO proxy: ${reports.length} SLV reports fetched`);
+    res.json(reports);
+  } catch (err) {
+    console.warn('BFRO proxy failed:', err.message);
+    res.json(bfroCache.data || []);
+  }
+});
+
+// Real documented SLV reports — baseline fallback
 const BASELINE_REPORTS = [
   { id:'nuforc-1967-003', date:'1967-09-03', location:'Near Crestone, CO', county:'Saguache County',
     category:'ufo', summary:'Three house-sized balls of fire descended vertically then accelerated horizontally, covering estimated 40 miles in 3–4 seconds. Multiple witnesses in adjacent counties corroborated. Reported to NUFORC.',
@@ -218,65 +334,26 @@ const BASELINE_REPORTS = [
     source:'NUFORC / MUFON', lat:38.09, lng:-106.14 },
 ];
 
-// In-memory cache (1 hour TTL)
+// Combined feed cache (1 hour TTL)
 let feedCache = { data: null, ts: 0 };
 const FEED_TTL = 60 * 60 * 1000;
 
-async function scrapNUFORCColorado() {
-  const res = await fetch('https://nuforc.org/webreports/ndxlCO.html', {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; research-archive)' },
-    signal: AbortSignal.timeout(10000),
-  });
-  const html = await res.text();
-
-  const rows = [];
-  const rowRx = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-  const cellRx = /<td[^>]*>([\s\S]*?)<\/td>/gi;
-  let m;
-  while ((m = rowRx.exec(html)) !== null) {
-    const cells = [];
-    let c;
-    while ((c = cellRx.exec(m[1])) !== null) {
-      cells.push(c[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim());
-    }
-    // NUFORC cols: status | date | city | state | country | shape | summary | posted
-    if (cells.length >= 7 && cells[3] === 'CO') {
-      const city = (cells[2] || '').toLowerCase();
-      if (SLV_CITIES.some(s => city.includes(s))) {
-        const rawDate = cells[1] || '';
-        const dateParts = rawDate.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-        const iso = dateParts ? `${dateParts[3]}-${dateParts[1]}-${dateParts[2]}` : rawDate;
-        const shape = (cells[5] || '').toLowerCase();
-        const category = shape.includes('track') || shape.includes('foot') ? 'cryptid' : 'ufo';
-        rows.push({
-          id: `nuforc-live-${iso}-${Math.random().toString(36).slice(2,6)}`,
-          date: iso,
-          location: `${cells[2]}, CO`,
-          county: '',
-          category,
-          shape: cells[5] || undefined,
-          summary: cells[6] || '',
-          source: 'NUFORC',
-          lat: undefined,
-          lng: undefined,
-        });
-      }
-    }
-  }
-  return rows;
-}
-
 app.get('/api/anomaly-feed', async (_req, res) => {
-  if (feedCache.data && Date.now() - feedCache.ts < FEED_TTL) {
-    return res.json(feedCache.data);
-  }
-  let live = [];
-  try {
-    live = await scrapNUFORCColorado();
-  } catch (err) {
-    console.warn('NUFORC scrape failed:', err.message);
-  }
-  // Merge live + baseline, deduplicate by id, sort newest first
+  if (feedCache.data && Date.now() - feedCache.ts < FEED_TTL) return res.json(feedCache.data);
+
+  // Fetch NUFORC and BFRO in parallel, server-side (no CORS)
+  const [ufoResult, bfroResult] = await Promise.allSettled([
+    fetchNUFORCColorado(),
+    fetchBFROColorado(),
+  ]);
+  const live = [
+    ...(ufoResult.status  === 'fulfilled' ? ufoResult.value  : []),
+    ...(bfroResult.status === 'fulfilled' ? bfroResult.value : []),
+  ];
+  if (ufoResult.status  === 'rejected') console.warn('NUFORC fetch failed:', ufoResult.reason?.message);
+  if (bfroResult.status === 'rejected') console.warn('BFRO fetch failed:',   bfroResult.reason?.message);
+
+  // Merge with baseline, deduplicate, sort newest first
   const seen = new Set();
   const merged = [...live, ...BASELINE_REPORTS].filter(r => {
     if (seen.has(r.id)) return false;
@@ -285,6 +362,7 @@ app.get('/api/anomaly-feed', async (_req, res) => {
   }).sort((a, b) => (b.date > a.date ? 1 : -1));
 
   feedCache = { data: merged, ts: Date.now() };
+  console.log(`Anomaly feed: ${live.length} live + ${BASELINE_REPORTS.length} baseline = ${merged.length} total`);
   res.json(merged);
 });
 
