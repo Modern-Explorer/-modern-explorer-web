@@ -181,8 +181,6 @@ export default function GoogleReviews() {
   const hasApiData  = apiReviews.length > 0;
   const reviews     = hasApiData ? apiReviews : FALLBACK_REVIEWS;
   const isFallback  = !hasApiData;
-  const hasReviews  = reviews.length > 0;
-
   return (
     <>
       <style>{`

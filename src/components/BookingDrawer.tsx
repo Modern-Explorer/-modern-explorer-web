@@ -41,7 +41,8 @@ interface Slot {
   max_group_size: number;
   duration_minutes: number;
 }
-interface Customer { name: string; email: string; phone: string; }
+type ContactPref = 'email' | 'sms' | 'both';
+interface Customer { name: string; email: string; phone: string; contact_preference?: ContactPref; }
 interface BookingResult {
   confirmation_code: string;
   tour_name: string;
