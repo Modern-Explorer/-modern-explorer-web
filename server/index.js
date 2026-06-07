@@ -5,7 +5,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -28,7 +28,12 @@ The Crestone Walking Tour is currently available. 45–60 minutes. Groups of 6�
 
 You speak like an experienced field researcher — precise, intriguing, never corporate. Help visitors learn about the area and get excited about booking a tour. Occasionally reference classified-sounding field data to stay in character. Keep responses concise and mysterious. Never break character.`;
 
-app.use(cors({ origin: ['http://localhost:5173', 'https://modernexplorer.me'] }));
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173')
+  .split(',').map(s => s.trim());
+app.use(cors({
+  origin:      ALLOWED_ORIGINS,
+  credentials: true,
+}));
 app.use(express.json());
 
 const INTEREST_LABELS = {
@@ -108,7 +113,7 @@ app.post('/api/contact', async (req, res) => {
   try {
     await transporter.sendMail({
       from: `"Modern Explorer" <${process.env.GMAIL_USER}>`,
-      to:       'mateo.arguello@modernexplorer.me',
+      to:       'hello@modernexplorer.me',
       replyTo:  email,
       subject:  `[Contact] ${interestLabel} — ${name}`,
       html,
@@ -141,6 +146,149 @@ app.post('/api/mesa', async (req, res) => {
   } catch (err) {
     console.error('MESA error:', err.message);
     res.status(500).json({ error: 'Field intelligence offline. Signal interrupted.' });
+  }
+});
+
+// ── YOUTUBE — server-side proxy (RSS primary, Data API optional) ──────────────
+
+// Channel ID for @ModernExplorer — obtained from channel page, stable identifier
+const YT_CHANNEL_ID  = 'UCi4UREaoAwK3_rPD1NYI7DA';
+const YT_RSS         = `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`;
+const YT_API         = 'https://www.googleapis.com/youtube/v3';
+const YT_KEY         = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_PLACES_API_KEY;
+const API_REFERER    = process.env.API_REFERER || 'http://localhost:5173/';
+
+function ytFormatViews(n) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
+function ytParseDuration(iso) {
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return '';
+  const h   = parseInt(m[1] || '0');
+  const min = parseInt(m[2] || '0');
+  const s   = parseInt(m[3] || '0');
+  const mm  = String(min).padStart(h > 0 ? 2 : 1, '0');
+  const ss  = String(s).padStart(2, '0');
+  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+function ytTimeAgo(dateStr) {
+  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
+  if (days === 0)  return 'Today';
+  if (days === 1)  return 'Yesterday';
+  if (days < 7)   return `${days} days ago`;
+  if (days < 14)  return '1 week ago';
+  if (days < 30)  return `${Math.floor(days / 7)} weeks ago`;
+  if (days < 60)  return '1 month ago';
+  if (days < 365) return `${Math.floor(days / 30)} months ago`;
+  return `${Math.floor(days / 365)} years ago`;
+}
+
+// Parse YouTube RSS feed — no API key required
+async function fetchYouTubeRSS() {
+  let res, text;
+  try {
+    res  = await fetch(YT_RSS, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ModernExplorer/1.0)' }, signal: AbortSignal.timeout(10000) });
+    text = await res.text();
+  } catch (fetchErr) {
+    throw new Error(`YouTube RSS network error: ${fetchErr.message}`);
+  }
+
+  console.log(`YouTube RSS fetch: HTTP ${res.status}, Content-Type: ${res.headers.get('content-type')}, body length: ${text.length}`);
+
+  if (!res.ok) {
+    console.error('YouTube RSS non-OK response body (first 200):', text.slice(0, 200));
+    throw new Error(`YouTube RSS returned HTTP ${res.status}`);
+  }
+
+  if (!text.includes('<entry>')) {
+    console.error('YouTube RSS missing <entry> tags. Body (first 500):', text.slice(0, 500));
+    throw new Error('YouTube RSS feed contains no video entries');
+  }
+
+  // Pull video entries via regex — avoids needing an XML parser package
+  const entries = [...text.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].slice(0, 3);
+  if (!entries.length) throw new Error('No entries matched in YouTube RSS feed');
+
+  return entries.map(([, block]) => {
+    const getTag  = (tag) => block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))?.[1]?.trim() ?? '';
+    const getAttr = (tag, attr) => block.match(new RegExp(`<${tag}[^>]*\\s${attr}="([^"]+)"`))?.[1] ?? '';
+
+    const videoId   = getTag('yt:videoId');
+    const title     = getTag('title')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+    const published = getTag('published');
+    const thumbnail = getAttr('media:thumbnail', 'url') || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    const link      = getAttr('link', 'href') || `https://www.youtube.com/watch?v=${videoId}`;
+    const views     = getAttr('media:statistics', 'views');
+
+    if (!videoId) console.warn('YouTube RSS: entry missing yt:videoId. Block snippet:', block.slice(0, 200));
+    console.log(`  → videoId=${videoId} title="${title.slice(0, 50)}" thumbnail=${thumbnail} published=${published} link=${link}`);
+
+    return { videoId, title, published, thumbnail, link, views };
+  });
+}
+
+// Try Data API for view counts + duration (optional enhancement)
+async function fetchYouTubeStats(ids) {
+  if (!YT_KEY) return null;
+  try {
+    const res  = await fetch(
+      `${YT_API}/videos?part=statistics,contentDetails&id=${ids}&key=${YT_KEY}`,
+      { signal: AbortSignal.timeout(6000), headers: { Referer: API_REFERER } }
+    );
+    const data = await res.json();
+    if (data.error) { console.warn('YouTube Data API:', data.error.message); return null; }
+    return data.items || null;
+  } catch { return null; }
+}
+
+let ytCache = { data: null, ts: 0 };
+const YT_TTL = 30 * 60 * 1000;
+
+app.get('/api/youtube', async (_req, res) => {
+  if (ytCache.data && Date.now() - ytCache.ts < YT_TTL) return res.json(ytCache.data);
+
+  try {
+    // Primary: RSS feed — thumbnail, views, and published date all available without API key
+    const rssVideos = await fetchYouTubeRSS();
+    const ids       = rssVideos.map(v => v.videoId).join(',');
+
+    // Optional: enrich with duration from Data API (view count already in RSS)
+    const stats = await fetchYouTubeStats(ids);
+
+    const videos = rssVideos.map((v, i) => {
+      const stat     = stats?.find(s => s.id === v.videoId);
+      const apiViews = stat ? parseInt(stat.statistics?.viewCount || '0', 10) : NaN;
+      const rssViews = v.views ? parseInt(v.views, 10) : NaN;
+      const viewNum  = !isNaN(apiViews) ? apiViews : !isNaN(rssViews) ? rssViews : 0;
+      return {
+        videoId:   v.videoId,
+        title:     v.title,
+        thumbnail: v.thumbnail,
+        published: v.published,
+        link:      v.link,
+        viewCount: viewNum > 0 ? ytFormatViews(viewNum) : '',
+        duration:  stat ? ytParseDuration(stat.contentDetails?.duration || '') : '',
+        ago:       ytTimeAgo(v.published),
+      };
+    });
+
+    ytCache = { data: videos, ts: Date.now() };
+    const enhanced = stats ? 'with Data API stats' : 'RSS only (Data API unavailable or unconfigured)';
+    console.log(`YouTube: cached ${videos.length} videos — ${enhanced}`);
+    console.log('YouTube videos:', videos.map(v => `${v.videoId}: "${v.title.slice(0, 40)}" views=${v.viewCount}`));
+    res.json(videos);
+  } catch (err) {
+    console.error('YouTube proxy error:', err.message, err.stack?.split('\n')[1]);
+    if (ytCache.data) {
+      console.log('YouTube: serving stale cache after error');
+      return res.json(ytCache.data);
+    }
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -392,6 +540,7 @@ app.get('/api/reviews', async (_req, res) => {
         headers: {
           'X-Goog-Api-Key':   API_KEY,
           'X-Goog-FieldMask': 'id,displayName,rating,userRatingCount,reviews',
+          'Referer':           API_REFERER,
         },
         signal: AbortSignal.timeout(8000),
       }

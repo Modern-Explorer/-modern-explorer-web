@@ -1,9 +1,9 @@
 import SEO from '../components/SEO';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 
 export default function Terms() {
-  const updated = 'June 4, 2026';
+  const { open: openBooking } = useBooking();
+  const updated = 'June 7, 2026';
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
@@ -26,11 +26,11 @@ export default function Terms() {
             },
             {
               h: '2. Booking and Payment',
-              body: `All bookings are processed through FareHarbor. Your booking is confirmed when you receive a confirmation email from FareHarbor. Payment is required in full at the time of booking.\n\nPrices are as listed on the booking platform at the time of your reservation. Modern Explorer reserves the right to update pricing with reasonable advance notice.`,
+              body: `All bookings are made through our booking system at modernexplorer.me. Your booking is confirmed when you receive a confirmation email to the address you provided. Payment is required in full at the time of booking and is processed securely by Stripe.\n\nPrices are as listed on the booking platform at the time of your reservation. Modern Explorer reserves the right to update pricing with reasonable advance notice.`,
             },
             {
               h: '3. Cancellation and Refund Policy',
-              body: `You may cancel your reservation for a full refund up to 72 hours before your scheduled tour start time. Cancellations made within 72 hours of the tour are not eligible for a refund but may be rescheduled to a future date subject to availability.\n\nTo cancel, email us at admin@modernexplorer.me or use the cancellation link in your FareHarbor confirmation email.\n\nIf Modern Explorer cancels a tour for any reason — including weather, unsafe conditions, or insufficient participants — you will receive a full refund or the option to reschedule at no charge.`,
+              body: `You may cancel your reservation for a full refund up to 72 hours before your scheduled tour start time. Cancellations made within 72 hours of the tour are not eligible for a refund but may be rescheduled to a future date subject to availability.\n\nTo cancel, email us at hello@modernexplorer.me with your confirmation code.\n\nIf Modern Explorer cancels a tour for any reason — including weather, unsafe conditions, or insufficient participants — you will receive a full refund or the option to reschedule at no charge.`,
             },
             {
               h: '4. Weather Policy',
@@ -66,7 +66,7 @@ export default function Terms() {
             },
             {
               h: '12. Contact',
-              body: `For questions about these terms, contact us at:\n\nModern Explorer\nCrestone, Colorado 81131\nadmin@modernexplorer.me\n(719) 331-4200`,
+              body: `For questions about these terms, contact us at:\n\nModern Explorer\nCrestone, Colorado 81131\nhello@modernexplorer.me\n(719) 331-4200`,
             },
           ].map(s => (
             <div key={s.h} style={{ marginBottom: 40 }}>
@@ -82,9 +82,9 @@ export default function Terms() {
             <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 16 }}>
               By proceeding with a booking you confirm that you have read, understood, and agree to these terms of service.
             </p>
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 13 }}>
+            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 13 }}>
               Book a Tour
-            </a>
+            </button>
           </div>
         </div>
       </section>

@@ -1,6 +1,5 @@
 import SEO from '../components/SEO';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 const values = [
@@ -33,6 +32,7 @@ const guidePlaceholders = [
 ];
 
 export default function About() {
+  const { open: openBooking } = useBooking();
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
@@ -59,7 +59,7 @@ export default function About() {
           <div className="grid-2" style={{ alignItems: 'center', gap: 64 }}>
             <div style={{ position: 'relative' }}>
               <img
-                src={IMG('Mateo', '20250301_134650.jpg')}
+                src={IMG('Mateo', 'mateo_main.jpg')}
                 alt="Mateo Argüello"
                 style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
               />
@@ -82,9 +82,9 @@ export default function About() {
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 32 }}>
                 Based in Colorado and rooted in the San Luis Valley, Mateo specializes in cryptozoology, high-strangeness field research, and the kind of local lore that doesn't make it into the guidebooks. Every tour he leads is built on what he's actually found—not what's expected.
               </p>
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+              <button onClick={openBooking} className="btn btn-primary">
                 Join an Expedition
-              </a>
+              </button>
             </div>
           </div>
         </div>

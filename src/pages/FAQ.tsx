@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import SEO from '../components/SEO';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 
 const faqs = [
   {
     category: 'Tours & Booking',
     items: [
-      { q: 'How do I book a tour?', a: 'All tour reservations are handled through FareHarbor. Click any "Book a Tour" button on the site and you\'ll be taken directly to the booking calendar. You can filter by tour type, date, and group size.' },
+      { q: 'How do I book a tour?', a: 'All tour reservations are made through our online booking system. Click any "Book a Tour" button on the site and you\'ll be taken directly to the booking calendar. You can filter by tour type, date, and group size.' },
       { q: 'How many people are on each tour?', a: 'We keep groups small — minimum 2, maximum 12 participants. This is intentional. Small groups mean more access, more conversation with your guide, and a better overall experience.' },
       { q: 'What is your cancellation policy?', a: 'Full refunds are available up to 72 hours before your tour. Cancellations within 72 hours may be rescheduled but are not eligible for a refund. Weather-related cancellations initiated by us are always fully refunded or rescheduled.' },
       { q: 'Can I book a private group tour?', a: 'Yes. We offer private bookings for groups of 4 or more. Contact us directly to discuss custom itineraries, dates, and pricing.' },
@@ -52,6 +51,7 @@ const faqs = [
 ];
 
 export default function FAQ() {
+  const { open: openBooking } = useBooking();
   const [open, setOpen] = useState<string | null>(null);
   const toggle = (key: string) => setOpen(o => o === key ? null : key);
 
@@ -123,7 +123,7 @@ export default function FAQ() {
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/contact" className="btn btn-outline" style={{ fontSize: 14 }}>Contact Us</a>
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 14 }}>Book a Tour</a>
+            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 14 }}>Book a Tour</button>
           </div>
         </div>
       </section>

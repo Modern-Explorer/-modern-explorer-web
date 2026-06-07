@@ -115,35 +115,6 @@ const posts = [
   },
 ];
 
-// ─── Mock social data ──────────────────────────────────────────────────────────
-
-const igPosts = [
-  { id: 1, img: IMG('Crestone', '20250810_090739-EDIT.jpg'), likes: 312, caption: 'Golden hour above Crestone. The valley floor from up here is something else. 🌄 #SanLuisValley' },
-  { id: 2, img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'), likes: 481, caption: 'Night three of the sky watch. Logged two anomalous events between 2–4am. More details in the field report. 👁️' },
-  { id: 3, img: IMG('Animals', 'pexels-brett-sayles-1098886.jpg'), likes: 228, caption: "Ran into this one at 10,800ft. Animals know things we don't. #Colorado #WildlifeWatch" },
-  { id: 4, img: IMG('Crestone', '20250810_093828-EDIT.jpg'), likes: 395, caption: 'Our new route breaks here at sunrise. This ridge has a story. Coming soon. 🧭' },
-  { id: 5, img: IMG('Mateo', '20250421_075338-EDIT.jpg'), likes: 267, caption: "Gearing up for the season. Everything we carry has a reason. What's in your pack? ⛺" },
-  { id: 6, img: IMG('Cryptids', 'di86V.jpg'), likes: 544, caption: "This came in from a guest last week. Make of it what you will. We're heading back to that area next month. 🐾" },
-];
-
-const fbPosts = [
-  {
-    id: 1, ago: '2 days ago', likes: 88, comments: 14,
-    img: IMG('Crestone', '20250810_090851-EDIT.jpg'),
-    text: 'New field report just dropped — six months of sky watch data from the San Luis Valley in one place. This is the most complete look at what we\'ve been tracking. Link in bio.',
-  },
-  {
-    id: 2, ago: '1 week ago', likes: 61, comments: 9,
-    img: IMG('Nature', '20250518_185929-EDIT.jpg'),
-    text: 'Tour dates are filling up for the fall season. We keep groups small on purpose — this isn\'t a bus tour. If you\'ve been thinking about joining us, now\'s the time to book.',
-  },
-  {
-    id: 3, ago: '2 weeks ago', likes: 103, comments: 22,
-    img: IMG('UFOs', 'MrhuO.jpg'),
-    text: 'Question for the community: what\'s your most unexplained experience in Colorado? We\'re building a community report and want to hear from people who\'ve been in the field.',
-  },
-];
-
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
 function PlatformHeader({ color, label, handle, url }: { color: string; label: string; handle: string; url: string }) {
@@ -166,14 +137,6 @@ function PlatformHeader({ color, label, handle, url }: { color: string; label: s
         Follow →
       </a>
     </div>
-  );
-}
-
-function MockBadge({ label = 'Mock Data' }: { label?: string }) {
-  return (
-    <span style={{ display: 'inline-block', padding: '2px 8px', background: 'rgba(203,243,110,0.08)', border: '1px solid rgba(203,243,110,0.2)', borderRadius: 2, fontSize: 10, fontFamily: 'var(--font-alt)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', opacity: 0.7 }}>
-      {label}
-    </span>
   );
 }
 
@@ -501,18 +464,22 @@ export default function FieldReports() {
 
       {/* ── SOCIAL MEDIA DASHBOARD ────────────────────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
+        <style>{`
+          @media (max-width: 768px) {
+            .social-ig-fb-row { grid-template-columns: 1fr !important; }
+            .social-x-card    { max-width: 100% !important; }
+          }
+        `}</style>
         <div className="container">
+
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <span className="eyebrow">Follow the Expedition</span>
-              <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)' }}>Social Activity</h2>
-            </div>
-            <MockBadge label="IG & FB Mock" />
+          <div style={{ marginBottom: 48 }}>
+            <span className="eyebrow">Follow the Expedition</span>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)' }}>Social Activity</h2>
           </div>
 
-          {/* YOUTUBE */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px', marginBottom: 24 }}>
+          {/* ── ROW 1: YouTube — full width hero ── */}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px', marginBottom: 20 }}>
             <PlatformHeader
               color="#ff0000"
               label="YouTube"
@@ -528,7 +495,7 @@ export default function FieldReports() {
             {!ytLoading && !ytError && (
               <div className="social-yt-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {ytVideos.map(v => (
-                  <a key={v.id} href={v.url} target="_blank" rel="noopener noreferrer"
+                  <a key={v.videoId} href={v.link} target="_blank" rel="noopener noreferrer"
                     style={{ textDecoration: 'none', color: 'inherit', transition: 'opacity 0.2s' }}
                     onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
                     onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
@@ -540,140 +507,108 @@ export default function FieldReports() {
                           ▶
                         </div>
                       </div>
-                      <div style={{ position: 'absolute', bottom: 6, right: 8, background: 'rgba(0,0,0,0.82)', borderRadius: 2, padding: '2px 6px', fontSize: 11, fontFamily: 'var(--font-alt)', fontWeight: 600, color: '#fff' }}>
-                        {v.duration}
-                      </div>
+                      {v.duration && (
+                        <div style={{ position: 'absolute', bottom: 6, right: 8, background: 'rgba(0,0,0,0.82)', borderRadius: 2, padding: '2px 6px', fontSize: 11, fontFamily: 'var(--font-alt)', fontWeight: 600, color: '#fff' }}>
+                          {v.duration}
+                        </div>
+                      )}
                     </div>
                     <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, fontWeight: 600, lineHeight: 1.35, color: 'var(--text)', marginBottom: 4 }}>{v.title}</p>
-                    <p style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{v.viewCount} views · {v.ago}</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>
+                      {v.viewCount ? `${v.viewCount} views · ` : ''}{v.ago}
+                    </p>
                   </a>
                 ))}
               </div>
             )}
           </div>
 
-          {/* INSTAGRAM + FACEBOOK side by side */}
-          <div className="social-ig-fb-grid">
+          {/* ── ROW 2: Instagram + Facebook side by side ── */}
+          <div className="social-ig-fb-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
 
             {/* INSTAGRAM */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px' }}>
-              <PlatformHeader
-                color="linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)"
-                label="Instagram"
-                handle="@modern._explorer"
-                url="https://instagram.com/modern._explorer"
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
-                {igPosts.map(p => (
-                  <div key={p.id} style={{ position: 'relative', paddingTop: '100%', overflow: 'hidden', borderRadius: 3, cursor: 'pointer' }}
-                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.querySelector('div')!.style.opacity = '1'; }}
-                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.querySelector('div')!.style.opacity = '0'; }}
-                  >
-                    <img src={p.img} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                    {/* Hover overlay */}
-                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', opacity: 0, transition: 'opacity 0.2s', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-                      <span style={{ fontSize: 13, color: '#fff', fontWeight: 700 }}>♥ {p.likes}</span>
-                    </div>
-                  </div>
-                ))}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 18 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 14, background: 'linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="white" strokeWidth="1.8"/>
+                  <circle cx="12" cy="12" r="4.5" stroke="white" strokeWidth="1.8"/>
+                  <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+                </svg>
               </div>
-              <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', marginTop: 14, fontStyle: 'italic' }}>
-                "{igPosts[0].caption}"
-              </p>
+              <div>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 700, letterSpacing: '0.02em', color: 'var(--text)', marginBottom: 8 }}>
+                  Modern Explorer on Instagram
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 260, margin: '0 auto' }}>
+                  Field photos, tour highlights, and San Luis Valley mysteries
+                </p>
+              </div>
+              <a
+                href="https://instagram.com/modern._explorer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ fontSize: 13, padding: '11px 28px' }}
+              >
+                Follow on Instagram
+              </a>
             </div>
 
             {/* FACEBOOK */}
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px', display: 'flex', flexDirection: 'column' }}>
-              <PlatformHeader
-                color="#1877f2"
-                label="Facebook"
-                handle="Modern Explorer"
-                url="https://facebook.com"
-              />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-                {fbPosts.map(p => (
-                  <div key={p.id} style={{ display: 'flex', gap: 14, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
-                    <div style={{ flexShrink: 0, width: 72, height: 72, borderRadius: 4, overflow: 'hidden' }}>
-                      <img src={p.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 13, color: 'var(--text)', fontFamily: 'var(--font-alt)', lineHeight: 1.55, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
-                        {p.text}
-                      </p>
-                      <div style={{ display: 'flex', gap: 12 }}>
-                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>♥ {p.likes}</span>
-                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>💬 {p.comments}</span>
-                        <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', marginLeft: 'auto' }}>{p.ago}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 18 }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#1877f2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
               </div>
+              <div>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 700, letterSpacing: '0.02em', color: 'var(--text)', marginBottom: 8 }}>
+                  Modern Explorer on Facebook
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 260, margin: '0 auto' }}>
+                  Join our community — events, updates, and local discoveries
+                </p>
+              </div>
+              <a
+                href="https://www.facebook.com/Modern.Explorer.ME"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ fontSize: 13, padding: '11px 28px' }}
+              >
+                Follow on Facebook
+              </a>
             </div>
           </div>
 
-          {/* X / TWITTER */}
-          <div style={{ marginTop: 24, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 28px 24px' }}>
-            <PlatformHeader
-              color="#000"
-              label="X / Twitter"
-              handle="@ModernExplorer5"
-              url="https://x.com/ModernExplorer5"
-            />
-            <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              gap: 20, padding: '48px 24px',
-              background: 'var(--bg)', borderRadius: 6, border: '1px solid var(--border)',
-              textAlign: 'center',
-            }}>
-              {/* X logo */}
-              <div style={{
-                width: 56, height: 56, borderRadius: '50%',
-                background: '#000', border: '1px solid var(--border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 26, color: '#fff', fontWeight: 700, fontFamily: 'serif',
-                flexShrink: 0,
-              }}>
-                𝕏
+          {/* ── ROW 3: X — smaller, centered ── */}
+          <div className="social-x-card" style={{ maxWidth: 480, margin: '0 auto' }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#000', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+                </svg>
               </div>
-
               <div>
-                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 700, letterSpacing: '0.04em', color: 'var(--text)', marginBottom: 4 }}>
-                  Modern Explorer
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, letterSpacing: '0.03em', color: 'var(--text)', marginBottom: 6 }}>
+                  Follow @ModernExplorer5 on X
                 </p>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-dim)', marginBottom: 0 }}>
-                  @ModernExplorer5
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55 }}>
+                  Field updates and expedition news
                 </p>
               </div>
-
-              <p style={{
-                fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)',
-                lineHeight: 1.65, maxWidth: 380,
-              }}>
-                Follow us for field updates, sighting reports, and expedition news.
-              </p>
-
               <a
                 href="https://x.com/ModernExplorer5"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-outline"
-                style={{ fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                className="btn btn-primary"
+                style={{ fontSize: 13, padding: '10px 24px' }}
               >
-                <span style={{ fontFamily: 'serif', fontWeight: 700, fontSize: 15, lineHeight: 1 }}>𝕏</span>
                 Follow on X
               </a>
             </div>
           </div>
 
-          {/* API Note */}
-          <div style={{ marginTop: 20, padding: '14px 20px', background: 'rgba(203,243,110,0.04)', border: '1px dashed rgba(203,243,110,0.15)', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 16, opacity: 0.6 }}>🔌</span>
-            <p style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)', lineHeight: 1.5 }}>
-              <strong style={{ color: 'var(--text-muted)' }}>Instagram & Facebook integration pending.</strong>{' '}
-              Those feeds currently show mock data. Real-time posts will populate once Instagram Graph API and Facebook Graph API are connected.
-            </p>
-          </div>
         </div>
       </section>
 

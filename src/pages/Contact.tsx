@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import SEO from '../components/SEO';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 // ─── Compass widget ────────────────────────────────────────────────────────────
@@ -70,6 +69,7 @@ function CompassWidget() {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function Contact() {
+  const { open: openBooking } = useBooking();
   const [form, setForm] = useState({ name: '', email: '', phone: '', interest: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -479,8 +479,8 @@ export default function Contact() {
                   {
                     icon: '✉',
                     label: 'Email',
-                    value: 'admin@modernexplorer.me',
-                    href: 'mailto:admin@modernexplorer.me',
+                    value: 'hello@modernexplorer.me',
+                    href: 'mailto:hello@modernexplorer.me',
                   },
                   {
                     icon: '☎',
@@ -538,9 +538,9 @@ export default function Contact() {
                 <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.55 }}>
                   Skip the form — reserve your spot directly through our booking system.
                 </p>
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 13 }}>
+                <button onClick={openBooking} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 13 }}>
                   Book a Tour Now
-                </a>
+                </button>
               </div>
 
               {/* Location map */}

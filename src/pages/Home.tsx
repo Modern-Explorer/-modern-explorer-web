@@ -4,8 +4,7 @@ import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/I
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
 import GoogleReviews from '../components/GoogleReviews';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -60,6 +59,7 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
+  const { open: openBooking } = useBooking();
   const heroRef = useRef<HTMLElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const topoRef = useRef<HTMLDivElement>(null);
@@ -185,9 +185,9 @@ export default function Home() {
           </p>
 
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 16, padding: '16px 36px' }}>
+            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 16, padding: '16px 36px' }}>
               Explore Journeys
-            </a>
+            </button>
             <a href="https://www.youtube.com/@ModernExplorer" target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ fontSize: 16, padding: '16px 36px' }}>
               ▶ See Trailer
             </a>
@@ -283,13 +283,13 @@ export default function Home() {
               </div>
               <div className="home-tour-booking" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
                 <div>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$45</span>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$35</span>
                   <span style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', marginLeft: 6 }}>/ person</span>
                   <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Groups of 2–12 · 45–60 min · All ages</p>
                 </div>
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '15px 36px' }}>
+                <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '15px 36px' }}>
                   Book This Tour →
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -357,9 +357,9 @@ export default function Home() {
           <p style={{ fontFamily: 'var(--font-alt)', fontSize: 20, color: 'rgba(240,244,255,0.8)', maxWidth: 560, margin: '0 auto 40px' }}>
             Ready to seek the unknown? Join our guided journeys—where history, mystery, and wild landscapes come alive.
           </p>
-          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 16, padding: '16px 40px' }}>
+          <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 16, padding: '16px 40px' }}>
             Book Your Expedition
-          </a>
+          </button>
         </div>
       </section>
 
@@ -457,10 +457,6 @@ export default function Home() {
       {/* REVIEWS */}
       <section className="section">
         <div className="container">
-          <div data-reveal style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="eyebrow">Explorer Stories</span>
-            <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>What Explorers Are Saying</h2>
-          </div>
           <GoogleReviews />
         </div>
       </section>
@@ -474,7 +470,7 @@ export default function Home() {
             Step into a world of hidden history, spiritual sanctuaries, and unexplained mysteries. Our guided walking tours are your invitation to explore, question, and connect.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15, padding: '14px 36px' }}>Book a Tour</a>
+            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 36px' }}>Book a Tour</button>
             <Link to="/about" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 36px' }}>Learn About Us</Link>
           </div>
         </div>

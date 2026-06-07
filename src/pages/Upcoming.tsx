@@ -3,8 +3,7 @@ import { LockPulseIcon, FootprintIcon, GhostEyeIcon, MountainIcon } from '../com
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
 import StructuredData, { TOURIST_TRIP_SCHEMA, ENERGY_FAIR_EVENT_SCHEMA, VORTEX_FESTIVAL_EVENT_SCHEMA } from '../components/StructuredData';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 // ─── Specialty tours (coming soon) ────────────────────────────────────────────
@@ -85,6 +84,7 @@ function NotifyButton({ label = 'Join Waitlist' }: { label?: string }) {
 }
 
 export default function Upcoming() {
+  const { open: openBooking } = useBooking();
   useReveal();
 
   const videoWrapRef = useRef<HTMLDivElement>(null);
@@ -206,15 +206,13 @@ export default function Upcoming() {
                 </div>
               </div>
 
-              <a
-                href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={openBooking}
                 className="btn btn-primary"
                 style={{ fontSize: 15, padding: '15px 36px' }}
               >
                 Book This Tour
-              </a>
+              </button>
             </div>
           </div>
         </div>

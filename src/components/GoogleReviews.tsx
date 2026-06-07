@@ -8,7 +8,21 @@ interface Review {
   ago:    string;
   time:   number;
   text:   string;
+  badge?: string;
 }
+
+const FALLBACK_REVIEWS: Review[] = [
+  {
+    author: 'Ruthie Poole',
+    url:    '',
+    photo:  '',
+    rating: 5,
+    ago:    '5 months ago',
+    time:   0,
+    badge:  'Local Guide',
+    text:   "Love these tours! Super fun exploring the area where you live and hearing the history and encounter stories. Really makes you look back on your own experiences and wonder...",
+  },
+];
 
 interface ReviewsData {
   configured: boolean;
@@ -56,12 +70,25 @@ function ReviewCard({ r }: { r: Review }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <Avatar photo={r.photo} name={r.author} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <a href={r.url} target="_blank" rel="noopener noreferrer"
-            style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}>
-            {r.author}
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {r.url ? (
+              <a href={r.url} target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text)')}>
+                {r.author}
+              </a>
+            ) : (
+              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {r.author}
+              </span>
+            )}
+            {r.badge && (
+              <span style={{ fontSize: 10, fontFamily: 'var(--font-alt)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid rgba(203,243,110,0.25)', borderRadius: 3, padding: '2px 6px', flexShrink: 0 }}>
+                {r.badge}
+              </span>
+            )}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
             <Stars n={r.rating} size={13} />
             <span style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>{r.ago}</span>
@@ -150,8 +177,11 @@ export default function GoogleReviews() {
     );
   }
 
-  const reviews    = data?.reviews || [];
-  const hasReviews = reviews.length > 0;
+  const apiReviews  = data?.reviews || [];
+  const hasApiData  = apiReviews.length > 0;
+  const reviews     = hasApiData ? apiReviews : FALLBACK_REVIEWS;
+  const isFallback  = !hasApiData;
+  const hasReviews  = reviews.length > 0;
 
   return (
     <>
@@ -214,8 +244,16 @@ export default function GoogleReviews() {
         }
       `}</style>
 
+      {/* Section title — controlled here so fallback can swap it */}
+      <div data-reveal style={{ textAlign: 'center', marginBottom: 48 }}>
+        <span className="eyebrow">Explorer Stories</span>
+        <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>
+          {isFallback ? 'What Travelers Are Saying' : 'What Explorers Are Saying'}
+        </h2>
+      </div>
+
       {/* Overall rating bar */}
-      {hasReviews && data && data.rating > 0 && (
+      {hasApiData && data && data.rating > 0 && (
         <div className="gr-rating-bar" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 48, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.02em', lineHeight: 1 }}>
@@ -241,79 +279,47 @@ export default function GoogleReviews() {
       )}
 
       {/* ── DESKTOP/TABLET: grid ── */}
-      {hasReviews ? (
-        <div className="gr-desktop">
-          <div className="grid-3" style={{ marginBottom: reviews.length > 3 ? 20 : 0 }}>
-            {reviews.slice(0, 3).map((r, i) => <ReviewCard key={i} r={r} />)}
-          </div>
-          {reviews.length > 3 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20, maxWidth: 820, margin: '0 auto' }}>
-              {reviews.slice(3).map((r, i) => <ReviewCard key={i} r={r} />)}
-            </div>
-          )}
+      <div className="gr-desktop">
+        <div className="grid-3" style={{ marginBottom: reviews.length > 3 ? 20 : 0 }}>
+          {reviews.slice(0, 3).map((r, i) => <ReviewCard key={i} r={r} />)}
         </div>
-      ) : (
-        <div className="gr-desktop">
-          {/* No reviews CTA — desktop */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-            {[
-              'Share what brought you to Crestone and what you discovered.',
-              'Tell us about the moment the valley changed how you see things.',
-              'Help future explorers know what to expect on their first visit.',
-            ].map((prompt, i) => (
-              <div key={i} style={{ padding: '28px 24px', background: 'var(--bg-section)', border: '1px dashed rgba(203,243,110,0.2)', borderRadius: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
-                <span style={{ fontSize: 28, opacity: 0.4 }}>{'★'.repeat(5)}</span>
-                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.65 }}>{prompt}</p>
-                <a href="https://g.page/r/review" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600 }}>
-                  Write a Google review →
-                </a>
-              </div>
-            ))}
+        {reviews.length > 3 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20, maxWidth: 820, margin: '0 auto' }}>
+            {reviews.slice(3).map((r, i) => <ReviewCard key={i} r={r} />)}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ── MOBILE: carousel ── */}
       <div className="gr-mobile">
         <div className="gr-track" ref={carousel.trackRef} onScroll={carousel.onScroll}>
-          {hasReviews ? reviews.map((r, i) => (
+          {reviews.map((r, i) => (
             <div key={i} className="gr-slide">
               <ReviewCard r={r} />
             </div>
-          )) : (
-            ['Share what brought you to Crestone.', 'Tell us what you discovered here.', 'Help future explorers know what to expect.'].map((prompt, i) => (
-              <div key={i} className="gr-slide">
-                <div style={{ padding: '28px 20px', background: 'var(--bg-section)', border: '1px dashed rgba(203,243,110,0.2)', borderRadius: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
-                  <span style={{ fontSize: 24, opacity: 0.4 }}>★★★★★</span>
-                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.65 }}>{prompt}</p>
-                  <a href="https://g.page/r/review" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600 }}>Write a Google review →</a>
-                </div>
-              </div>
-            ))
-          )}
+          ))}
         </div>
 
         {/* Arrows */}
         <div className="gr-arrows">
           <button className="gr-arrow" disabled={carousel.activeIdx === 0}
             onClick={() => carousel.scrollTo(carousel.activeIdx - 1)}>‹</button>
-          <button className="gr-arrow" disabled={carousel.activeIdx >= (hasReviews ? reviews.length : 3) - 1}
+          <button className="gr-arrow" disabled={carousel.activeIdx >= reviews.length - 1}
             onClick={() => carousel.scrollTo(carousel.activeIdx + 1)}>›</button>
         </div>
 
         {/* Dots */}
         <div className="gr-dots">
-          {(hasReviews ? reviews : [1,2,3]).map((_, i) => (
+          {reviews.map((_, i) => (
             <button key={i} className={`gr-dot${carousel.activeIdx === i ? ' active' : ''}`}
               onClick={() => carousel.scrollTo(i)} />
           ))}
         </div>
       </div>
 
-      {/* Google attribution (required by ToS) */}
-      <p style={{ textAlign: 'right', marginTop: 16, fontFamily: 'var(--font-alt)', fontSize: 11, color: 'var(--text-dim)', opacity: 0.6 }}>
-        Reviews from Google
+      {/* Attribution */}
+      <p style={{ textAlign: 'right', marginTop: 16, fontFamily: 'var(--font-alt)', fontSize: 11, color: 'var(--text-dim)', opacity: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+        <span style={{ color: '#f59e0b', fontSize: 12 }}>★</span> Reviews from Google
       </p>
     </>
   );

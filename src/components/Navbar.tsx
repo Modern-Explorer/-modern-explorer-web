@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import { useBooking } from '../context/BookingContext';
 
 const links = [
   { to: '/', label: 'Home' },
@@ -11,9 +12,8 @@ const links = [
   { to: '/faq', label: 'FAQ' },
 ];
 
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
-
 export default function Navbar() {
+  const { open: openBooking } = useBooking();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -71,15 +71,13 @@ export default function Navbar() {
           ))}
         </div>
 
-        <a
-          href={BOOKING_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={openBooking}
           className="btn btn-primary"
           style={{ flexShrink: 0, padding: '10px 22px', fontSize: 13 }}
         >
           Book a Tour
-        </a>
+        </button>
 
         <button
           aria-label="Toggle menu"
@@ -119,15 +117,13 @@ export default function Navbar() {
               {l.label}
             </NavLink>
           ))}
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => { openBooking(); setOpen(false); }}
             className="btn btn-primary"
             style={{ marginTop: 20, width: '100%', justifyContent: 'center' }}
           >
             Book a Tour
-          </a>
+          </button>
         </div>
       )}
 

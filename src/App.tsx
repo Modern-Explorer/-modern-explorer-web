@@ -5,6 +5,8 @@ import ScrollToTop from './components/ScrollToTop';
 import Mesa from './components/Mesa';
 import Analytics from './components/Analytics';
 import StructuredData, { LOCAL_BUSINESS_SCHEMA } from './components/StructuredData';
+import BookingDrawer from './components/BookingDrawer';
+import { BookingProvider } from './context/BookingContext';
 import Home from './pages/Home';
 import About from './pages/About';
 import FieldReports from './pages/FieldReports';
@@ -19,27 +21,30 @@ import Terms from './pages/Terms';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Analytics />
-      <StructuredData data={LOCAL_BUSINESS_SCHEMA} />
+    <BookingProvider>
+      <BrowserRouter>
+        <Analytics />
+        <StructuredData data={LOCAL_BUSINESS_SCHEMA} />
 
-      <ScrollToTop />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/field-reports" element={<FieldReports />} />
-        <Route path="/upcoming" element={<Upcoming />} />
-        <Route path="/merch" element={<MerchStore />} />
-        <Route path="/coming-soon" element={<ComingSoon />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/what-to-expect" element={<WhatToExpect />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<Terms />} />
-      </Routes>
-      <Footer />
-      <Mesa />
-    </BrowserRouter>
+        <ScrollToTop />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/field-reports" element={<FieldReports />} />
+          <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/merch" element={<MerchStore />} />
+          <Route path="/coming-soon" element={<ComingSoon />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/what-to-expect" element={<WhatToExpect />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+        </Routes>
+        <Footer />
+        <Mesa />
+        <BookingDrawer />
+      </BrowserRouter>
+    </BookingProvider>
   );
 }

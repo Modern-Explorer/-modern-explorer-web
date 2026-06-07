@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 
 export default function Footer() {
+  const { open: openBooking } = useBooking();
   return (
     <footer style={{ background: '#080c17', borderTop: '1px solid var(--border)', paddingTop: 64, paddingBottom: 40 }}>
       <div className="container">
@@ -21,7 +21,10 @@ export default function Footer() {
               {[
                 { label: 'Instagram', href: 'https://instagram.com/modern._explorer' },
                 { label: 'YouTube', href: 'https://www.youtube.com/@ModernExplorer' },
-                { label: 'Facebook', href: 'https://facebook.com' },
+                { label: 'Facebook', href: 'https://www.facebook.com/Modern.Explorer.ME' },
+                { label: 'Twitter/X', href: 'https://twitter.com/explorer_modern' },
+                { label: 'Reddit', href: 'https://www.reddit.com/r/modernexplorer' },
+                { label: 'Spotify', href: 'https://open.spotify.com/show/0sX6pZpCSM7m4nyHRnLjUx' },
               ].map(s => (
                 <a
                   key={s.label}
@@ -85,9 +88,9 @@ export default function Footer() {
             <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
               Ready for your next adventure? Reserve your spot today.
             </p>
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 13, padding: '10px 20px' }}>
+            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 13, padding: '10px 20px' }}>
               Reserve a Spot
-            </a>
+            </button>
           </div>
         </div>
 

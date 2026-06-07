@@ -23,7 +23,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
   description: 'Immersive small-group guided tours in Crestone, Colorado exploring UFO hotspots, Spanish treasure legends, paranormal history, and the mysteries of the San Luis Valley and Sangre de Cristo mountains.',
   url: 'https://modernexplorer.me',
   telephone: '(719) 331-4200',
-  email: 'admin@modernexplorer.me',
+  email: 'hello@modernexplorer.me',
   image: 'https://modernexplorer.me/assets/images/content/Logo/ME Logo Draft 5.png',
   priceRange: '$$',
   address: {
@@ -68,7 +68,7 @@ export const TOURIST_TRIP_SCHEMA = {
     '@type': 'Offer',
     priceCurrency: 'USD',
     availability: 'https://schema.org/InStock',
-    url: 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes',
+    url: 'http://localhost:5177',
   },
   itinerary: {
     '@type': 'ItemList',

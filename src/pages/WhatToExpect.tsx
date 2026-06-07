@@ -1,6 +1,5 @@
 import SEO from '../components/SEO';
-
-const BOOKING_URL = 'https://fareharbor.com/embeds/book/modernexplorer/?full-items=yes';
+import { useBooking } from '../context/BookingContext';
 
 const sections = [
   {
@@ -46,6 +45,7 @@ const sections = [
 ];
 
 export default function WhatToExpect() {
+  const { open: openBooking } = useBooking();
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
@@ -96,7 +96,7 @@ export default function WhatToExpect() {
               Questions not answered here? Contact us before booking and we'll make sure you have everything you need.
             </p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: 15 }}>Book a Tour</a>
+              <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15 }}>Book a Tour</button>
               <a href="/contact" className="btn btn-ghost" style={{ fontSize: 15 }}>Contact Us</a>
             </div>
           </div>
