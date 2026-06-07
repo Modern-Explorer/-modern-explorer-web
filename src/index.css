@@ -603,3 +603,30 @@ h1, h2, h3, h4, h5 {
 @media (min-width: 768px) and (max-width: 1024px) {
   .merch-iframe { height: max(700px, calc(100vh - 160px)) !important; }
 }
+
+/* 15. Hero: stronger top-down gradient overlay at all tablet sizes for contrast */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(8,12,23,0.78) 0%,
+      rgba(8,12,23,0.52) 45%,
+      rgba(8,12,23,0.28) 100%
+    ) !important;
+  }
+}
+
+/* 16. Hero: portrait tablet — cap height, tighten spacing, scale logo down */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  #mesa-hero {
+    max-height: 860px !important;
+  }
+  #mesa-hero .container {
+    padding-top: 64px !important;
+    padding-bottom: 48px !important;
+  }
+  #mesa-hero img {
+    width: clamp(220px, 44vw, 380px) !important;
+    margin-bottom: 10px !important;
+  }
+}

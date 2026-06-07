@@ -124,7 +124,7 @@ export default function Home() {
           }}
         />
         {/* Gradient — fixed, above topo layer */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(135deg, rgba(8,12,23,0.72) 0%, rgba(8,12,23,0.38) 60%, rgba(8,12,23,0.25) 100%)' }} />
+        <div className="hero-overlay" style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(135deg, rgba(8,12,23,0.72) 0%, rgba(8,12,23,0.38) 60%, rgba(8,12,23,0.25) 100%)' }} />
         {/* Terrain map — medium-speed parallax layer between landscape and text */}
         <div
           ref={topoRef}
@@ -152,20 +152,34 @@ export default function Home() {
               width: 'clamp(300px, 48vw, 700px)',
               height: 'auto',
               display: 'block',
-              marginBottom: 24,
+              marginBottom: 14,
               filter: 'drop-shadow(0 0 60px rgba(203,243,110,0.20)) drop-shadow(0 8px 24px rgba(0,0,0,0.6))',
             }}
           />
 
-          {/* Tagline — large and clearly readable */}
+          {/* Primary tagline — reads as one unit with the logo */}
+          <p style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'clamp(17px, 2.6vw, 30px)',
+            fontWeight: 500,
+            color: '#bdd96e',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            marginBottom: 28,
+            textShadow: '0 2px 14px rgba(0,0,0,0.75)',
+          }}>
+            Immersive Small-Group Tours Designed For Curious Travelers
+          </p>
+
+          {/* Location line */}
           <p style={{
             fontFamily: 'var(--font-alt)',
-            fontSize: 'clamp(15px, 1.8vw, 22px)',
+            fontSize: 'clamp(13px, 1.5vw, 18px)',
             fontWeight: 500,
-            color: 'rgba(240,244,255,0.92)',
+            color: 'rgba(240,244,255,0.72)',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
-            marginBottom: 52,
+            marginBottom: 48,
           }}>
             Colorado · Crestone · San Luis Valley · Near Great Sand Dunes National Park
           </p>
@@ -178,17 +192,6 @@ export default function Home() {
               ▶ See Trailer
             </a>
           </div>
-          <p style={{
-            fontFamily: 'var(--font-alt)',
-            fontSize: 'clamp(15px, 1.8vw, 20px)',
-            color: '#ffffff',
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            marginTop: 52,
-            textShadow: '0 1px 10px rgba(0,0,0,0.9), 0 0 28px rgba(0,0,0,0.6)',
-          }}>
-            Immersive Small-Group Tours Designed For Curious Travelers.
-          </p>
         </div>
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: 'linear-gradient(to top, var(--bg), transparent)', zIndex: 3 }} />
       </section>

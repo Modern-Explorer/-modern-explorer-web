@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { LockPulseIcon, FootprintIcon, GhostEyeIcon, MountainIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
@@ -86,6 +86,27 @@ function NotifyButton({ label = 'Join Waitlist' }: { label?: string }) {
 
 export default function Upcoming() {
   useReveal();
+
+  const videoWrapRef = useRef<HTMLDivElement>(null);
+  const videoRef     = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const wrap   = videoWrapRef.current;
+    const iframe = videoRef.current;
+    if (!wrap || !iframe) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          iframe.src = 'https://www.youtube.com/embed/y_ijGXYyKtI?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1';
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    observer.observe(wrap);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
@@ -319,9 +340,44 @@ export default function Upcoming() {
                 </p>
                 <h2 style={{ fontSize: 'clamp(32px, 4.5vw, 58px)', marginBottom: 28, lineHeight: 1.04 }}>Dead Man's<br />Treasure</h2>
 
-                <p style={{ fontFamily: 'var(--font-alt)', color: 'rgba(240,244,255,0.72)', fontSize: 15, lineHeight: 1.9, marginBottom: 40 }}>
+                <p style={{ fontFamily: 'var(--font-alt)', color: 'rgba(240,244,255,0.72)', fontSize: 15, lineHeight: 1.9, marginBottom: 24 }}>
                   In 1719, Spanish colonial governor Antonio Valverde y Cosío led a military expedition deep into the Sangre de Cristo range — the mountains whose very name, <em>Blood of Christ</em>, was given by missionaries who watched the setting sun turn the peaks a deep, violent red. What they were looking for, the official reports never quite say. The San Luis Valley sits at the center of documented Spanish colonial treasure routes stretching north from the silver mines of Chihuahua and Santa Fe. Multiple independent accounts — oral traditions, court records, surveyor field notes — converge on the same terrain: the foothills east of Crestone, where the flatland meets the mountains and the old Spanish trail systems vanish into wilderness.
                 </p>
+
+                {/* FIELD FOOTAGE */}
+                <div ref={videoWrapRef} style={{ marginBottom: 40 }}>
+                  <p style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(203,243,110,0.65)',
+                    marginBottom: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(203,243,110,0.7)', display: 'inline-block', boxShadow: '0 0 6px rgba(203,243,110,0.5)', flexShrink: 0 }} />
+                    Field Footage
+                  </p>
+                  <div style={{
+                    position: 'relative',
+                    paddingTop: '56.25%',
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                    border: '1px solid rgba(203,243,110,0.22)',
+                    boxShadow: '0 0 28px rgba(203,243,110,0.07)',
+                  }}>
+                    <iframe
+                      ref={videoRef}
+                      title="Dead Man's Cave — Field Footage"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                    />
+                  </div>
+                </div>
 
                 {/* Legend I */}
                 <div id="mesa-caverna" style={{ borderLeft: '2px solid rgba(203,243,110,0.35)', paddingLeft: 22, marginBottom: 36 }}>
