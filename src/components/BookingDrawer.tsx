@@ -6,7 +6,7 @@ import WaiverModal from './WaiverModal';
 
 // ─── Stripe & API config ──────────────────────────────────────────────────────
 const stripePromise = loadStripe((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
-const API_URL = (import.meta as any).env?.VITE_BOOKING_API_URL ?? 'http://localhost:3001';
+const API_URL = (import.meta.env.VITE_BOOKING_API_URL as string | undefined) ?? 'http://localhost:3001/api';
 
 const STRIPE_APPEARANCE: import('@stripe/stripe-js').Appearance = {
   theme: 'night',
@@ -559,7 +559,7 @@ function ReviewStep({ slot, groupSize, isPrivate, customer, waiverAgreedAt, onCo
     || ((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY ?? '').includes('YOUR_KEY');
 
   useEffect(() => {
-    fetch(`${API_URL}/api/payments/setup-intent`, {
+    fetch(`${API_URL}/payments/setup-intent`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tenant_slug: 'modern-explorer', availability_id: slot.id, group_size: groupSize, is_private: isPrivate }),
     })
@@ -638,7 +638,7 @@ function ReviewStep({ slot, groupSize, isPrivate, customer, waiverAgreedAt, onCo
         )}
         {intentError && (
           <div style={{ padding: '14px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 6, marginBottom: 16 }}>
-            <p style={{ fontSize: 13, color: '#ef4444', lineHeight: 1.6 }}><strong>Could not reach payment backend.</strong> Make sure the API server is running on port 3001.</p>
+            <p style={{ fontSize: 13, color: '#ef4444', lineHeight: 1.6 }}><strong>Could not reach payment backend.</strong> Please try again or contact support if the problem persists.</p>
           </div>
         )}
         {loading && !intentError && (
@@ -683,7 +683,7 @@ function StripeForm({ estimatedTotal, slot, groupSize, isPrivate, customer, waiv
     if (!setupIntent || setupIntent.status !== 'succeeded') { setStripeError('Card setup was not completed. Please try again.'); setProcessing(false); return; }
 
     try {
-      const res = await fetch(`${API_URL}/api/bookings`, {
+      const res = await fetch(`${API_URL}/bookings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ setup_intent_id: setupIntent.id, payment_method_id: setupIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: isPrivate, tenant_slug: 'modern-explorer', customer, waiver_agreed_at: waiverAgreedAt || undefined }),
       });
@@ -816,7 +816,7 @@ export default function BookingDrawer() {
     if (!isOpen) return;
     const from = new Date().toISOString().split('T')[0];
     setSlotsLoading(true);
-    fetch(`${API_URL}/api/availability?tenant=modern-explorer&tour=crestone-walking-tour&from=${from}`)
+    fetch(`${API_URL}/availability?tenant=modern-explorer&tour=crestone-anomaly-tour&from=${from}`)
       .then(r => r.json())
       .then((data: { slots?: Slot[] }) => {
         const normalized = (data.slots ?? []).map(s => ({ ...s, date: String(s.date).slice(0, 10), start_time: String(s.start_time).slice(0, 5) }));
