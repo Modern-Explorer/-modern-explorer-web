@@ -816,7 +816,7 @@ export default function BookingDrawer() {
     if (!isOpen) return;
     const from = new Date().toISOString().split('T')[0];
     setSlotsLoading(true);
-    fetch(`${API_URL}/availability?tenant=modern-explorer&tour=crestone-anomaly-tour&from=${from}`)
+    fetch(`${API_URL}/availability?tenant=modern-explorer&tour=crestone-walking-tour&from=${from}`)
       .then(r => r.json())
       .then((data: { slots?: Slot[] }) => {
         const normalized = (data.slots ?? []).map(s => ({ ...s, date: String(s.date).slice(0, 10), start_time: String(s.start_time).slice(0, 5) }));
