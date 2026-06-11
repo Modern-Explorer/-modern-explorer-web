@@ -559,7 +559,7 @@ function ReviewStep({ slot, groupSize, isPrivate, customer, waiverAgreedAt, onCo
     || ((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY ?? '').includes('YOUR_KEY');
 
   useEffect(() => {
-    fetch(`${API_URL}/payments/setup-intent`, {
+    fetch(`${API_URL}/payments/intent`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tenant_slug: 'modern-explorer', availability_id: slot.id, group_size: groupSize, is_private: isPrivate }),
     })
