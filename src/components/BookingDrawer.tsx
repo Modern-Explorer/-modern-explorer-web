@@ -677,15 +677,15 @@ function StripeForm({ estimatedTotal, slot, groupSize, isPrivate, customer, waiv
     setProcessing(true);
     setStripeError(null);
 
-    const { error, setupIntent } = await stripe.confirmPayment({ elements, confirmParams: {}, redirect: 'if_required' });
+    const { error, paymentIntent } = await stripe.confirmPayment({ elements, confirmParams: {}, redirect: 'if_required' });
 
     if (error) { setStripeError(error.message ?? 'Could not save card. Please try again.'); setProcessing(false); return; }
-    if (!setupIntent || setupIntent.status !== 'succeeded') { setStripeError('Card setup was not completed. Please try again.'); setProcessing(false); return; }
+    if (!paymentIntent || paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture' && paymentIntent.status !== 'processing') { setStripeError('Card setup was not completed. Please try again.'); setProcessing(false); return; }
 
     try {
       const res = await fetch(`${API_URL}/bookings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ setup_intent_id: setupIntent.id, payment_method_id: setupIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: isPrivate, tenant_slug: 'modern-explorer', customer, waiver_agreed_at: waiverAgreedAt || undefined }),
+        body: JSON.stringify({ setup_intent_id: paymentIntent.id, payment_method_id: paymentIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: isPrivate, tenant_slug: 'modern-explorer', customer, waiver_agreed_at: waiverAgreedAt || undefined }),
       });
       const data = await res.json() as Record<string, unknown>;
       if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');
