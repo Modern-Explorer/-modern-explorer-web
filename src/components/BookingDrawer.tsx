@@ -677,7 +677,7 @@ function StripeForm({ estimatedTotal, slot, groupSize, isPrivate, customer, waiv
     setProcessing(true);
     setStripeError(null);
 
-    const { error, setupIntent } = await stripe.confirmSetup({ elements, confirmParams: {}, redirect: 'if_required' });
+    const { error, setupIntent } = await stripe.confirmPayment({ elements, confirmParams: {}, redirect: 'if_required' });
 
     if (error) { setStripeError(error.message ?? 'Could not save card. Please try again.'); setProcessing(false); return; }
     if (!setupIntent || setupIntent.status !== 'succeeded') { setStripeError('Card setup was not completed. Please try again.'); setProcessing(false); return; }
