@@ -81,7 +81,7 @@ function calcAmounts(size: number, tourType: TourType, slot?: Slot | null) {
 }
 
 function chargeDate(tourDate: string): string {
-  const d = new Date(tourDate + 'T12:00:00');
+  const d = new Date(tourDate.slice(0, 10) + 'T12:00:00');
   d.setDate(d.getDate() - 1);
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
@@ -90,7 +90,7 @@ function formatTime(t: string) {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
 }
 function formatDate(d: string) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  return new Date(d.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
 // ─── Tour config ──────────────────────────────────────────────────────────────
@@ -815,7 +815,7 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
 // ─── Confirmation — matches Confirmation.tsx exactly ─────────────────────────
 function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onReset: () => void }) {
   const cd = booking.charge_date
-    ? new Date(booking.charge_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+    ? new Date(booking.charge_date.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
     : chargeDate(booking.date);
 
   return (
