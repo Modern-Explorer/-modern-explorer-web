@@ -71,6 +71,7 @@ export default function Mesa() {
   const [loading, setLoading]     = useState(false);
   const [fieldNote, setFieldNote] = useState<string | null>(null);
   const [orbPulsing, setOrbPulsing] = useState(false);
+  const [nearBottom, setNearBottom] = useState(false);
 
   const seenRef        = useRef<Set<string>>(new Set());
   const noteTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,6 +85,16 @@ export default function Mesa() {
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 120);
   }, [open]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const distFromBottom = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+      setNearBottom(distFromBottom < 200);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const showFieldNote = useCallback((note: string) => {
     setFieldNote(note);
@@ -374,6 +385,7 @@ export default function Mesa() {
         onClick={() => setOpen(o => !o)}
         title="MESA — Modern Explorer Situational AI"
         aria-label="Open MESA field intelligence"
+        style={{ opacity: nearBottom ? 0 : undefined, pointerEvents: nearBottom ? 'none' : undefined, transition: 'opacity 0.4s ease' }}
       >
         <svg viewBox="0 0 80 80" width="44" height="44">
           <defs>
