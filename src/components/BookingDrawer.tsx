@@ -67,8 +67,8 @@ const MAX_GROUP    = 12;
 function calcAmounts(size: number, slot?: Slot | null) {
   const isPrivate = size <= 2;
   const subtotal  = isPrivate
-    ? (slot?.private_flat_price ?? PRIVATE_FLAT)
-    : size * (slot?.price_per_person ?? GROUP_PER_PP);
+    ? Number(slot?.private_flat_price ?? PRIVATE_FLAT)
+    : size * Number(slot?.price_per_person ?? GROUP_PER_PP);
   const fee  = Math.round(subtotal * SERVICE_RATE * 100) / 100;
   return { isPrivate, subtotal, fee, total: Math.round((subtotal + fee) * 100) / 100 };
 }
@@ -329,7 +329,7 @@ function TimeSlotStep({ date, slots, groupSize, selectedSlot, setSelectedSlot }:
 }) {
   const isPrivate = groupSize <= 2;
   const subtotal  = selectedSlot
-    ? (isPrivate ? (selectedSlot.private_flat_price ?? 70) : groupSize * (selectedSlot.price_per_person ?? 35))
+    ? (isPrivate ? Number(selectedSlot.private_flat_price ?? 70) : groupSize * Number(selectedSlot.price_per_person ?? 35))
     : 0;
 
   return (
@@ -337,8 +337,8 @@ function TimeSlotStep({ date, slots, groupSize, selectedSlot, setSelectedSlot }:
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>{formatDate(date)}</p>
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 8 }}>
         {isPrivate
-          ? `Private tour for ${groupSize === 1 ? 'you' : 'your group'} · $${selectedSlot?.private_flat_price ?? 70} flat`
-          : `Group tour · ${groupSize} people × $${selectedSlot?.price_per_person ?? 35}/person`}
+          ? `Private tour for ${groupSize === 1 ? 'you' : 'your group'} · $${Number(selectedSlot?.private_flat_price ?? 70)} flat`
+          : `Group tour · ${groupSize} people × $${Number(selectedSlot?.price_per_person ?? 35)}/person`}
       </p>
 
       <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 12, marginTop: 20 }}>Available Times</p>
@@ -351,7 +351,7 @@ function TimeSlotStep({ date, slots, groupSize, selectedSlot, setSelectedSlot }:
             const sel        = selectedSlot?.id === slot.id;
             const almostFull = slot.spots_remaining <= 3 && slot.spots_remaining > 0;
             const hasOthers  = slot.capacity - slot.spots_remaining > 0;
-            const slotSub    = isPrivate ? (slot.private_flat_price ?? 70) : groupSize * (slot.price_per_person ?? 35);
+            const slotSub    = isPrivate ? Number(slot.private_flat_price ?? 70) : groupSize * Number(slot.price_per_person ?? 35);
             return (
               <button key={slot.id} onClick={() => setSelectedSlot(slot)}
                 style={{ background: sel ? 'var(--accent-dim)' : 'var(--bg-section)', border: `${sel ? 2 : 1}px solid ${sel ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 6, padding: '14px 16px', textAlign: 'left', cursor: 'pointer', transition: 'border-color var(--ease), background var(--ease)' }}
@@ -374,7 +374,7 @@ function TimeSlotStep({ date, slots, groupSize, selectedSlot, setSelectedSlot }:
 
       {selectedSlot && (
         <div style={{ padding: '14px 18px', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isPrivate ? 'Private tour · flat rate' : `${groupSize} people × $${selectedSlot.price_per_person ?? 35}`}</span>
+          <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{isPrivate ? 'Private tour · flat rate' : `${groupSize} people × $${Number(selectedSlot.price_per_person ?? 35)}`}</span>
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--accent)' }}>${subtotal}</span>
         </div>
       )}
@@ -551,7 +551,7 @@ function ReviewStep({ slot, groupSize, isPrivate, customer, waiverAgreedAt, onCo
   const [loading,      setLoading]      = useState(true);
   const [intentError,  setIntentError]  = useState<string | null>(null);
 
-  const subtotal   = isPrivate ? (slot.private_flat_price ?? 70) : (slot.price_per_person ?? 35) * groupSize;
+  const subtotal   = isPrivate ? Number(slot.private_flat_price ?? 70) : Number(slot.price_per_person ?? 35) * groupSize;
   const serviceFee = Math.round(subtotal * SERVICE_RATE * 100) / 100;
   const total      = Math.round((subtotal + serviceFee) * 100) / 100;
 
@@ -587,7 +587,7 @@ function ReviewStep({ slot, groupSize, isPrivate, customer, waiverAgreedAt, onCo
           {[
             slot.tour_name,
             `${formatDate(slot.date)} · ${formatTime(slot.start_time)}`,
-            isPrivate ? `Private Tour · $${slot.private_flat_price ?? 70} flat rate` : `Group · ${groupSize} ${groupSize === 1 ? 'person' : 'people'} × $${slot.price_per_person ?? 35}/person`,
+            isPrivate ? `Private Tour · $${Number(slot.private_flat_price ?? 70)} flat rate` : `Group · ${groupSize} ${groupSize === 1 ? 'person' : 'people'} × $${Number(slot.price_per_person ?? 35)}/person`,
           ].map((label, i) => (
             <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
               <span style={{ fontSize: 13, color: i === 2 ? 'var(--text)' : 'var(--text-muted)', fontWeight: i === 2 ? 500 : 400 }}>{label}</span>
@@ -697,7 +697,7 @@ function StripeForm({ estimatedTotal, slot, groupSize, isPrivate, customer, waiv
         confirmation_code: `MEX-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
         tour_name: slot.tour_name, date: slot.date, start_time: slot.start_time,
         group_size: groupSize, is_private: isPrivate,
-        subtotal: isPrivate ? (slot.private_flat_price ?? 70) : (slot.price_per_person ?? 35) * groupSize,
+        subtotal: isPrivate ? Number(slot.private_flat_price ?? 70) : Number(slot.price_per_person ?? 35) * groupSize,
         service_fee: Math.round(estimatedTotal * SERVICE_RATE * 100) / 100,
         total_amount: estimatedTotal, customer_name: customer.name,
         charge_date: chargeAt.toISOString().split('T')[0],
