@@ -95,11 +95,13 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)' }}>
+          <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <a href="https://app.modernexplorer.me/admin" style={{ color: 'inherit', opacity: 0.25, fontSize: 10, textDecoration: 'none', userSelect: 'none' }}>✦</a>
             © {new Date().getFullYear()} Modern Explorer. All rights reserved.
           </p>
-          <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)' }}>
+          <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', display: 'flex', alignItems: 'center', gap: 10 }}>
             Crestone · San Luis Valley, Colorado · Near Great Sand Dunes National Park
+            <a href="https://app.modernexplorer.me/guide/login" style={{ color: 'inherit', opacity: 0.25, fontSize: 10, textDecoration: 'none', userSelect: 'none' }}>⬡</a>
           </p>
         </div>
       </div>
