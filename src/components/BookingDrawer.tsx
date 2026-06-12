@@ -115,6 +115,124 @@ function InfoTooltip({ text }: { text: string }) {
   );
 }
 
+// ─── Tour Request Form ────────────────────────────────────────────────────────
+function TourRequestForm({ onBack }: { onBack: () => void }) {
+  const [form, setForm] = useState({ name: '', email: '', desired_date: '', preferred_time: '', group_size: '', notes: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted,  setSubmitted]  = useState(false);
+  const [error,      setError]      = useState<string | null>(null);
+
+  function setField(k: keyof typeof form, v: string) { setForm(f => ({ ...f, [k]: v })); }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/tour-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, group_size: Number(form.group_size) || 1 }),
+      });
+      const data = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Request failed');
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not submit. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 4, padding: '11px 14px', fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text)', outline: 'none', transition: 'border-color .15s', boxSizing: 'border-box' };
+  const labelStyle: React.CSSProperties = { fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-dim)', display: 'block', marginBottom: 6 };
+  const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => (e.target.style.borderColor = 'rgba(203,243,110,0.4)');
+  const onBlur  = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => (e.target.style.borderColor = 'rgba(255,255,255,0.07)');
+
+  if (submitted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '32px 8px' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--accent-dim)', border: '2px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M5 14l7 7 11-11" stroke="#cbf36e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+        <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 10 }}>Request Received</p>
+        <p style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>We'll be in touch soon.</p>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: 320, margin: '0 auto 28px' }}>
+          Your request has been received. We will contact you within 24 hours to confirm availability.
+        </p>
+        <button className="btn btn-ghost" onClick={onBack} style={{ width: '100%', justifyContent: 'center' }}>← Back to booking options</button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <button onClick={onBack} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--text-dim)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20, fontFamily: 'var(--font-alt)' }}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        Back
+      </button>
+
+      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>Request a Custom Tour</p>
+      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 24 }}>
+        Tell us what you have in mind and we'll reach out within 24 hours to confirm availability.
+      </p>
+
+      <form onSubmit={handleSubmit}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Full Name *</label>
+              <input style={inputStyle} type="text" required placeholder="Jane Smith" value={form.name} onChange={e => setField('name', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
+            </div>
+            <div>
+              <label style={labelStyle}>Email *</label>
+              <input style={inputStyle} type="email" required placeholder="jane@example.com" value={form.email} onChange={e => setField('email', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Desired Date *</label>
+              <input style={inputStyle} type="date" required value={form.desired_date} onChange={e => setField('desired_date', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
+            </div>
+            <div>
+              <label style={labelStyle}>Preferred Time</label>
+              <input style={inputStyle} type="time" value={form.preferred_time} onChange={e => setField('preferred_time', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Group Size *</label>
+            <input style={inputStyle} type="number" required min="1" max="100" placeholder="e.g. 15" value={form.group_size} onChange={e => setField('group_size', e.target.value)} onFocus={onFocus} onBlur={onBlur} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Notes & Special Requests</label>
+            <textarea
+              style={{ ...inputStyle, resize: 'vertical', minHeight: 90 } as React.CSSProperties}
+              placeholder="Tell us about your group, any special occasions, accessibility needs, or other requests…"
+              value={form.notes}
+              onChange={e => setField('notes', e.target.value)}
+              onFocus={onFocus as any}
+              onBlur={onBlur as any}
+            />
+          </div>
+        </div>
+
+        {error && (
+          <div style={{ padding: '12px 16px', marginBottom: 16, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 6, fontSize: 13, color: '#ef4444', lineHeight: 1.5 }}>{error}</div>
+        )}
+
+        <button type="submit" className="btn btn-primary" disabled={submitting} style={{ width: '100%', justifyContent: 'center', opacity: submitting ? 0.65 : 1 }}>
+          {submitting
+            ? <><span style={{ width: 15, height: 15, border: '2px solid rgba(8,12,23,0.3)', borderTopColor: '#080c17', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block', marginRight: 8 }} />Sending…</>
+            : 'Send Request'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ─── Tour Type Selection ──────────────────────────────────────────────────────
 const LOCK_SVG = (color = 'currentColor') => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -123,7 +241,7 @@ const LOCK_SVG = (color = 'currentColor') => (
   </svg>
 );
 
-function TourTypeStep({ selectedType, onSelect }: { selectedType: TourType | null; onSelect: (t: TourType) => void }) {
+function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType: TourType | null; onSelect: (t: TourType) => void; onRequestTour: () => void }) {
   const options: Array<{ id: TourType; title: string; price: string; priceNote: string; tagline: string; description: string; isPrivate?: boolean }> = [
     {
       id: 'group',
@@ -193,6 +311,20 @@ function TourTypeStep({ selectedType, onSelect }: { selectedType: TourType | nul
           );
         })}
       </div>
+
+      {/* Custom tour request prompt */}
+      <button
+        type="button"
+        onClick={onRequestTour}
+        style={{ width: '100%', marginBottom: 16, padding: '13px 16px', background: 'none', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: 8, cursor: 'pointer', textAlign: 'center', transition: 'border-color 0.2s, background 0.2s' }}
+        onMouseEnter={e => { (e.currentTarget.style.borderColor = 'rgba(203,243,110,0.35)'); (e.currentTarget.style.background = 'rgba(203,243,110,0.04)'); }}
+        onMouseLeave={e => { (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'); (e.currentTarget.style.background = 'none'); }}
+      >
+        <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+          Have a large group or special request?{' '}
+          <span style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }}>Request a custom tour.</span>
+        </span>
+      </button>
 
       <div style={{ padding: '12px 16px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>🔒</span>
@@ -894,9 +1026,10 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
 export default function BookingDrawer() {
   const { isOpen, close } = useBooking();
 
-  const [step,         setStep]         = useState<DrawerStep>('tour-type');
-  const [tourType,     setTourType]     = useState<TourType | null>(null);
-  const [groupSize,    setGroupSize]    = useState(1);
+  const [step,            setStep]            = useState<DrawerStep>('tour-type');
+  const [tourType,        setTourType]        = useState<TourType | null>(null);
+  const [showTourRequest, setShowTourRequest] = useState(false);
+  const [groupSize,       setGroupSize]       = useState(1);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [customer,       setCustomer]       = useState<Customer>({ name: '', email: '', phone: '' });
@@ -941,7 +1074,7 @@ export default function BookingDrawer() {
   useEffect(() => {
     if (!isOpen) {
       const t = setTimeout(() => {
-        setStep('tour-type'); setTourType(null); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
+        setStep('tour-type'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
         setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setBooking(null);
       }, 380);
       return () => clearTimeout(t);
@@ -949,7 +1082,7 @@ export default function BookingDrawer() {
   }, [isOpen]);
 
   function reset() {
-    setStep('tour-type'); setTourType(null); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
+    setStep('tour-type'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
     setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setBooking(null);
   }
 
@@ -1028,13 +1161,16 @@ export default function BookingDrawer() {
             </div>
           </div>
 
-          {/* Step bar (hidden on confirmation) */}
-          {step !== 'confirmation' && <StepBar step={step} />}
+          {/* Step bar (hidden on confirmation and tour request form) */}
+          {step !== 'confirmation' && !showTourRequest && <StepBar step={step} />}
 
           {/* ── Scrollable content ── */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 8px' }}>
-            {step === 'tour-type' && (
-              <TourTypeStep selectedType={tourType} onSelect={handleTourTypeSelect} />
+            {showTourRequest && (
+              <TourRequestForm onBack={() => setShowTourRequest(false)} />
+            )}
+            {!showTourRequest && step === 'tour-type' && (
+              <TourTypeStep selectedType={tourType} onSelect={handleTourTypeSelect} onRequestTour={() => setShowTourRequest(true)} />
             )}
             {step === 'group-size' && tourType && tourType !== 'solo-flex' && (
               <GroupSizeStep groupSize={groupSize} setGroupSize={setGroupSize} tourType={tourType} />
@@ -1081,7 +1217,7 @@ export default function BookingDrawer() {
           </div>
 
           {/* ── Sticky footer ── */}
-          {step !== 'confirmation' && (
+          {step !== 'confirmation' && !showTourRequest && (
             <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', background: 'var(--bg-section)' }}>
               {/* Trust line */}
               <div style={{ padding: '9px 20px', borderBottom: '1px solid var(--border)' }}>
