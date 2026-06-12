@@ -201,11 +201,11 @@ function GroupSizeStep({ groupSize, setGroupSize }: { groupSize: number; setGrou
         <div style={{ borderTop: '1px solid rgba(203,243,110,0.15)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
             <span>Service &amp; booking fee (6%)</span>
-            <span>${fee.toFixed(2)}</span>
+            <span>${Number(fee).toFixed(2)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Estimated Total</span>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>${total.toFixed(2)}</span>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>${Number(total).toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -595,20 +595,20 @@ function ReviewStep({ slot, groupSize, isPrivate, customer, waiverAgreedAt, onCo
           ))}
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Tour subtotal</span>
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>${subtotal.toFixed(2)}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>${Number(subtotal).toFixed(2)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
             <span style={{ display: 'flex', alignItems: 'center', fontSize: 13, color: 'var(--text-dim)' }}>
               Service &amp; booking fee (6%)<InfoTooltip text="This fee covers secure payment processing and booking platform costs. It is not retained by Modern Explorer." />
             </span>
-            <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>${serviceFee.toFixed(2)}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>${Number(serviceFee).toFixed(2)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0 10px' }}>
             <div>
               <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>Estimated Total</span>
               <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Charged {chargeDate(slot.date)}</span>
             </div>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, color: 'var(--accent)' }}>${total.toFixed(2)}</span>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, color: 'var(--accent)' }}>${Number(total).toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -751,7 +751,7 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 5 }}>No charge today</p>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
             Your card is saved securely via Stripe. Your estimated{' '}
-            <strong style={{ color: 'var(--text)' }}>${booking.total_amount.toFixed(2)}</strong>{' '}
+            <strong style={{ color: 'var(--text)' }}>${Number(booking.total_amount).toFixed(2)}</strong>{' '}
             charge processes automatically on <strong style={{ color: 'var(--text)' }}>{cd}</strong> — 24 hours before your tour.
             {booking.is_private && <span> If others join your time slot before then, your rate adjusts to $35/person and you'll be notified.</span>}
           </p>
@@ -764,9 +764,9 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
           ['Tour',  booking.tour_name],
           ['Date',  formatDate(booking.date)],
           ['Time',  formatTime(booking.start_time)],
-          ['Type',  booking.is_private ? `Private Tour · $${booking.subtotal.toFixed(0)} flat` : `Group · ${booking.group_size} ${booking.group_size === 1 ? 'person' : 'people'} · $${(booking.subtotal / booking.group_size).toFixed(0)}/pp`],
-          ['Subtotal', `$${booking.subtotal.toFixed(2)}`],
-          ['Service Fee', `$${booking.service_fee.toFixed(2)}`],
+          ['Type',  booking.is_private ? `Private Tour · $${Number(booking.subtotal).toFixed(0)} flat` : `Group · ${booking.group_size} ${booking.group_size === 1 ? 'person' : 'people'} · $${(Number(booking.subtotal) / booking.group_size).toFixed(0)}/pp`],
+          ['Subtotal', `$${Number(booking.subtotal).toFixed(2)}`],
+          ['Service Fee', `$${Number(booking.service_fee).toFixed(2)}`],
         ].map(([label, value], i) => (
           <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '10px 18px', background: i % 2 !== 0 ? 'rgba(255,255,255,0.02)' : 'transparent', borderBottom: '1px solid var(--border)' }}>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>{label}</span>
@@ -778,7 +778,7 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 2 }}>Estimated Charge</span>
             <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Billed {cd}</span>
           </div>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>${booking.total_amount.toFixed(2)}</span>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>${Number(booking.total_amount).toFixed(2)}</span>
         </div>
       </div>
 
@@ -970,7 +970,7 @@ export default function BookingDrawer() {
                     {isPrivate ? 'Private tour' : `${groupSize} × $${GROUP_PER_PP}/pp`} + 6% fee
                   </p>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>
-                    ${total.toFixed(2)}
+                    ${Number(total).toFixed(2)}
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
