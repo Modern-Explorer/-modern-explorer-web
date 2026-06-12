@@ -96,7 +96,7 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <a href="https://app.modernexplorer.me/admin" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--spin" style={{ color: '#cbf36e', opacity: 0.6, fontSize: 24, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '8px' }}>✦</a>
+            <a href="https://app.modernexplorer.me/admin" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--spin" style={{ color: '#cbf36e', opacity: 0.7, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>✦</a>
             <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', margin: 0 }}>
               © {new Date().getFullYear()} Modern Explorer. All rights reserved.
             </p>
@@ -105,7 +105,7 @@ export default function Footer() {
             <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', margin: 0 }}>
               Crestone · San Luis Valley, Colorado · Near Great Sand Dunes National Park
             </p>
-            <a href="https://app.modernexplorer.me/guide/login" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--pulse" style={{ color: '#cbf36e', fontSize: 28, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '8px' }}>⬡</a>
+            <a href="https://app.modernexplorer.me/guide/login" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--pulse footer-sigil--guide" style={{ color: '#cbf36e', opacity: 0.8, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>⬡</a>
           </div>
         </div>
       </div>
@@ -123,6 +123,9 @@ export default function Footer() {
         .footer-sigil--pulse { animation: footer-pulse 3s ease-in-out infinite; }
         @media (max-width: 900px) {
           footer .container > div:first-child { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 768px) {
+          .footer-sigil--guide { margin-bottom: 80px; }
         }
         @media (max-width: 560px) {
           footer .container > div:first-child { grid-template-columns: 1fr !important; }
