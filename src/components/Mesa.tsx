@@ -260,6 +260,9 @@ export default function Mesa() {
           borderRadius:4,
           boxShadow:'0 0 32px rgba(203,243,110,.12), 0 8px 32px rgba(0,0,0,.6)',
           animation:'mesaNoteIn .2s ease-out',
+          opacity: nearBottom ? 0 : undefined,
+          pointerEvents: nearBottom ? 'none' : undefined,
+          transition: 'opacity 0.4s ease',
         }}>
           <p style={{ fontFamily:"'Courier New',monospace", fontSize:10, color:'rgba(203,243,110,.38)', letterSpacing:'.14em', margin:'0 0 6px' }}>
             MESA // FIELD NOTE
