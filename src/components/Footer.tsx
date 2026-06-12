@@ -96,17 +96,27 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <a href="https://app.modernexplorer.me/admin" style={{ color: 'inherit', opacity: 0.25, fontSize: 10, textDecoration: 'none', userSelect: 'none' }}>✦</a>
+            <a href="https://app.modernexplorer.me/admin" className="footer-sigil footer-sigil--spin" style={{ color: '#cbf36e', opacity: 0.4, fontSize: 16, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1 }}>✦</a>
             © {new Date().getFullYear()} Modern Explorer. All rights reserved.
           </p>
           <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', display: 'flex', alignItems: 'center', gap: 10 }}>
             Crestone · San Luis Valley, Colorado · Near Great Sand Dunes National Park
-            <a href="https://app.modernexplorer.me/guide/login" style={{ color: 'inherit', opacity: 0.25, fontSize: 10, textDecoration: 'none', userSelect: 'none' }}>⬡</a>
+            <a href="https://app.modernexplorer.me/guide/login" className="footer-sigil footer-sigil--pulse" style={{ color: '#cbf36e', opacity: 0.4, fontSize: 16, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1 }}>⬡</a>
           </p>
         </div>
       </div>
 
       <style>{`
+        @keyframes footer-spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes footer-pulse {
+          0%, 100% { opacity: 0.4; }
+          50%       { opacity: 0.15; }
+        }
+        .footer-sigil--spin  { animation: footer-spin  8s linear infinite; }
+        .footer-sigil--pulse { animation: footer-pulse 6s ease-in-out infinite; }
         @media (max-width: 900px) {
           footer .container > div:first-child { grid-template-columns: 1fr 1fr !important; }
         }
