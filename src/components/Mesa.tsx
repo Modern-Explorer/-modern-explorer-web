@@ -206,6 +206,11 @@ export default function Mesa() {
   }
 
   const sendMessage = async () => {
+    if (listening) {
+      listeningRef.current = false;
+      setListening(false);
+      recogRef.current?.stop();
+    }
     const text = input.trim();
     if (!text || loading) return;
     const userMsg: Message = { role: 'user', content: text };
