@@ -72,11 +72,17 @@ export default function Mesa() {
   const [fieldNote, setFieldNote] = useState<string | null>(null);
   const [orbPulsing, setOrbPulsing] = useState(false);
   const [nearBottom, setNearBottom] = useState(false);
+  const [listening,       setListening]       = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [interim,         setInterim]         = useState('');
 
   const seenRef        = useRef<Set<string>>(new Set());
   const noteTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef       = useRef<HTMLInputElement>(null);
+  const listeningRef   = useRef(false);
+  const recogRef       = useRef<any>(null);
+  const pendingRef     = useRef('');
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -137,6 +143,68 @@ export default function Mesa() {
     return () => window.removeEventListener('mesa:field-report', handler);
   }, [showFieldNote]);
 
+  useEffect(() => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    setSpeechSupported(true);
+
+    const recog = new SR();
+    recog.continuous     = true;
+    recog.interimResults = true;
+    recog.lang           = 'en-US';
+
+    recog.onresult = (e: any) => {
+      let fin = '', interimText = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) fin         += e.results[i][0].transcript;
+        else                      interimText += e.results[i][0].transcript;
+      }
+      setInterim(interimText);
+      if (fin) {
+        const appended = fin.trim();
+        setInput(prev => prev + (prev && !prev.endsWith(' ') ? ' ' : '') + appended);
+        pendingRef.current += (pendingRef.current ? ' ' : '') + appended;
+      }
+    };
+
+    recog.onend = () => {
+      // If listening was not explicitly stopped, restart (some browsers end continuous sessions early)
+      if (listeningRef.current) {
+        try { recog.start(); } catch {}
+        return;
+      }
+      setListening(false);
+      setInterim('');
+      pendingRef.current = '';
+    };
+
+    recog.onerror = (e: any) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        setSpeechSupported(false);
+      }
+      listeningRef.current = false;
+      setListening(false);
+      setInterim('');
+    };
+
+    recogRef.current = recog;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function toggleMic() {
+    if (!recogRef.current) return;
+    if (listening) {
+      listeningRef.current = false;
+      recogRef.current.stop();
+    } else {
+      pendingRef.current = '';
+      try {
+        recogRef.current.start();
+        listeningRef.current = true;
+        setListening(true);
+      } catch {}
+    }
+  }
+
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || loading) return;
@@ -164,6 +232,10 @@ export default function Mesa() {
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
+
+  const displayInput = listening && interim
+    ? input + (input && !input.endsWith(' ') ? ' ' : '') + interim
+    : input;
 
   return (
     <>
@@ -232,6 +304,10 @@ export default function Mesa() {
         .mesa-dot-1 { animation:mesaDot 1.4s .00s ease-in-out infinite; }
         .mesa-dot-2 { animation:mesaDot 1.4s .22s ease-in-out infinite; }
         .mesa-dot-3 { animation:mesaDot 1.4s .44s ease-in-out infinite; }
+        @keyframes mesaMicPulse {
+          0%,100% { opacity:1; box-shadow:0 0 5px #f87171; }
+          50%      { opacity:0.35; box-shadow:0 0 2px #f87171; }
+        }
         .mesa-chat {
           position:fixed; bottom:100px; right:24px; z-index:9998;
           width:min(400px, calc(100vw - 48px)); height:530px;
@@ -343,34 +419,81 @@ export default function Mesa() {
           {/* Divider */}
           <div style={{ height:1, background:'rgba(203,243,110,.09)', flexShrink:0 }} />
 
-          {/* Input row */}
-          <div style={{ padding:'10px 14px', display:'flex', alignItems:'center', gap:9, background:'#010803', flexShrink:0 }}>
-            <span style={{ fontFamily:"'Courier New',monospace", fontSize:14, color:'rgba(203,243,110,.35)', flexShrink:0 }}>›</span>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="Enter query…"
-              disabled={loading}
-              className="mesa-input"
-              style={{ flex:1, background:'none', border:'none', fontFamily:"'Courier New',monospace", fontSize:13, color:'rgba(203,243,110,.9)', caretColor:'rgba(203,243,110,.9)' }}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              style={{
-                background:'none',
-                border:`1px solid rgba(203,243,110,${loading || !input.trim() ? '.12' : '.3'})`,
-                borderRadius:3, padding:'4px 10px',
-                fontFamily:"'Courier New',monospace", fontSize:10,
-                color:`rgba(203,243,110,${loading || !input.trim() ? '.18' : '.65'})`,
-                cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-                letterSpacing:'.1em', transition:'color .15s, border-color .15s',
-              }}
-              onMouseEnter={e => { if (!loading && input.trim()) { e.currentTarget.style.color='rgba(203,243,110,.95)'; e.currentTarget.style.borderColor='rgba(203,243,110,.6)'; } }}
-              onMouseLeave={e => { e.currentTarget.style.color=`rgba(203,243,110,${loading||!input.trim()?'.18':'.65'})`; e.currentTarget.style.borderColor=`rgba(203,243,110,${loading||!input.trim()?'.12':'.3'})`; }}
-            >SEND</button>
+          {/* Input area */}
+          <div style={{ background:'#010803', flexShrink:0 }}>
+            {/* Listening status line */}
+            {listening && (
+              <div style={{ padding:'5px 14px 0', display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ display:'inline-block', width:5, height:5, borderRadius:'50%', background:'#f87171', boxShadow:'0 0 5px #f87171', animation:'mesaMicPulse 0.8s ease-in-out infinite' }} />
+                <span style={{ fontFamily:"'Courier New',monospace", fontSize:9, color:'rgba(248,113,113,.75)', letterSpacing:'.12em' }}>LISTENING…</span>
+              </div>
+            )}
+
+            {/* Input row */}
+            <div style={{ padding:'10px 14px', display:'flex', alignItems:'center', gap:9 }}>
+              <span style={{ fontFamily:"'Courier New',monospace", fontSize:14, color: listening ? 'rgba(248,113,113,.5)' : 'rgba(203,243,110,.35)', flexShrink:0 }}>›</span>
+              <input
+                ref={inputRef}
+                value={displayInput}
+                onChange={e => { if (!listening) setInput(e.target.value); }}
+                onKeyDown={handleKey}
+                placeholder={listening ? '' : 'Enter query…'}
+                disabled={loading}
+                className="mesa-input"
+                style={{ flex:1, background:'none', border:'none', fontFamily:"'Courier New',monospace", fontSize:13, color: listening && interim ? 'rgba(248,113,113,.65)' : 'rgba(203,243,110,.9)', caretColor:'rgba(203,243,110,.9)' }}
+              />
+
+              {/* Mic button */}
+              {speechSupported && (
+                <button
+                  type="button"
+                  onClick={toggleMic}
+                  disabled={loading}
+                  title={listening ? 'Stop recording' : 'Voice input'}
+                  style={{
+                    flexShrink:0, width:28, height:28,
+                    background: listening ? 'rgba(248,113,113,.12)' : 'none',
+                    border:`1px solid ${listening ? 'rgba(248,113,113,.45)' : 'rgba(203,243,110,.18)'}`,
+                    borderRadius:3,
+                    color: listening ? 'rgba(248,113,113,.85)' : 'rgba(203,243,110,.38)',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    transition:'all 0.15s',
+                  }}
+                  onMouseEnter={e => { if (!loading && !listening) { e.currentTarget.style.borderColor='rgba(203,243,110,.45)'; e.currentTarget.style.color='rgba(203,243,110,.7)'; } }}
+                  onMouseLeave={e => { if (!listening) { e.currentTarget.style.borderColor='rgba(203,243,110,.18)'; e.currentTarget.style.color='rgba(203,243,110,.38)'; } }}
+                >
+                  {listening ? (
+                    <svg width="9" height="9" viewBox="0 0 10 10">
+                      <rect x="1.5" y="1.5" width="7" height="7" fill="currentColor" rx="1" />
+                    </svg>
+                  ) : (
+                    <svg width="11" height="12" viewBox="0 0 13 14" fill="none">
+                      <rect x="4" y="1" width="5" height="8" rx="2.5" stroke="currentColor" strokeWidth="1.5"/>
+                      <path d="M1.5 7.5A5 5 0 0 0 11.5 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                      <line x1="6.5" y1="12.5" x2="6.5" y2="10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  )}
+                </button>
+              )}
+
+              {/* Send button */}
+              <button
+                onClick={sendMessage}
+                disabled={loading || !input.trim()}
+                style={{
+                  background:'none',
+                  border:`1px solid rgba(203,243,110,${loading || !input.trim() ? '.12' : '.3'})`,
+                  borderRadius:3, padding:'4px 10px',
+                  fontFamily:"'Courier New',monospace", fontSize:10,
+                  color:`rgba(203,243,110,${loading || !input.trim() ? '.18' : '.65'})`,
+                  cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+                  letterSpacing:'.1em', transition:'color .15s, border-color .15s',
+                }}
+                onMouseEnter={e => { if (!loading && input.trim()) { e.currentTarget.style.color='rgba(203,243,110,.95)'; e.currentTarget.style.borderColor='rgba(203,243,110,.6)'; } }}
+                onMouseLeave={e => { e.currentTarget.style.color=`rgba(203,243,110,${loading||!input.trim()?'.18':'.65'})`; e.currentTarget.style.borderColor=`rgba(203,243,110,${loading||!input.trim()?'.12':'.3'})`; }}
+              >SEND</button>
+            </div>
           </div>
 
           {/* Footer */}
