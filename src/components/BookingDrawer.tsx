@@ -80,11 +80,7 @@ function calcAmounts(size: number, tourType: TourType, slot?: Slot | null) {
   return { subtotal, fee, total: Math.round((subtotal + fee) * 100) / 100 };
 }
 
-function chargeDate(tourDate: string): string {
-  const d = new Date(tourDate.slice(0, 10) + 'T12:00:00');
-  d.setDate(d.getDate() - 1);
-  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-}
+
 function formatTime(t: string) {
   const [h, m] = t.split(':').map(Number);
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
@@ -257,7 +253,7 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType:
       price: '$70',
       priceNote: 'flat rate',
       tagline: '1 person · slot open to other guests',
-      description: 'Book a spot for yourself. If others join before your tour date, your rate automatically drops to $35/person and you\'ll be notified.',
+      description: '$70 flat rate, charged immediately. You have the tour to yourself — others may still join at the group rate.',
     },
     {
       id: 'private-guaranteed',
@@ -329,8 +325,8 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType:
       <div style={{ padding: '12px 16px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>🔒</span>
         <p style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6, margin: 0 }}>
-          <strong style={{ color: 'var(--text-muted)' }}>No charge today.</strong>{' '}
-          Your card is saved securely via Stripe and charged automatically 24 hours before your tour.
+          <strong style={{ color: 'var(--text-muted)' }}>Charged immediately.</strong>{' '}
+          Payment is collected securely via Stripe when you confirm your booking.
         </p>
       </div>
     </div>
@@ -442,12 +438,12 @@ function GroupSizeStep({ groupSize, setGroupSize, tourType }: { groupSize: numbe
         </div>
       </div>
 
-      {/* Deferred charge notice */}
+      {/* Immediate charge notice */}
       <div style={{ padding: '12px 16px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>🔒</span>
         <p style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6, margin: 0 }}>
-          <strong style={{ color: 'var(--text-muted)' }}>No charge today.</strong>{' '}
-          We save your payment method securely and run the charge automatically 24 hours before your tour date.
+          <strong style={{ color: 'var(--text-muted)' }}>Charged immediately.</strong>{' '}
+          Payment is collected securely via Stripe when you confirm your booking.
         </p>
       </div>
     </div>
@@ -605,10 +601,11 @@ function TimeSlotStep({ date, slots, groupSize, tourType, selectedSlot, setSelec
 function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
   customer: Customer; setCustomer: (c: Customer) => void; onWaiverAgreed: (ts: string) => void;
 }) {
-  const [waiverChecked,   setWaiverChecked]   = useState(false);
-  const [hasMinors,       setHasMinors]       = useState(false);
-  const [waiverTimestamp, setWaiverTimestamp] = useState<string | null>(null);
-  const [modalOpen,       setModalOpen]       = useState(false);
+  const [waiverChecked,      setWaiverChecked]      = useState(false);
+  const [hasMinors,          setHasMinors]          = useState(false);
+  const [minorWaiverChecked, setMinorWaiverChecked] = useState(false);
+  const [waiverTimestamp,    setWaiverTimestamp]    = useState<string | null>(null);
+  const [modalOpen,          setModalOpen]          = useState(false);
 
   const pref          = customer.contact_preference ?? 'email';
   const smsSelected   = pref === 'sms' || pref === 'both';
@@ -616,7 +613,7 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
   const phoneRequired = smsSelected && !phoneProvided;
   const emailValid    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email);
   const formValid     = customer.name.trim().length > 0 && emailValid && !phoneRequired;
-  const canContinue   = formValid && waiverChecked;
+  const canContinue   = formValid && waiverChecked && (!hasMinors || minorWaiverChecked);
 
   function setField(field: keyof Customer, value: string) { setCustomer({ ...customer, [field]: value }); }
   function setPref(p: ContactPref) { setCustomer({ ...customer, contact_preference: p }); }
@@ -699,11 +696,9 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
               );
             })}
           </div>
-          {smsSelected && (
-            <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, lineHeight: 1.6 }}>
-              By selecting SMS you consent to receive booking confirmations and tour updates via text from Modern Explorer. Msg &amp; data rates may apply. Reply <strong style={{ color: 'var(--text-muted)' }}>STOP</strong> to unsubscribe.
-            </p>
-          )}
+          <p style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, lineHeight: 1.6 }}>
+            SMS opt-out: If you select text message (SMS) confirmation, standard message and data rates may apply. Reply <strong style={{ color: 'var(--text-muted)' }}>STOP</strong> to cancel at any time. Modern Explorer will not share your number with third parties.
+          </p>
         </div>
 
         {/* Waiver */}
@@ -742,9 +737,20 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
           <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>My group includes participants under 18 years old.</span>
         </label>
         {hasMinors && (
-          <div style={{ padding: '14px 18px', marginBottom: 20, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.28)', borderLeft: '3px solid rgba(245,158,11,0.6)', borderRadius: 5 }}>
-            <p style={{ fontSize: 13, color: 'rgba(245,158,11,0.9)', lineHeight: 1.7 }}>A parent or legal guardian must sign the waiver for all minors. Separate waiver forms will be sent after booking.</p>
-          </div>
+          <>
+            <div style={{ padding: '14px 18px', marginBottom: 12, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.28)', borderLeft: '3px solid rgba(245,158,11,0.6)', borderRadius: 5 }}>
+              <p style={{ fontSize: 13, color: 'rgba(245,158,11,0.9)', lineHeight: 1.7 }}>A parent or legal guardian must sign the waiver for all minors. Separate waiver forms will be sent after booking.</p>
+            </div>
+            <label style={{ display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', marginBottom: 20 }}>
+              <span style={{ position: 'relative', flexShrink: 0, marginTop: 2 }}>
+                <input type="checkbox" checked={minorWaiverChecked} onChange={e => setMinorWaiverChecked(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: 3, background: minorWaiverChecked ? 'var(--accent)' : 'var(--bg-section)', border: `2px solid ${minorWaiverChecked ? 'var(--accent)' : 'var(--border)'}`, transition: 'background 0.15s, border-color 0.15s' }}>
+                  {minorWaiverChecked && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#080c17" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </span>
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>I confirm that a parent or legal guardian will complete a separate minor participant waiver for all participants under 18 before the tour.</span>
+            </label>
+          </>
         )}
 
         <div style={{ padding: '12px 16px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, marginBottom: 20 }}>
@@ -792,7 +798,7 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
     <div>
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>Final Step</p>
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 24 }}>
-        No charge today — your card is saved securely and charged automatically 24 hours before your tour.
+        Your card will be charged immediately when you confirm your booking.
       </p>
 
       {/* Order summary */}
@@ -827,22 +833,20 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0 10px' }}>
             <div>
-              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>Estimated Total</span>
-              <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Charged {chargeDate(slot.date)}</span>
+              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>Total</span>
+              <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Charged immediately</span>
             </div>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, color: 'var(--accent)' }}>${Number(total).toFixed(2)}</span>
           </div>
         </div>
       </div>
 
-      {/* Deferred charge notice */}
+      {/* Immediate charge notice */}
       <div style={{ padding: '12px 16px', marginBottom: 20, background: 'rgba(203,243,110,0.06)', border: '1px solid rgba(203,243,110,0.2)', borderRadius: 6, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
         <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>🔒</span>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-          <strong style={{ color: 'var(--accent)' }}>No charge today.</strong>{' '}
-          Your payment method is saved securely via Stripe. The charge processes automatically on{' '}
-          <strong style={{ color: 'var(--text)' }}>{chargeDate(slot.date)}</strong> based on your final group size.
-          {tourType === 'solo-flex' && <span> If others join your time slot before then, your rate adjusts to $35/person and you'll be notified by email.</span>}
+          <strong style={{ color: 'var(--accent)' }}>Charged immediately.</strong>{' '}
+          Your payment is processed securely via Stripe when you confirm your booking.
         </p>
       </div>
 
@@ -850,7 +854,7 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
       <div style={{ background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 8, padding: '24px', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
           <svg width="20" height="14" viewBox="0 0 20 14" fill="none"><rect width="20" height="14" rx="2" fill="#1a1f36"/><rect x="2" y="9" width="4" height="2" rx="0.5" fill="#cbf36e" opacity="0.7"/><rect x="7" y="9" width="2" height="2" rx="0.5" fill="#cbf36e" opacity="0.4"/></svg>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Save Card Securely · Stripe</span>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Pay Securely · Stripe</span>
         </div>
 
         {missingKey && (
@@ -866,7 +870,7 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
         {loading && !intentError && (
           <div style={{ padding: '28px 0', textAlign: 'center' }}>
             <div style={{ width: 24, height: 24, margin: '0 auto 10px', border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-            <p style={{ fontSize: 13, color: 'var(--text-dim)' }}>Setting up secure card save…</p>
+            <p style={{ fontSize: 13, color: 'var(--text-dim)' }}>Setting up payment…</p>
           </div>
         )}
         {!loading && clientSecret && !missingKey && (
@@ -901,8 +905,8 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
 
     const { error, paymentIntent } = await stripe.confirmPayment({ elements, confirmParams: {}, redirect: 'if_required' });
 
-    if (error) { setStripeError(error.message ?? 'Could not save card. Please try again.'); setProcessing(false); return; }
-    if (!paymentIntent || paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture' && paymentIntent.status !== 'processing') { setStripeError('Card setup was not completed. Please try again.'); setProcessing(false); return; }
+    if (error) { setStripeError(error.message ?? 'Could not process payment. Please try again.'); setProcessing(false); return; }
+    if (!paymentIntent || paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture' && paymentIntent.status !== 'processing') { setStripeError('Payment was not completed. Please try again.'); setProcessing(false); return; }
 
     try {
       const res = await fetch(`${API_URL}/bookings`, {
@@ -936,8 +940,8 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
         <button type="button" className="btn btn-ghost" onClick={onBack} disabled={processing} style={{ flex: '0 0 auto' }}>← Back</button>
         <button type="submit" className="btn btn-primary" disabled={!stripe || !elements || processing} style={{ flex: 1, justifyContent: 'center' }}>
           {processing
-            ? <><span style={{ width: 16, height: 16, border: '2px solid rgba(8,12,23,0.3)', borderTopColor: '#080c17', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block', flexShrink: 0, marginRight: 8 }} />Saving…</>
-            : 'Save Card & Confirm Booking — no charge today'}
+            ? <><span style={{ width: 16, height: 16, border: '2px solid rgba(8,12,23,0.3)', borderTopColor: '#080c17', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block', flexShrink: 0, marginRight: 8 }} />Processing…</>
+            : 'Confirm & Pay Now'}
         </button>
       </div>
     </form>
@@ -946,10 +950,6 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
 
 // ─── Confirmation — matches Confirmation.tsx exactly ─────────────────────────
 function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onReset: () => void }) {
-  const cd = booking.charge_date
-    ? new Date(booking.charge_date.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-    : chargeDate(booking.date);
-
   return (
     <div style={{ textAlign: 'center', paddingTop: 8 }}>
       <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--accent-dim)', border: '2px solid var(--border-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
@@ -967,16 +967,14 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
         <p style={{ fontFamily: "'Courier New', Courier, monospace", fontSize: 28, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.12em' }}>{booking.confirmation_code}</p>
       </div>
 
-      {/* Deferred charge banner */}
+      {/* Payment confirmed banner */}
       <div style={{ padding: '14px 18px', marginBottom: 16, background: 'rgba(203,243,110,0.07)', border: '1px solid rgba(203,243,110,0.25)', borderRadius: 8, display: 'flex', gap: 12, alignItems: 'flex-start', textAlign: 'left' }}>
         <span style={{ fontSize: 20, flexShrink: 0 }}>🔒</span>
         <div>
-          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 5 }}>No charge today</p>
+          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 5 }}>Payment confirmed</p>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-            Your card is saved securely via Stripe. Your estimated{' '}
             <strong style={{ color: 'var(--text)' }}>${Number(booking.total_amount).toFixed(2)}</strong>{' '}
-            charge processes automatically on <strong style={{ color: 'var(--text)' }}>{cd}</strong> — 24 hours before your tour.
-            {booking.tour_type === 'solo-flex' && <span> If others join your time slot before then, your rate adjusts to $35/person and you'll be notified.</span>}
+            was charged securely via Stripe.
           </p>
         </div>
       </div>
@@ -1004,8 +1002,8 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
         ))}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 18px' }}>
           <div>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 2 }}>Estimated Charge</span>
-            <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Billed {cd}</span>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 2 }}>Total Charged</span>
+            <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Charged today</span>
           </div>
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--accent)' }}>${Number(booking.total_amount).toFixed(2)}</span>
         </div>
@@ -1222,7 +1220,7 @@ export default function BookingDrawer() {
               {/* Trust line */}
               <div style={{ padding: '9px 20px', borderBottom: '1px solid var(--border)' }}>
                 <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, color: 'var(--text-dim)', textAlign: 'center' }}>
-                  🔒 No charge today · Secure via Stripe · Free cancellation 48h+
+                  🔒 Charged immediately · Secure via Stripe · Free cancellation 48h+
                 </p>
               </div>
               {/* Price + nav */}
