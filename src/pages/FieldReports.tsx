@@ -63,6 +63,13 @@ const posts = [
     excerpt: "Now in its nearly fourth decade, the Crestone Energy Fair returns September 11–13, 2026 in Saguache County — where minimal building codes have enabled decades of hands-on experimentation in sustainable living, producing one of the highest concentrations of natural and regenerative homes in the country. Features home tours, workshops, and speakers on sustainable building, renewable energy, water systems, and food sovereignty. Free and open to all.",
   },
   {
+    id: 11, tag: 'Community', pinnedEvent: true,
+    title: 'Crestone 4th of July Celebration — July 4, 2026',
+    date: 'Jul 2026', author: 'Modern Explorer', readTime: '3 min',
+    img: IMG('Crestone', '20250810_095413-EDIT.jpg'),
+    excerpt: "Crestone doesn't do holidays small. The annual 4th of July celebration brings the whole community together at the base of the Sangres — vendors, food, music, and the legendary Crestone Soapbox Derby. Gravity-powered cars, homemade and wild, race down the hill in what may be the most Crestone thing that happens all year. Free and open to everyone. Vendors apply at the link below. Questions: crestone4th@gmail.com · mountainsiderealty.com/4th-of-july-2026",
+  },
+  {
     id: 8, tag: 'Community', pinnedEvent: true,
     title: "Crestone Vortex Festival — August 8–9, 2026",
     date: 'Aug 2026', author: 'Modern Explorer', readTime: '4 min',
@@ -107,7 +114,7 @@ const posts = [
     excerpt: "At 13,266 feet, Marble Mountain holds the highest-elevation significant cave in the United States. In 1541 Spanish monks used Native American slave labor to extract gold from within it. Around 1900 explorer Elisha Horn found a skeleton in Spanish armor at the entrance. In 1932 a second skeleton was found chained by the neck to an interior wall. The cave has never been fully surveyed. The gold has never been found.",
   },
   {
-    id: 11, tag: 'Expedition News',
+    id: 14, tag: 'Expedition News',
     title: "Dead Man's Cave: The Spanish Treasure Expedition",
     date: 'Mar 2026', author: 'Modern Explorer', readTime: '9 min',
     img: IMG('History', 'Spanish Map.jpg'),
