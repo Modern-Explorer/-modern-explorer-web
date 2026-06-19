@@ -41,7 +41,7 @@ interface Slot {
   max_group_size: number;
   duration_minutes: number;
 }
-type TourType = 'group' | 'solo-flex' | 'private-guaranteed';
+type TourType = 'join-group' | 'group' | 'private-guaranteed';
 type ContactPref = 'email' | 'sms' | 'both';
 interface Customer { name: string; email: string; phone: string; contact_preference?: ContactPref; }
 interface BookingResult {
@@ -56,23 +56,22 @@ interface BookingResult {
   service_fee: number;
   total_amount: number;
   customer_name: string;
-  charge_date?: string;
 }
-type DrawerStep = 'tour-type' | 'group-size' | 'calendar' | 'slot' | 'customer' | 'review' | 'confirmation';
+type DrawerStep = 'calendar' | 'slot' | 'tour-type' | 'group-size' | 'customer' | 'review' | 'confirmation';
 
 // ─── Pricing & date utilities ─────────────────────────────────────────────────
-const SOLO_FLEX_PRICE         = 70;
 const PRIVATE_GUARANTEED_BASE = 85;
 const GROUP_PER_PP            = 35;
+const GROUP_MIN               = 70;
 const SERVICE_RATE            = 0.06;
 const MAX_GROUP               = 12;
 
 function calcAmounts(size: number, tourType: TourType, slot?: Slot | null) {
   let subtotal: number;
-  if (tourType === 'group') {
-    subtotal = size * Number(slot?.price_per_person ?? GROUP_PER_PP);
-  } else if (tourType === 'solo-flex') {
-    subtotal = Number(slot?.private_flat_price ?? SOLO_FLEX_PRICE);
+  if (tourType === 'join-group') {
+    subtotal = size * Number(slot?.price_per_person ?? GROUP_PER_PP); // no minimum
+  } else if (tourType === 'group') {
+    subtotal = Math.max(GROUP_MIN, size * Number(slot?.price_per_person ?? GROUP_PER_PP));
   } else {
     subtotal = PRIVATE_GUARANTEED_BASE + Math.max(0, size - 2) * GROUP_PER_PP;
   }
@@ -237,23 +236,32 @@ const LOCK_SVG = (color = 'currentColor') => (
   </svg>
 );
 
-function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType: TourType | null; onSelect: (t: TourType) => void; onRequestTour: () => void }) {
-  const options: Array<{ id: TourType; title: string; price: string; priceNote: string; tagline: string; description: string; isPrivate?: boolean }> = [
+function TourTypeStep({ selectedType, onSelect, onRequestTour, slot }: {
+  selectedType: TourType | null;
+  onSelect: (t: TourType) => void;
+  onRequestTour: () => void;
+  slot: Slot | null;
+}) {
+  const slotHasOthers = slot ? (slot.capacity - slot.spots_remaining) > 0 : false;
+
+  const options = ([
+    {
+      id: 'join-group' as TourType,
+      title: 'Join a Group',
+      price: '$35',
+      priceNote: 'per person',
+      tagline: 'others already joining this slot',
+      description: "Jump into an existing group. $35/person — no minimum. You'll share the tour with other guests who have already booked.",
+      hidden: !slotHasOthers,
+    },
     {
       id: 'group',
       title: 'Group Tour',
       price: '$35',
       priceNote: 'per person',
-      tagline: '2-person minimum · joins open slot',
-      description: 'Share the tour with other guests. Best rate for groups of 2 or more.',
-    },
-    {
-      id: 'solo-flex',
-      title: 'Solo Flex',
-      price: '$70',
-      priceNote: 'flat rate',
-      tagline: '1 person · slot open to other guests',
-      description: '$70 flat rate, charged immediately. You have the tour to yourself — other guests may still join at the group rate.',
+      tagline: '$70 minimum for 1–2 people',
+      description: 'Book your group at $35/person. Groups of 1–2 pay the $70 minimum. Other guests may join this slot.',
+      hidden: slotHasOthers,
     },
     {
       id: 'private-guaranteed',
@@ -264,7 +272,7 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType:
       description: 'Lock the entire time slot for your group only. No other guests will be added — your slot is fully reserved.',
       isPrivate: true,
     },
-  ];
+  ] as Array<{ id: TourType; title: string; price: string; priceNote: string; tagline: string; description: string; isPrivate?: boolean; hidden?: boolean }>).filter(o => !o.hidden);
 
   return (
     <div>
@@ -318,7 +326,7 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType:
       >
         <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
           Have a large group or special request?{' '}
-          <span style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }}>Request a custom tour.</span>
+          <span style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }}>Request a custom date/time.</span>
         </span>
       </button>
 
@@ -333,10 +341,10 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType:
   );
 }
 
-// ─── Step indicator — matches booking-frontend StepIndicator exactly ──────────
-const STEP_LABELS = ['Party', 'Date', 'Time', 'Details', 'Confirm'];
+// ─── Step indicator ───────────────────────────────────────────────────────────
+const STEP_LABELS = ['Date', 'Time', 'Party', 'Details', 'Confirm'];
 const STEP_INDEX: Record<DrawerStep, number> = {
-  'tour-type': 0, 'group-size': 0, calendar: 1, slot: 2, customer: 3, review: 4, confirmation: 5,
+  calendar: 0, slot: 1, 'tour-type': 2, 'group-size': 2, customer: 3, review: 4, confirmation: 5,
 };
 
 function StepBar({ step }: { step: DrawerStep }) {
@@ -366,26 +374,32 @@ function StepBar({ step }: { step: DrawerStep }) {
   );
 }
 
-// ─── STEP 2: Group Size ───────────────────────────────────────────────────────
+// ─── STEP 3: Group Size ───────────────────────────────────────────────────────
 function GroupSizeStep({ groupSize, setGroupSize, tourType }: { groupSize: number; setGroupSize: (n: number) => void; tourType: TourType }) {
-  const minSize = tourType === 'group' ? 2 : 1;
+  const minSize = 1;
   const { subtotal, fee, total } = calcAmounts(groupSize, tourType);
 
-  const rateLabel = tourType === 'group'
-    ? `${groupSize} people × $${GROUP_PER_PP}/person`
-    : groupSize <= 2
+  const rateLabel = tourType === 'private-guaranteed'
+    ? groupSize <= 2
       ? `${groupSize === 1 ? '1 person' : '2-person group'} · flat rate`
-      : `2 base + ${groupSize - 2} extra × $${GROUP_PER_PP}/person`;
+      : `2 base + ${groupSize - 2} extra × $${GROUP_PER_PP}/person`
+    : tourType === 'join-group'
+      ? `${groupSize} ${groupSize === 1 ? 'person' : 'people'} × $${GROUP_PER_PP}/person`
+      : groupSize <= 2
+        ? `${groupSize === 1 ? '1 person' : '2 people'} · $${GROUP_MIN} minimum`
+        : `${groupSize} people × $${GROUP_PER_PP}/person`;
 
   return (
     <div>
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>
-        {tourType === 'group' ? 'How many people are coming?' : 'How large is your group?'}
+        How many people are coming?
       </p>
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 24 }}>
-        {tourType === 'group'
-          ? 'Group tours require at least 2 guests.'
-          : `Including yourself. $${PRIVATE_GUARANTEED_BASE} for up to 2 people, $${GROUP_PER_PP}/person beyond that.`}
+        {tourType === 'private-guaranteed'
+          ? `Including yourself. $${PRIVATE_GUARANTEED_BASE} for up to 2 people, $${GROUP_PER_PP}/person beyond that.`
+          : tourType === 'join-group'
+            ? `$${GROUP_PER_PP}/person — no minimum.`
+            : `$${GROUP_PER_PP}/person. Groups of 1–2 pay a $${GROUP_MIN} minimum.`}
       </p>
 
       {/* Stepper */}
@@ -407,13 +421,13 @@ function GroupSizeStep({ groupSize, setGroupSize, tourType }: { groupSize: numbe
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <div>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 4 }}>
-              {tourType === 'group' ? 'Group Rate' : 'Private Guaranteed Rate'}
+              {tourType === 'private-guaranteed' ? 'Private Guaranteed Rate' : tourType === 'join-group' ? 'Join a Group Rate' : 'Group Tour Rate'}
             </p>
             <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5 }}>{rateLabel}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', lineHeight: 1, marginBottom: 2 }}>${subtotal}</p>
-            <p style={{ fontSize: 12, color: 'var(--text-dim)' }}>{tourType === 'group' ? 'subtotal' : 'flat rate'}</p>
+            <p style={{ fontSize: 12, color: 'var(--text-dim)' }}>{tourType === 'private-guaranteed' ? 'flat rate' : 'subtotal'}</p>
           </div>
         </div>
         {tourType === 'private-guaranteed' && groupSize > 2 && (
@@ -537,22 +551,14 @@ function CalendarStep({ selectedDate, availableDates, loading, onSelect }: {
   );
 }
 
-// ─── STEP 3: Time Slot ────────────────────────────────────────────────────────
-function TimeSlotStep({ date, slots, groupSize, tourType, selectedSlot, setSelectedSlot }: {
-  date: string; slots: Slot[]; groupSize: number; tourType: TourType; selectedSlot: Slot | null; setSelectedSlot: (s: Slot) => void;
+// ─── STEP 2: Time Slot ────────────────────────────────────────────────────────
+function TimeSlotStep({ date, slots, selectedSlot, setSelectedSlot }: {
+  date: string; slots: Slot[]; selectedSlot: Slot | null; setSelectedSlot: (s: Slot) => void;
 }) {
-  const { subtotal } = selectedSlot ? calcAmounts(groupSize, tourType, selectedSlot) : { subtotal: 0 };
-
-  const typeLabel = tourType === 'group'
-    ? `Group Tour · ${groupSize} people × $${Number(slots[0]?.price_per_person ?? GROUP_PER_PP)}/person`
-    : tourType === 'solo-flex'
-      ? `Solo Flex · $${SOLO_FLEX_PRICE} flat (1 person)`
-      : `Private Guaranteed · $${PRIVATE_GUARANTEED_BASE}${groupSize > 2 ? ` + ${groupSize - 2} extra × $${GROUP_PER_PP}` : ' for 1–2 people'}`;
-
   return (
     <div>
       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>{formatDate(date)}</p>
-      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 8 }}>{typeLabel}</p>
+      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 8 }}>Choose a departure time — pricing options appear on the next step.</p>
 
       <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 12, marginTop: 20 }}>Available Times</p>
 
@@ -563,8 +569,7 @@ function TimeSlotStep({ date, slots, groupSize, tourType, selectedSlot, setSelec
           {slots.map(slot => {
             const sel        = selectedSlot?.id === slot.id;
             const almostFull = slot.spots_remaining <= 3 && slot.spots_remaining > 0;
-            const hasOthers  = slot.capacity - slot.spots_remaining > 0;
-            const { subtotal: slotSub } = calcAmounts(groupSize, tourType, slot);
+            const hasOthers  = (slot.capacity - slot.spots_remaining) > 0;
             return (
               <button key={slot.id} onClick={() => setSelectedSlot(slot)}
                 style={{ background: sel ? 'var(--accent-dim)' : 'var(--bg-section)', border: `${sel ? 2 : 1}px solid ${sel ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 6, padding: '14px 16px', textAlign: 'left', cursor: 'pointer', transition: 'border-color var(--ease), background var(--ease)' }}
@@ -572,13 +577,14 @@ function TimeSlotStep({ date, slots, groupSize, tourType, selectedSlot, setSelec
                 onMouseLeave={e => { if (!sel) (e.currentTarget.style.borderColor = 'var(--border)'); }}
               >
                 <p style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 600, color: sel ? 'var(--accent)' : 'var(--text)', marginBottom: 4, lineHeight: 1 }}>{formatTime(slot.start_time)}</p>
-                <p style={{ fontSize: 12, color: almostFull ? '#f59e0b' : 'var(--text-dim)', marginBottom: 5 }}>
+                <p style={{ fontSize: 12, color: almostFull ? '#f59e0b' : 'var(--text-dim)', marginBottom: hasOthers ? 4 : 0 }}>
                   {almostFull ? `Only ${slot.spots_remaining} spot${slot.spots_remaining !== 1 ? 's' : ''} left` : `${slot.spots_remaining} spot${slot.spots_remaining !== 1 ? 's' : ''} available`}
                 </p>
-                <p style={{ fontSize: 11, color: sel ? 'var(--accent)' : 'var(--text-dim)', fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.04em' }}>
-                  ${slotSub}{tourType !== 'group' ? ' flat' : ' total'}
-                  {hasOthers && tourType === 'group' && <span style={{ fontWeight: 400, color: 'var(--text-dim)' }}> · others joining</span>}
-                </p>
+                {hasOthers && (
+                  <p style={{ fontSize: 11, color: sel ? 'rgba(203,243,110,0.6)' : 'var(--text-dim)', fontFamily: 'var(--font-heading)', fontWeight: 500, letterSpacing: '0.03em' }}>
+                    others joining
+                  </p>
+                )}
               </button>
             );
           })}
@@ -586,11 +592,13 @@ function TimeSlotStep({ date, slots, groupSize, tourType, selectedSlot, setSelec
       )}
 
       {selectedSlot && (
-        <div style={{ padding: '14px 18px', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-            {tourType === 'group' ? `${groupSize} people × $${Number(selectedSlot.price_per_person ?? GROUP_PER_PP)}` : 'Flat rate'}
+        <div style={{ padding: '12px 16px', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 6 }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+            Selected: <strong style={{ color: 'var(--accent)' }}>{formatTime(selectedSlot.start_time)}</strong>
+            {(selectedSlot.capacity - selectedSlot.spots_remaining) > 0 && (
+              <span style={{ color: 'var(--text-dim)' }}> · others already in this slot</span>
+            )}
           </span>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--accent)' }}>${subtotal}</span>
         </div>
       )}
     </div>
@@ -811,10 +819,10 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
           {[
             slot.tour_name,
             `${formatDate(slot.date)} · ${formatTime(slot.start_time)}`,
-            tourType === 'group'
-              ? `Group Tour · ${groupSize} ${groupSize === 1 ? 'person' : 'people'} × $${Number(slot.price_per_person ?? GROUP_PER_PP)}/person`
-              : tourType === 'solo-flex'
-                ? `Solo Flex · $${SOLO_FLEX_PRICE} flat (1 person)`
+            tourType === 'join-group'
+              ? `Join a Group · ${groupSize} ${groupSize === 1 ? 'person' : 'people'} × $${Number(slot.price_per_person ?? GROUP_PER_PP)}/person`
+              : tourType === 'group'
+                ? `Group Tour · ${groupSize <= 2 ? `$${GROUP_MIN} minimum` : `${groupSize} people × $${Number(slot.price_per_person ?? GROUP_PER_PP)}/person`}`
                 : `Private Guaranteed · $${PRIVATE_GUARANTEED_BASE}${groupSize > 2 ? ` + ${groupSize - 2} × $${GROUP_PER_PP}` : ' for 1–2 people'}`,
           ].map((label, i) => (
             <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
@@ -917,8 +925,6 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
       if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');
       onConfirmed(data as unknown as BookingResult);
     } catch {
-      const chargeAt = new Date(slot.date + 'T12:00:00');
-      chargeAt.setDate(chargeAt.getDate() - 1);
       const { subtotal: fallbackSub } = calcAmounts(groupSize, tourType, slot);
       onConfirmed({
         confirmation_code: `MEX-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
@@ -927,7 +933,6 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
         subtotal: fallbackSub,
         service_fee: Math.round(estimatedTotal * SERVICE_RATE * 100) / 100,
         total_amount: estimatedTotal, customer_name: customer.name,
-        charge_date: chargeAt.toISOString().split('T')[0],
       });
     }
   }
@@ -986,10 +991,10 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
           ['Date',  formatDate(booking.date)],
           ['Time',  formatTime(booking.start_time)],
           ['Type',
-            booking.tour_type === 'group'
-              ? `Group Tour · ${booking.group_size} ${booking.group_size === 1 ? 'person' : 'people'} · $${(Number(booking.subtotal) / booking.group_size).toFixed(0)}/pp`
-              : booking.tour_type === 'solo-flex'
-                ? `Solo Flex · $${SOLO_FLEX_PRICE} flat (1 person)`
+            booking.tour_type === 'join-group'
+              ? `Join a Group · ${booking.group_size} ${booking.group_size === 1 ? 'person' : 'people'} · $${GROUP_PER_PP}/pp`
+              : booking.tour_type === 'group'
+                ? `Group Tour · ${booking.group_size} ${booking.group_size === 1 ? 'person' : 'people'} · $${(Number(booking.subtotal) / booking.group_size).toFixed(0)}/pp`
                 : `Private Guaranteed · $${Number(booking.subtotal).toFixed(0)} flat`
           ],
           ['Subtotal', `$${Number(booking.subtotal).toFixed(2)}`],
@@ -1024,7 +1029,7 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
 export default function BookingDrawer() {
   const { isOpen, close } = useBooking();
 
-  const [step,            setStep]            = useState<DrawerStep>('tour-type');
+  const [step,            setStep]            = useState<DrawerStep>('calendar');
   const [tourType,        setTourType]        = useState<TourType | null>(null);
   const [showTourRequest, setShowTourRequest] = useState(false);
   const [groupSize,       setGroupSize]       = useState(1);
@@ -1072,7 +1077,7 @@ export default function BookingDrawer() {
   useEffect(() => {
     if (!isOpen) {
       const t = setTimeout(() => {
-        setStep('tour-type'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
+        setStep('calendar'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
         setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setBooking(null);
       }, 380);
       return () => clearTimeout(t);
@@ -1080,14 +1085,12 @@ export default function BookingDrawer() {
   }, [isOpen]);
 
   function reset() {
-    setStep('tour-type'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
+    setStep('calendar'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
     setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setBooking(null);
   }
 
   function handleTourTypeSelect(t: TourType) {
     setTourType(t);
-    if (t === 'solo-flex') setGroupSize(1);
-    else if (t === 'group') setGroupSize(Math.max(2, groupSize));
   }
 
   // Pricing for sticky footer
@@ -1095,29 +1098,23 @@ export default function BookingDrawer() {
 
   // Footer label for current type/size
   const footerPriceLabel = !tourType
-    ? 'Select a tour type'
-    : tourType === 'group'
+    ? 'Select pricing after choosing a time'
+    : tourType === 'join-group'
       ? `${groupSize} × $${GROUP_PER_PP}/pp + 6% fee`
-      : tourType === 'solo-flex'
-        ? `Solo Flex · $${SOLO_FLEX_PRICE} flat + 6% fee`
+      : tourType === 'group'
+        ? groupSize <= 2
+          ? `$${GROUP_MIN} minimum + 6% fee`
+          : `${groupSize} × $${GROUP_PER_PP}/pp + 6% fee`
         : `Private · $${PRIVATE_GUARANTEED_BASE}${groupSize > 2 ? ` + ${groupSize - 2}×$${GROUP_PER_PP}` : ''} + 6% fee`;
 
   // Footer nav config per step
   type FooterCfg = { back?: () => void; next?: () => void; nextLabel?: string; nextDisabled?: boolean };
   const footerConfig: Record<DrawerStep, FooterCfg> = {
-    'tour-type':  {
-      next: () => {
-        if (!tourType) return;
-        if (tourType === 'solo-flex') setStep('calendar');
-        else setStep('group-size');
-      },
-      nextLabel: 'Continue →',
-      nextDisabled: !tourType,
-    },
-    'group-size': { back: () => setStep('tour-type'), next: () => setStep('calendar'), nextLabel: 'Choose a Date →' },
-    'calendar':   { back: () => tourType === 'solo-flex' ? setStep('tour-type') : setStep('group-size') },
-    'slot':       { back: () => setStep('calendar'), next: () => selectedSlot && setStep('customer'), nextLabel: 'Continue →', nextDisabled: !selectedSlot },
-    'customer':   { back: () => setStep('slot') },
+    'calendar':   {},
+    'slot':       { back: () => setStep('calendar'), next: () => selectedSlot && setStep('tour-type'), nextLabel: 'Continue →', nextDisabled: !selectedSlot },
+    'tour-type':  { back: () => setStep('slot'), next: () => tourType && setStep('group-size'), nextLabel: 'Continue →', nextDisabled: !tourType },
+    'group-size': { back: () => setStep('tour-type'), next: () => setStep('customer'), nextLabel: 'Continue →' },
+    'customer':   { back: () => setStep('group-size') },
     'review':     { back: () => setStep('customer') },
     'confirmation': {},
   };
@@ -1167,12 +1164,6 @@ export default function BookingDrawer() {
             {showTourRequest && (
               <TourRequestForm onBack={() => setShowTourRequest(false)} />
             )}
-            {!showTourRequest && step === 'tour-type' && (
-              <TourTypeStep selectedType={tourType} onSelect={handleTourTypeSelect} onRequestTour={() => setShowTourRequest(true)} />
-            )}
-            {step === 'group-size' && tourType && tourType !== 'solo-flex' && (
-              <GroupSizeStep groupSize={groupSize} setGroupSize={setGroupSize} tourType={tourType} />
-            )}
             {step === 'calendar' && (
               <CalendarStep
                 selectedDate={selectedDate}
@@ -1181,15 +1172,19 @@ export default function BookingDrawer() {
                 onSelect={date => { setSelectedDate(date); setSelectedSlot(null); setStep('slot'); }}
               />
             )}
-            {step === 'slot' && selectedDate && tourType && (
+            {step === 'slot' && selectedDate && (
               <TimeSlotStep
                 date={selectedDate}
                 slots={slotsForDate(selectedDate)}
-                groupSize={groupSize}
-                tourType={tourType}
                 selectedSlot={selectedSlot}
                 setSelectedSlot={setSelectedSlot}
               />
+            )}
+            {!showTourRequest && step === 'tour-type' && (
+              <TourTypeStep selectedType={tourType} onSelect={handleTourTypeSelect} onRequestTour={() => setShowTourRequest(true)} slot={selectedSlot} />
+            )}
+            {step === 'group-size' && tourType && (
+              <GroupSizeStep groupSize={groupSize} setGroupSize={setGroupSize} tourType={tourType} />
             )}
             {step === 'customer' && (
               <CustomerStep
