@@ -253,7 +253,7 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour }: { selectedType:
       price: '$70',
       priceNote: 'flat rate',
       tagline: '1 person · slot open to other guests',
-      description: '$70 flat rate, charged immediately. You have the tour to yourself — others may still join at the group rate.',
+      description: '$70 flat rate, charged immediately. You have the tour to yourself — other guests may still join at the group rate.',
     },
     {
       id: 'private-guaranteed',
