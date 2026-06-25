@@ -18,6 +18,7 @@ import FAQ from './pages/FAQ';
 import WhatToExpect from './pages/WhatToExpect';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+import Tip from './pages/Tip';
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/what-to-expect" element={<WhatToExpect />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/tip" element={<Tip />} />
         </Routes>
         <Footer />
         <Mesa />
