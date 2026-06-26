@@ -29,9 +29,10 @@ const STRIPE_APPEARANCE: import('@stripe/stripe-js').Appearance = {
 const PRESET_AMOUNTS = [5, 10, 15, 20, 25, 50];
 
 // ─── Inner payment form (must live inside <Elements>) ─────────────────────────
-function PaymentForm({ amountCents, onSuccess, onBack }: {
+function PaymentForm({ amountCents, guideName: _guideName, onSuccess, onBack }: {
   amountCents: number;
-  onSuccess: () => void;
+  guideName: string;
+  onSuccess: (paymentIntentId: string) => void;
   onBack: () => void;
 }) {
   const stripe   = useStripe();
@@ -61,7 +62,7 @@ function PaymentForm({ amountCents, onSuccess, onBack }: {
       setProcessing(false);
       return;
     }
-    onSuccess();
+    onSuccess(paymentIntent.id);
   }
 
   const dollars = amountCents / 100;
@@ -320,7 +321,15 @@ export default function Tip() {
                 >
                   <PaymentForm
                     amountCents={amountCents}
-                    onSuccess={() => setStep('success')}
+                    guideName={guideName}
+                    onSuccess={async (paymentIntentId) => {
+                      setStep('success');
+                      fetch(`${API_URL}/tips/record`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount_cents: amountCents, guide_name: guideName || undefined, payment_intent_id: paymentIntentId }),
+                      }).catch(() => {});
+                    }}
                     onBack={() => setStep('select')}
                   />
                 </Elements>
