@@ -265,6 +265,7 @@ function TourTypeStep({ selectedType, onSelect, onRequestTour, slot }: {
     },
     {
       id: 'private-guaranteed',
+      hidden: slotHasOthers,
       title: 'Private Guaranteed',
       price: '$85',
       priceNote: 'for 1–2 people',
@@ -919,7 +920,7 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
     try {
       const res = await fetch(`${API_URL}/bookings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payment_intent_id: paymentIntent.id, payment_method_id: paymentIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, waiver_agreed_at: waiverAgreedAt || undefined }),
+        body: JSON.stringify({ payment_intent_id: paymentIntent.id, payment_method_id: paymentIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined }),
       });
       const data = await res.json() as Record<string, unknown>;
       if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');

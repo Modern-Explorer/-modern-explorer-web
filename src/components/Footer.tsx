@@ -96,7 +96,7 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <a href="https://app.modernexplorer.me/admin" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--spin" style={{ color: '#cbf36e', opacity: 0.7, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>✦</a>
+            <a href="https://admin.modernexplorer.me/admin" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--spin" style={{ color: '#cbf36e', opacity: 0.7, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>✦</a>
             <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', margin: 0 }}>
               © {new Date().getFullYear()} Modern Explorer. All rights reserved.
             </p>

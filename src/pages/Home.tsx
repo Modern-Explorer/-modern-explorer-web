@@ -157,6 +157,9 @@ export default function Home() {
             }}
           />
 
+          {/* Brand tagline */}
+          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(13px, 1.8vw, 22px)', fontWeight: 600, color: 'rgba(203,243,110,0.9)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10, textShadow: '0 0 20px rgba(203,243,110,0.4), 0 2px 10px rgba(0,0,0,0.8)' }}>Reigniting the Age of Discovery</p>
+
           {/* Primary tagline — reads as one unit with the logo */}
           <p style={{
             fontFamily: 'var(--font-heading)',

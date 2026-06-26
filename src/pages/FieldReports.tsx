@@ -66,7 +66,7 @@ const posts = [
     id: 11, tag: 'Community', pinnedEvent: true,
     title: 'Crestone 4th of July Celebration — July 4, 2026',
     date: 'Jul 2026', author: 'Modern Explorer', readTime: '3 min',
-    img: IMG('Crestone', '20250810_095413-EDIT.jpg'),
+    img: IMG('Crestone', 'DJI_0289 edit.jpg'),
     excerpt: "Crestone doesn't do holidays small. The annual 4th of July celebration brings the whole community together at the base of the Sangres — vendors, food, music, and the legendary Crestone Soapbox Derby. Gravity-powered cars, homemade and wild, race down the hill in what may be the most Crestone thing that happens all year. Free and open to everyone. Vendors apply at the link below. Questions: crestone4th@gmail.com · mountainsiderealty.com/4th-of-july-2026",
   },
   {
@@ -247,7 +247,7 @@ export default function FieldReports() {
                         borderRadius: 3, padding: '6px 12px',
                         fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1.35,
                       }}>
-                        {isEnergyFair ? <>SEP 11–13<br /><span style={{ fontSize: 9 }}>FREE EVENT</span></> : <>AUG 8–9<br /><span style={{ fontSize: 9 }}>CRESTONE</span></>}
+                        {isEnergyFair ? <>SEP 11–13<br /><span style={{ fontSize: 9 }}>FREE EVENT</span></> : p.id === 11 ? <>JUL 4<br /><span style={{ fontSize: 9 }}>CRESTONE</span></> : <>AUG 8–9<br /><span style={{ fontSize: 9 }}>CRESTONE</span></>}
                       </div>
                     </div>
                     <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column' }}>
@@ -260,7 +260,7 @@ export default function FieldReports() {
                         <button onClick={() => setModalId(p.id)} className="btn btn-primary" style={{ fontSize: 12 }}>
                           Read Full Article →
                         </button>
-                        <a href={isEnergyFair ? 'https://crestoneenergyfair.org' : 'https://darkskyvortex.com'}
+                        <a href={isEnergyFair ? 'https://crestoneenergyfair.org' : p.id === 11 ? 'https://www.mountainsiderealty.com/4th-of-july-2026' : 'https://darkskyvortex.com'}
                           target="_blank" rel="noopener noreferrer"
                           className="btn btn-outline" style={{ fontSize: 12 }}>
                           Website →
