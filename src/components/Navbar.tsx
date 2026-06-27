@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useBooking } from '../context/BookingContext';
 
-const links = [
+type NavItem = { to: string; label: string } | { href: string; label: string };
+const links: NavItem[] = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
   { to: '/field-reports', label: 'Field Reports' },
   { to: '/upcoming', label: 'Upcoming' },
+  { href: '/lab', label: 'Field Lab' },
   { to: '/merch', label: 'Merch' },
   { to: '/contact', label: 'Contact' },
   { to: '/faq', label: 'FAQ' },
@@ -43,31 +45,52 @@ export default function Navbar() {
 
         <div style={{ display: 'flex', gap: 4, flex: 1, alignItems: 'center' }} className="nav-links-desktop">
           {links.map(l => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.to === '/'}
-              onClick={l.to === '/' ? () => window.scrollTo({ top: 0, behavior: 'smooth' }) : undefined}
-              style={({ isActive }) => ({
-                padding: '6px 14px',
-                fontFamily: 'var(--font-heading)',
-                fontSize: 13,
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: isActive ? 'var(--accent)' : 'var(--text-muted)',
-                borderRadius: 3,
-                transition: 'color 0.15s',
-                position: 'relative',
-              })}
-            >
-              {({ isActive }) => (
-                <>
-                  {l.label}
-                  {isActive && <span className="nav-active-line" />}
-                </>
-              )}
-            </NavLink>
+            'href' in l ? (
+              <a
+                key={l.href}
+                href={l.href}
+                style={{
+                  padding: '6px 14px',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                  borderRadius: 3,
+                  transition: 'color 0.15s',
+                  position: 'relative',
+                }}
+              >
+                {l.label}
+              </a>
+            ) : (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.to === '/'}
+                onClick={l.to === '/' ? () => window.scrollTo({ top: 0, behavior: 'smooth' }) : undefined}
+                style={({ isActive }) => ({
+                  padding: '6px 14px',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                  borderRadius: 3,
+                  transition: 'color 0.15s',
+                  position: 'relative',
+                })}
+              >
+                {({ isActive }) => (
+                  <>
+                    {l.label}
+                    {isActive && <span className="nav-active-line" />}
+                  </>
+                )}
+              </NavLink>
+            )
           ))}
         </div>
 
@@ -97,25 +120,46 @@ export default function Navbar() {
           backdropFilter: 'blur(12px)',
         }}>
           {links.map(l => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.to === '/'}
-              onClick={() => setOpen(false)}
-              style={({ isActive }) => ({
-                display: 'block',
-                padding: '12px 0',
-                fontFamily: 'var(--font-heading)',
-                fontSize: 16,
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: isActive ? 'var(--accent)' : 'var(--text)',
-                borderBottom: '1px solid var(--border)',
-              })}
-            >
-              {l.label}
-            </NavLink>
+            'href' in l ? (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                style={{
+                  display: 'block',
+                  padding: '12px 0',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text)',
+                  borderBottom: '1px solid var(--border)',
+                }}
+              >
+                {l.label}
+              </a>
+            ) : (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.to === '/'}
+                onClick={() => setOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'block',
+                  padding: '12px 0',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: isActive ? 'var(--accent)' : 'var(--text)',
+                  borderBottom: '1px solid var(--border)',
+                })}
+              >
+                {l.label}
+              </NavLink>
+            )
           ))}
           <button
             onClick={() => { openBooking(); setOpen(false); }}
