@@ -327,7 +327,7 @@ export default function Tip() {
                       fetch(`${API_URL}/tips/record`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ amount_cents: amountCents, guide_name: guideName || undefined, payment_intent_id: paymentIntentId }),
+                        body: JSON.stringify({ amount_cents: amountCents, guide_name: guideName || undefined, guide_id: new URLSearchParams(window.location.search).get('guide_id') || undefined, payment_intent_id: paymentIntentId }),
                       }).catch(() => {});
                     }}
                     onBack={() => setStep('select')}
