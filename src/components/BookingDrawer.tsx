@@ -784,24 +784,72 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading,      setLoading]      = useState(true);
   const [intentError,  setIntentError]  = useState<string | null>(null);
+  const [intentKey,    setIntentKey]    = useState(0);
+
+  const [promoInput,   setPromoInput]   = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount_cents: number; final_amount_cents: number } | null>(null);
+  const [promoMsg,     setPromoMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const isPrivateBooking = tourType === 'private-guaranteed';
   const { subtotal, fee: serviceFee, total } = calcAmounts(groupSize, tourType, slot);
+  const displayTotal = appliedPromo ? appliedPromo.final_amount_cents / 100 : total;
 
   const missingKey = !((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY)
     || ((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY ?? '').includes('YOUR_KEY');
 
+  async function fetchIntent(promoCode?: string) {
+    setLoading(true); setClientSecret(null); setIntentError(null);
+    try {
+      const r = await fetch(`${API_URL}/payments/intent`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant_slug: 'modern-explorer', availability_id: slot.id, group_size: groupSize, is_private: isPrivateBooking, ...(promoCode ? { promo_code: promoCode } : {}) }),
+      });
+      const d = await r.json() as Record<string, unknown>;
+      if (!r.ok) throw new Error((d.error as string) ?? 'Failed to initialise');
+      setClientSecret(d.client_secret as string);
+      setIntentKey(k => k + 1);
+    } catch (err) {
+      setIntentError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    fetch(`${API_URL}/payments/intent`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenant_slug: 'modern-explorer', availability_id: slot.id, group_size: groupSize, is_private: isPrivateBooking }),
-    })
-      .then(async r => { const d = await r.json() as Record<string, unknown>; if (!r.ok) throw new Error((d.error as string) ?? 'Failed to initialise'); return d; })
-      .then(d => setClientSecret(d.client_secret as string))
-      .catch(err => setIntentError(err instanceof Error ? err.message : 'Unknown error'))
-      .finally(() => setLoading(false));
+    fetchIntent();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function applyPromo() {
+    if (!promoInput.trim()) return;
+    setPromoLoading(true); setPromoMsg(null);
+    try {
+      const totalCents = Math.round(total * 100);
+      const resp = await fetch(`${API_URL}/promo/validate`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoInput.trim(), tenant_slug: 'modern-explorer', amount_cents: totalCents }),
+      });
+      const data = await resp.json() as { valid: boolean; message?: string; discount_cents?: number; final_amount_cents?: number };
+      if (!resp.ok || !data.valid) {
+        setPromoMsg({ type: 'err', text: data.message ?? 'Invalid promo code.' });
+        return;
+      }
+      setAppliedPromo({ code: promoInput.trim().toUpperCase(), discount_cents: data.discount_cents!, final_amount_cents: data.final_amount_cents! });
+      setPromoMsg({ type: 'ok', text: data.message ?? 'Promo code applied!' });
+      await fetchIntent(promoInput.trim());
+    } catch (err) {
+      setPromoMsg({ type: 'err', text: err instanceof Error ? err.message : 'Could not apply promo code.' });
+      setAppliedPromo(null);
+    } finally {
+      setPromoLoading(false);
+    }
+  }
+
+  function removePromo() {
+    setAppliedPromo(null); setPromoInput(''); setPromoMsg(null);
+    void fetchIntent();
+  }
 
   return (
     <div>
@@ -840,14 +888,77 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
             </span>
             <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>${Number(serviceFee).toFixed(2)}</span>
           </div>
+          {appliedPromo && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+              <span style={{ fontSize: 13, color: 'var(--accent)' }}>Promo: {appliedPromo.code}</span>
+              <span style={{ fontSize: 13, color: 'var(--accent)' }}>–${(appliedPromo.discount_cents / 100).toFixed(2)}</span>
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0 10px' }}>
             <div>
               <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>Total</span>
               <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>Charged immediately</span>
             </div>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, color: 'var(--accent)' }}>${Number(total).toFixed(2)}</span>
+            <div style={{ textAlign: 'right' }}>
+              {appliedPromo && (
+                <span style={{ fontSize: 13, color: 'var(--text-dim)', textDecoration: 'line-through', display: 'block', marginBottom: 2 }}>${Number(total).toFixed(2)}</span>
+              )}
+              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, color: 'var(--accent)' }}>${Number(displayTotal).toFixed(2)}</span>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Promo code */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Promo Code</span>
+          {appliedPromo && (
+            <button onClick={removePromo} style={{ fontSize: 11, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', fontFamily: 'var(--font-heading)', letterSpacing: '0.06em', textDecoration: 'underline' }}>
+              Remove
+            </button>
+          )}
+        </div>
+        {!appliedPromo ? (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              value={promoInput}
+              onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoMsg(null); }}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); void applyPromo(); } }}
+              placeholder="Enter code"
+              style={{
+                flex: 1, background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6,
+                color: 'var(--text)', padding: '10px 12px', fontSize: 13,
+                fontFamily: "'Courier New', monospace", letterSpacing: '0.08em', outline: 'none',
+              }}
+              onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(203,243,110,0.32)'; }}
+              onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}
+            />
+            <button
+              onClick={() => void applyPromo()}
+              disabled={!promoInput.trim() || promoLoading}
+              style={{
+                padding: '10px 16px', borderRadius: 6, border: '1px solid rgba(203,243,110,0.3)',
+                background: 'rgba(203,243,110,0.08)', color: 'var(--accent)',
+                fontSize: 12, fontFamily: 'var(--font-heading)', fontWeight: 700, letterSpacing: '0.1em',
+                cursor: promoInput.trim() && !promoLoading ? 'pointer' : 'not-allowed',
+                opacity: promoInput.trim() ? 1 : 0.5, transition: 'opacity 0.15s',
+              }}
+            >
+              {promoLoading ? '…' : 'Apply'}
+            </button>
+          </div>
+        ) : (
+          <div style={{ padding: '10px 14px', borderRadius: 6, background: 'rgba(203,243,110,0.08)', border: '1px solid rgba(203,243,110,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 13, color: 'var(--accent)', fontFamily: "'Courier New', monospace", letterSpacing: '0.06em' }}>{appliedPromo.code}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>–${(appliedPromo.discount_cents / 100).toFixed(2)}</span>
+          </div>
+        )}
+        {promoMsg && (
+          <p style={{ fontSize: 12, marginTop: 6, color: promoMsg.type === 'ok' ? 'var(--accent)' : '#ef4444', lineHeight: 1.4 }}>
+            {promoMsg.text}
+          </p>
+        )}
       </div>
 
       {/* Immediate charge notice */}
@@ -883,8 +994,8 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
           </div>
         )}
         {!loading && clientSecret && !missingKey && (
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance: STRIPE_APPEARANCE, fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap' }] }}>
-            <StripeForm estimatedTotal={total} slot={slot} groupSize={groupSize} tourType={tourType} customer={customer} waiverAgreedAt={waiverAgreedAt} onConfirmed={onConfirmed} onBack={onBack} />
+          <Elements key={intentKey} stripe={stripePromise} options={{ clientSecret, appearance: STRIPE_APPEARANCE, fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap' }] }}>
+            <StripeForm estimatedTotal={displayTotal} promoCode={appliedPromo?.code ?? null} slot={slot} groupSize={groupSize} tourType={tourType} customer={customer} waiverAgreedAt={waiverAgreedAt} onConfirmed={onConfirmed} onBack={onBack} />
           </Elements>
         )}
         {!loading && !clientSecret && !intentError && !missingKey && (
@@ -897,8 +1008,8 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
 }
 
 // ─── Stripe form ──────────────────────────────────────────────────────────────
-function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack }: {
-  estimatedTotal: number; slot: Slot; groupSize: number; tourType: TourType;
+function StripeForm({ estimatedTotal, promoCode, slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack }: {
+  estimatedTotal: number; promoCode: string | null; slot: Slot; groupSize: number; tourType: TourType;
   customer: Customer; waiverAgreedAt: string; onConfirmed: (r: BookingResult) => void; onBack: () => void;
 }) {
   const stripe   = useStripe();
@@ -920,7 +1031,7 @@ function StripeForm({ estimatedTotal, slot, groupSize, tourType, customer, waive
     try {
       const res = await fetch(`${API_URL}/bookings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payment_intent_id: paymentIntent.id, payment_method_id: paymentIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined }),
+        body: JSON.stringify({ payment_intent_id: paymentIntent.id, payment_method_id: paymentIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined, ...(promoCode ? { promo_code: promoCode } : {}) }),
       });
       const data = await res.json() as Record<string, unknown>;
       if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');

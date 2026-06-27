@@ -10,6 +10,15 @@ The public-facing Modern Explorer marketing website: a React + Vite + TypeScript
 small Express API server alongside it for contact, AI, and data feeds. SEO-oriented
 (react-helmet) with client-side routing (react-router).
 
+## Booking — THIS is the customer-facing one
+
+Customer booking lives here in `src/components/BookingDrawer.tsx`. It opens as a drawer over
+the marketing site (same URL). ALL customer-facing booking changes go here: pricing, steps,
+waiver, Stripe flow, availability, confirmation. It calls the shared booking-api directly.
+⚠️ A second, separate booking flow exists in the booking-frontend repo (admin/guide
+dashboards) — the two are hand-duplicated and will drift. Customer changes belong HERE, not
+there.
+
 ## Stack
 
 - **Frontend:** React + Vite + TypeScript, `react-router-dom`, `react-helmet-async`.
