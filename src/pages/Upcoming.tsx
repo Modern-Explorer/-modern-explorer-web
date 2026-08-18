@@ -110,8 +110,8 @@ export default function Upcoming() {
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
-        title="Upcoming Tours & Expeditions | Modern Explorer — Crestone, Colorado"
-        description="Specialty tours and expeditions launching soon in Crestone, Colorado — 30 miles from Great Sand Dunes National Park. UFO/UAP tours, paranormal investigations, Dead Man's Cave treasure expeditions, and more in the San Luis Valley."
+        title="Upcoming Tours & Expeditions | Modern Explorer, Crestone CO"
+        description="See dates and book upcoming guided tours in Crestone, Colorado — UFO watch nights, treasure legend hikes, and paranormal history expeditions in the valley."
         url="/upcoming"
       />
       <StructuredData data={TOURIST_TRIP_SCHEMA} />

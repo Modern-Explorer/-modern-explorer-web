@@ -115,7 +115,7 @@ export default function Contact() {
     <main style={{ paddingTop: 72, ...sageVars }}>
       <SEO
         title="Contact Modern Explorer — Book a Tour in Crestone, Colorado"
-        description="Plan your expedition with Modern Explorer. Book guided tours in Crestone, Colorado — 30 miles from Great Sand Dunes National Park, in the heart of the San Luis Valley and Sangre de Cristo mountains."
+        description="Questions about tours, private bookings, or group trips? Contact Modern Explorer in Crestone, Colorado — we typically respond within one business day."
         url="/contact"
       />
       {/* ── KEYFRAMES ─────────────────────────────────────────────────────────── */}

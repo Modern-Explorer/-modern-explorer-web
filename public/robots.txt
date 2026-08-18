@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /lab/codex/admin
 
 Sitemap: https://modernexplorer.me/sitemap.xml

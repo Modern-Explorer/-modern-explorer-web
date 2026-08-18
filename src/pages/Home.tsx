@@ -104,8 +104,8 @@ export default function Home() {
   return (
     <main>
       <SEO
-        title="Modern Explorer | Guided Tours in Crestone, Colorado & the San Luis Valley"
-        description="Immersive small-group guided tours in Crestone, Colorado. Explore UFO hotspots, Spanish treasure legends, paranormal history, and the mysteries of the San Luis Valley and Sangre de Cristo mountains. Located 30 miles from Great Sand Dunes National Park."
+        title="Modern Explorer | Guided UFO & Paranormal Tours, Crestone CO"
+        description="Small-group guided tours of UFO hotspots, treasure legends, and paranormal history in Crestone, Colorado and the San Luis Valley. Book your expedition today."
         url="/"
       />
       {/* HERO */}
@@ -161,7 +161,7 @@ export default function Home() {
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(13px, 1.8vw, 22px)', fontWeight: 600, color: 'rgba(203,243,110,0.9)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10, textShadow: '0 0 20px rgba(203,243,110,0.4), 0 2px 10px rgba(0,0,0,0.8)' }}>Reigniting the Age of Discovery</p>
 
           {/* Primary tagline — reads as one unit with the logo */}
-          <p style={{
+          <h1 style={{
             fontFamily: 'var(--font-heading)',
             fontSize: 'clamp(17px, 2.6vw, 30px)',
             fontWeight: 500,
@@ -172,7 +172,7 @@ export default function Home() {
             textShadow: '0 2px 14px rgba(0,0,0,0.75)',
           }}>
             Immersive Small-Group Tours Designed For Curious Travelers
-          </p>
+          </h1>
 
           {/* Location line */}
           <p style={{

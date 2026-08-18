@@ -8,7 +8,7 @@ export default function Terms() {
     <main style={{ paddingTop: 72 }}>
       <SEO
         title="Terms of Service | Modern Explorer"
-        description="Terms and conditions for booking and participating in Modern Explorer guided tours in Crestone, Colorado."
+        description="Terms and conditions for booking and joining Modern Explorer guided tours — payments, cancellations, waivers, and participant responsibilities."
         url="/terms"
       />
       <section style={{ padding: '64px 0 80px' }}>

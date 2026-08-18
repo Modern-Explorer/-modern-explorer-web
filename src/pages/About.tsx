@@ -37,7 +37,7 @@ export default function About() {
     <main style={{ paddingTop: 72 }}>
       <SEO
         title="About Modern Explorer — Crestone, Colorado"
-        description="Modern Explorer is led by founder Mateo Argüello, a former Marine Corps intelligence operator based in Crestone, Colorado — 30 miles from Great Sand Dunes National Park. Small-group guided tours through the mysteries of the San Luis Valley and Sangre de Cristo mountains."
+        description="Meet the team behind Modern Explorer — a veteran-founded guide company exploring the mysteries of the San Luis Valley through immersive small-group tours."
         url="/about"
       />
       {/* PAGE HERO */}

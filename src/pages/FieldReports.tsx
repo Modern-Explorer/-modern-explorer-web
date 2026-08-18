@@ -176,8 +176,8 @@ export default function FieldReports() {
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
-        title="Field Reports | Modern Explorer — San Luis Valley Paranormal Research"
-        description="Documented UFO sightings, cattle mutilations, cryptid encounters, Great Sand Dunes mysteries, and the unexplained history of the San Luis Valley and Sangre de Cristo mountains. Research and field reports from Crestone, Colorado."
+        title="Field Reports: San Luis Valley Sightings | Modern Explorer"
+        description="Documented sightings, investigations, and strange encounters from the San Luis Valley. Read field reports from Modern Explorer expeditions around Crestone, CO."
         url="/field-reports"
         keywords="San Luis Valley UFO sightings, cattle mutilation Colorado, Sasquatch Blanca Peak, Great Sand Dunes paranormal, Crestone vortex, Dead Man's Cave Colorado, La Caverna del Oro, Christopher O'Brien, UFO Watchtower Hooper Colorado"
       />

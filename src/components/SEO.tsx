@@ -39,6 +39,9 @@ export default function SEO({ title, description, keywords, image, url }: SEOPro
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image"       content={`${BASE_URL}${img}`} />
 
+      {/* Canonical */}
+      {url && <link rel="canonical" href={`${BASE_URL}${url}`} />}
+
       {/* Google Search Console verification */}
       {GSC_ID && <meta name="google-site-verification" content={GSC_ID} />}
 

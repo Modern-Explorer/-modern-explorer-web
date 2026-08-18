@@ -50,7 +50,7 @@ export default function WhatToExpect() {
     <main style={{ paddingTop: 72 }}>
       <SEO
         title="What to Expect | Modern Explorer — Crestone, Colorado Tours"
-        description="Everything you need to know before your Modern Explorer tour in Crestone, Colorado. Meeting location, what to bring, weather, group size, duration, and accessibility."
+        description="What a Modern Explorer tour is really like — group size, terrain, gear, timing, and how we explore UFO hotspots and legends around Crestone, Colorado."
         url="/what-to-expect"
       />
 

@@ -7,7 +7,7 @@ export default function MerchStore() {
     <main style={{ paddingTop: 72 }}>
       <SEO
         title="Store | Modern Explorer — Gear for Explorers"
-        description="Modern Explorer merchandise. Apparel, gear, and art for explorers who take their curiosity seriously. Every purchase supports field research in the San Luis Valley and Sangre de Cristo mountains of Colorado."
+        description="Shop Modern Explorer t-shirts, hats, and expedition gear. Take home a piece of the San Luis Valley's mystery and support independent exploration in Crestone."
         url="/merch"
       />
       {/* HERO */}

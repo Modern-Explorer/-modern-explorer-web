@@ -106,6 +106,7 @@ export default function Footer() {
               Crestone · San Luis Valley, Colorado · Near Great Sand Dunes National Park
             </p>
             <a href="https://app.modernexplorer.me/guide/login" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--pulse footer-sigil--guide" style={{ color: '#cbf36e', opacity: 0.8, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>⬡</a>
+            <a href="https://research.modernexplorer.me" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--float" style={{ color: '#cbf36e', opacity: 0.7, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>⊙</a>
           </div>
         </div>
       </div>
@@ -121,6 +122,11 @@ export default function Footer() {
         }
         .footer-sigil--spin  { animation: footer-spin  8s linear infinite; }
         .footer-sigil--pulse { animation: footer-pulse 3s ease-in-out infinite; }
+        @keyframes footer-float {
+          0%, 100% { opacity: 0.5; transform: scale(0.95); filter: drop-shadow(0 0 2px #cbf36e); }
+          50%       { opacity: 0.9; transform: scale(1.05); filter: drop-shadow(0 0 10px #cbf36e) drop-shadow(0 0 20px #cbf36e66); }
+        }
+        .footer-sigil--float { animation: footer-float 6s ease-in-out infinite; }
         @media (max-width: 900px) {
           footer .container > div:first-child { grid-template-columns: 1fr 1fr !important; }
         }

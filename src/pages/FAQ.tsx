@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import SEO from '../components/SEO';
+import StructuredData from '../components/StructuredData';
 import { useBooking } from '../context/BookingContext';
 
 const faqs = [
@@ -55,13 +56,26 @@ export default function FAQ() {
   const [open, setOpen] = useState<string | null>(null);
   const toggle = (key: string) => setOpen(o => o === key ? null : key);
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.flatMap(section =>
+      section.items.map(item => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      }))
+    ),
+  };
+
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
         title="FAQ | Modern Explorer — Crestone, Colorado Tours"
-        description="Frequently asked questions about Modern Explorer guided tours in Crestone, Colorado. What to expect, how to book, group sizes, difficulty, and what makes the San Luis Valley and Sangre de Cristo mountains unique."
+        description="Answers to common questions about Modern Explorer tours — what to bring, fitness levels, weather, kids and pets, cancellations, and booking in Crestone, CO."
         url="/faq"
       />
+      <StructuredData data={faqSchema} />
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Nature/20250510_091707-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />

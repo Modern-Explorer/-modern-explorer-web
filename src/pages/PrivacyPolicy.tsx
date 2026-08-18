@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
     <main style={{ paddingTop: 72 }}>
       <SEO
         title="Privacy Policy | Modern Explorer"
-        description="Privacy policy for Modern Explorer — how we collect, use, and protect your personal information."
+        description="How Modern Explorer collects, uses, and protects your personal information when you browse our website or book a guided tour in Crestone, Colorado."
         url="/privacy-policy"
       />
       <section style={{ padding: '64px 0 80px' }}>

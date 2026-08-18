@@ -68,7 +68,7 @@ export const TOURIST_TRIP_SCHEMA = {
     '@type': 'Offer',
     priceCurrency: 'USD',
     availability: 'https://schema.org/InStock',
-    url: 'http://localhost:5177',
+    url: 'https://modernexplorer.me/upcoming',
   },
   itinerary: {
     '@type': 'ItemList',
