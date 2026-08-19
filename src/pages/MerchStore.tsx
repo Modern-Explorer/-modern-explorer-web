@@ -48,6 +48,9 @@ export default function MerchStore() {
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75 }}>
                 Modern Explorer is self-funded by people who believe real discovery matters. When you buy merch, you're helping us put better gear in the field and reach more remote locations.
               </p>
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginTop: 16 }}>
+                The store carries t-shirts, hats, hoodies, and art prints — all designed around the themes we explore in Crestone: high-strangeness, the San Luis Valley, and the edge of the known. Items ship worldwide through Spreadshop.
+              </p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)' }}>
               {[
