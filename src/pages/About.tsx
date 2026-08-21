@@ -78,7 +78,7 @@ export default function About() {
                   fetchPriority="high"
                   width={900}
                   height={895}
-                  style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
+                  style={{ width: '100%', height: 'auto', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
                 />
               </picture>
               <div style={{
