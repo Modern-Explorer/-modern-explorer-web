@@ -56,7 +56,7 @@ export default function WhatToExpect() {
 
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Crestone/20250810_090447-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Crestone/20250810_090447-EDIT.webp')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent, var(--bg-section))' }} />
         <div className="container" style={{ position: 'relative' }}>
           <span className="eyebrow">Before You Arrive</span>

@@ -251,7 +251,7 @@ export default function Contact() {
         {/* Background image */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `url('${IMG('Nature', '20250729_200506-EDIT.jpg')}')`,
+          backgroundImage: `url('${IMG('Nature', '20250729_200506-EDIT.webp')}')`,
           backgroundSize: 'cover', backgroundPosition: 'center 40%',
           filter: 'brightness(0.22) saturate(0.7)',
         }} />

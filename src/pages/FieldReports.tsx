@@ -14,42 +14,42 @@ const posts = [
     id: 1, tag: 'Field Report',
     title: "Lady (Snippy): The World's First Documented Animal Mutilation — San Luis Valley, 1967",
     date: 'May 2025', author: 'Modern Explorer', readTime: '7 min',
-    img: IMG('Animals', 'snippy-1967-dan-anderson.jpg'),
+    img: IMG('Animals', 'snippy-1967-dan-anderson.webp'),
     excerpt: "On September 9, 1967, a three-year-old Appaloosa mare was found on the King Ranch at the base of the Blanca Massif — head and neck stripped to bone with surgical precision, heart and brain absent, not a drop of blood on the ground. Tracks ended 100 feet from the carcass. A Superior Court judge and his wife reported three reddish-orange rings moving in triangular formation the same evening. No official explanation has ever been issued.",
   },
   {
     id: 2, tag: 'Field Report',
     title: "Over 1,000 Events Logged: The San Luis Valley's Documented Paranormal Record",
     date: 'Apr 2025', author: 'Modern Explorer', readTime: '8 min',
-    img: IMG('UFOs', 'ufo-watchtower-hooper.jpg'),
+    img: IMG('UFOs', 'ufo-watchtower-hooper.webp'),
     excerpt: "Author Christopher O'Brien has cataloged more than 1,000 paranormal events in the San Luis Valley since 1992. The UFO Watchtower in Hooper alone has logged over 304 documented sightings. Two sheriff's deputies were followed by an orange sphere. A college student's rear tires blew out as he approached an unidentified object sitting in a field. The CIA has formally documented reports from this region.",
   },
   {
     id: 3, tag: 'Field Report',
     title: "Two Skeptics Near Ute Mountain: The Encounter That Changed Everything (2019)",
     date: 'Mar 2025', author: 'Modern Explorer', readTime: '6 min',
-    img: IMG('Nature', '20250518_185929-EDIT.jpg'),
+    img: IMG('Nature', '20250518_185929-EDIT.webp'),
     excerpt: "They went in as skeptics. In 2019, two hunters operating near Ute Mountain just south of the Colorado border encountered two extremely tall hooded figures with oversized heads. Before leaving the area, they came across a 50-to-60-foot structure resembling a circus tent with no reason to exist in that location. 'We're a couple of guys that don't believe in much,' said witness Josh Brinkley. 'But we believe now.'",
   },
   {
     id: 4, tag: 'Field Report',
     title: "Contact on US-160: The Documented Telepathic Encounters of Robert Whitting",
     date: 'Mar 2025', author: 'Modern Explorer', readTime: '5 min',
-    img: IMG('Nature', '20250531_201055-EDIT.jpg'),
+    img: IMG('Nature', '20250531_201055-EDIT.webp'),
     excerpt: "Alamosa Episcopal minister Robert Whitting was driving US-160 at night when a craft appeared alongside his vehicle and a voice warned him of a dead animal in the road ahead. He found it exactly where described. Whitting went on to report multiple subsequent encounters and began publishing a bi-monthly record of anomalous activity across the San Luis Valley.",
   },
   {
     id: 5, tag: 'Field Report',
     title: "Sasquatch on Blanca Peak: The August 2000 ATV Encounter",
     date: 'Feb 2025', author: 'Modern Explorer', readTime: '5 min',
-    img: IMG('Cryptids', 'Sasquatch.jpg'),
+    img: IMG('Cryptids', 'Sasquatch.webp'),
     excerpt: "In August 2000, two ATV operators on the Blanca Peaks filed a formal report with the Bigfoot Research Organization describing a close encounter with a large bipedal creature. The Blanca Massif has generated consistent large-creature reports spanning decades — a pattern that remains unaccounted for by wildlife biologists familiar with the region.",
   },
   {
     id: 6, tag: 'Community',
     title: "Why the World Comes to Crestone: North America's Most Concentrated Spiritual Hub",
     date: 'Jan 2025', author: 'Modern Explorer', readTime: '6 min',
-    img: IMG('Crestone', 'DJI_0286 edit.jpg'),
+    img: IMG('Crestone', 'DJI_0286 edit.webp'),
     excerpt: "Crestone is home to more than 20 active spiritual centers representing Buddhist, Hindu, Carmelite, Sufi, and other traditions — all within a few square miles at the foot of the Sangre de Cristo Mountains. The annual Energy Fair draws seekers from across the country. We looked into why this particular valley keeps drawing people searching for something they can't quite name.",
   },
 
@@ -59,28 +59,28 @@ const posts = [
     id: 7, tag: 'Community', pinnedEvent: true,
     title: "Crestone Energy Fair 2026 — September 11–13",
     date: 'Jun 2026', author: 'Modern Explorer', readTime: '4 min',
-    img: IMG('Crestone', '20250810_095413-EDIT.jpg'),
+    img: IMG('Crestone', '20250810_095413-EDIT.webp'),
     excerpt: "Now in its nearly fourth decade, the Crestone Energy Fair returns September 11–13, 2026 in Saguache County — where minimal building codes have enabled decades of hands-on experimentation in sustainable living, producing one of the highest concentrations of natural and regenerative homes in the country. Features home tours, workshops, and speakers on sustainable building, renewable energy, water systems, and food sovereignty. Free and open to all.",
   },
   {
     id: 11, tag: 'Community', pinnedEvent: true,
     title: 'Crestone 4th of July Celebration — July 4, 2026',
     date: 'Jul 2026', author: 'Modern Explorer', readTime: '3 min',
-    img: IMG('Crestone', 'DJI_0289 edit.jpg'),
+    img: IMG('Crestone', 'DJI_0289 edit.webp'),
     excerpt: "Crestone doesn't do holidays small. The annual 4th of July celebration brings the whole community together at the base of the Sangres — vendors, food, music, and the legendary Crestone Soapbox Derby. Gravity-powered cars, homemade and wild, race down the hill in what may be the most Crestone thing that happens all year. Free and open to everyone. Vendors apply at the link below. Questions: crestone4th@gmail.com · mountainsiderealty.com/4th-of-july-2026",
   },
   {
     id: 8, tag: 'Community', pinnedEvent: true,
     title: "Crestone Vortex Festival — August 8–9, 2026",
     date: 'Aug 2026', author: 'Modern Explorer', readTime: '4 min',
-    img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'),
+    img: IMG('UFOs', 'pexels-miriamespacio-365625.webp'),
     excerpt: "Presented by Dark Sky Astrology — founded by astrologers, for astrologers, focused on harmonizing astrology and astronomy with archetypal wisdom and myth. The Crestone Vortex Festival runs August 8–9, 2026 at 187 W Silver Ave, Crestone, CO. Features vendors, main stage speakers, community yoga, classes, food trucks, and a Kid's Zone — plus the first annual Dark Sky Astrology Retreat held in conjunction with the festival. Crestone is set to be named one of the few international Dark Sky communities in the world. 'We welcome everyone to come experience the magical Vortex for yourself.' Website: darkskyvortex.com · darkskyvortex@gmail.com",
   },
   {
     id: 9, tag: 'Community',
     title: "The Vortex of Crestone: What It Is, Why It Draws the World, and What Visitors Experience",
     date: 'May 2026', author: 'Modern Explorer', readTime: '6 min',
-    img: IMG('Crestone', '20250810_091639-EDIT.jpg'),
+    img: IMG('Crestone', '20250810_091639-EDIT.webp'),
     excerpt: "More than 20 active spiritual centers — Buddhist monasteries, Hindu ashrams, a Carmelite hermitage, Sufi circles, and Native ceremonial sites — within a few square miles at the base of the Sangres. Multiple esoteric traditions locate converging ley lines beneath this valley. Visitors from six continents describe the same thing: something shifts when they arrive. The Vortex of Crestone is not one phenomenon. It is the cumulative weight of centuries of intentional human seeking, concentrated in one place.",
   },
 
@@ -90,7 +90,7 @@ const posts = [
     id: 10, tag: 'Skills & Gear',
     title: "Wilderness Survival in the Sangre de Cristos: A Field Guide",
     date: 'Apr 2026', author: 'Modern Explorer', readTime: '8 min',
-    img: IMG('Nature', 'sangre-de-cristo-topo.jpg'),
+    img: IMG('Nature', 'sangre-de-cristo-topo.webp'),
     excerpt: "At 14,000 feet, a clear morning becomes a dangerous lightning storm in under an hour. The Sangres are unforgiving: loose scree, false ridges, unmarked drainages, weather that kills without announcement. This field guide covers what actually matters — reading terrain and high-altitude weather, finding shelter and water, navigating without cell service, recognizing altitude sickness before it becomes an emergency, and understanding why conditions above treeline are categorically different from anything below.",
   },
 
@@ -100,7 +100,7 @@ const posts = [
     id: 13, tag: 'Field Report',
     title: "Great Sand Dunes: North America's Tallest Dunes and the Mysteries Surrounding Them",
     date: 'Jun 2026', author: 'Modern Explorer', readTime: '7 min',
-    img: IMG('Nature', 'pexels-mohamedelaminemsiouri-2097442.jpg'),
+    img: IMG('Nature', 'pexels-mohamedelaminemsiouri-2097442.webp'),
     excerpt: "At the eastern edge of the San Luis Valley, where the flatlands meet the Sangre de Cristo Mountains, the tallest sand dunes in North America rise 750 feet from an ancient lake bed. They've been here 440,000 years. The Pueblo peoples believed their ancestors emerged from the underworld through openings nearby. The UAP corridor between the dunes and Crestone — 25 miles apart — is one of the most documented in Christopher O'Brien's 30-year database. Most people visiting the dunes don't know Crestone is 30 miles away.",
   },
 
@@ -110,14 +110,14 @@ const posts = [
     id: 12, tag: 'Expedition News',
     title: "La Caverna del Oro: The Cave of Gold at 13,000 Feet",
     date: 'Feb 2026', author: 'Modern Explorer', readTime: '8 min',
-    img: IMG('History', '20250602_154545-EDIT.jpg'),
+    img: IMG('History', '20250602_154545-EDIT.webp'),
     excerpt: "At 13,266 feet, Marble Mountain holds the highest-elevation significant cave in the United States. In 1541 Spanish monks used Native American slave labor to extract gold from within it. Around 1900 explorer Elisha Horn found a skeleton in Spanish armor at the entrance. In 1932 a second skeleton was found chained by the neck to an interior wall. The cave has never been fully surveyed. The gold has never been found.",
   },
   {
     id: 14, tag: 'Expedition News',
     title: "Dead Man's Cave: The Spanish Treasure Expedition",
     date: 'Mar 2026', author: 'Modern Explorer', readTime: '9 min',
-    img: IMG('History', 'Spanish Map.jpg'),
+    img: IMG('History', 'Spanish Map.webp'),
     excerpt: "October 1880. Three Silver Cliff prospectors crawl through a four-foot opening during a blizzard. Inside: five skeletons — and a second chamber with 400 gold bars stamped with Spanish colonial mint marks. They carry out five bars, assayed at $900 each, and become local celebrities. Then they go back and can't find the cave. Two years of LiDAR research, historical mapping, and rastra location data have pointed us to a specific slope in the Sangres. That slope has no LiDAR coverage. We're going anyway.",
   },
 ];
@@ -192,7 +192,7 @@ export default function FieldReports() {
       ))}
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_095422-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_095422-EDIT.webp')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent, var(--bg-section))' }} />
         <div className="container" style={{ position: 'relative' }}>
           <span className="eyebrow">From the Field</span>
@@ -281,7 +281,7 @@ export default function FieldReports() {
           <div className="container" style={{ padding: '48px 24px' }}>
             <div className="grid-2" style={{ gap: 48, alignItems: 'center' }}>
               <div style={{ position: 'relative', paddingTop: '60%', borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)' }}>
-                <img src={IMG('Animals', 'snippy-1967-dan-anderson.jpg')} alt="Featured" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={IMG('Animals', 'snippy-1967-dan-anderson.webp')} alt="Featured" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="tag">Featured</span>

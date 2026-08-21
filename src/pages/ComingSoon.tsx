@@ -69,7 +69,7 @@ export default function ComingSoon() {
 
       {/* HERO */}
       <section style={{ position: 'relative', padding: '100px 0 80px', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', 'DJI_0289 edit.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.22)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', 'DJI_0289 edit.webp')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.22)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(203,243,110,0.05) 0%, transparent 65%)' }} />
         <div className="container-narrow" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">Beyond the Tours</span>
@@ -102,11 +102,11 @@ export default function ComingSoon() {
       <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', overflow: 'hidden' }}>
         <div style={{ display: 'flex', height: 220 }}>
           {[
-            IMG('Crestone', '20250810_090800-EDIT.jpg'),
-            IMG('Nature', '20250729_200506-EDIT.jpg'),
-            IMG('Animals', 'pexels-brett-sayles-1603783.jpg'),
-            IMG('UFOs', 'MrhuO.jpg'),
-            IMG('Mateo', '20250421_075338-EDIT.jpg'),
+            IMG('Crestone', '20250810_090800-EDIT.webp'),
+            IMG('Nature', '20250729_200506-EDIT.webp'),
+            IMG('Animals', 'pexels-brett-sayles-1603783.webp'),
+            IMG('UFOs', 'MrhuO.webp'),
+            IMG('Mateo', '20250421_075338-EDIT.webp'),
           ].map((src, i) => (
             <div key={i} style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.55)', transition: 'filter 0.3s, transform 0.4s' }}

@@ -91,7 +91,7 @@ function formatDate(d: string) {
 }
 
 // ─── Tour config ──────────────────────────────────────────────────────────────
-const TOUR_PHOTO = '/assets/images/content/Crestone/20250810_090608-EDIT.jpg';
+const TOUR_PHOTO = '/assets/images/content/Crestone/20250810_090608-EDIT.webp';
 const TOUR_NAME  = 'The Crestone Walking Tour';
 const TOUR_DESC  = 'Immersive 45–60 min small-group tour through Crestone\'s spiritual history, mining past, documented paranormal activity, and UAP phenomena.';
 
