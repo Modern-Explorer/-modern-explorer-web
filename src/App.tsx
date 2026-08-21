@@ -36,7 +36,9 @@ export default function App() {
         <StructuredData data={LOCAL_BUSINESS_SCHEMA} />
         <ScrollToTop />
         <Navbar />
-        <Suspense fallback={null}>
+        {/* min-height prevents Footer from appearing above fold while lazy chunks load,
+            which would cause CLS≈1 when the route renders and pushes Footer down. */}
+        <Suspense fallback={<div style={{ minHeight: 'calc(100vh - 72px)' }} />}>
           <Routes>
             <Route path="/"              element={<Home />} />
             <Route path="/about"         element={<About />} />
