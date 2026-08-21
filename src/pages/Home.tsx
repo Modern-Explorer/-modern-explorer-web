@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useRef, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
@@ -107,6 +108,10 @@ export default function Home() {
         description="Small-group guided tours of UFO hotspots, treasure legends, and paranormal history in Crestone, Colorado and the San Luis Valley. Book your expedition today."
         url="/"
       />
+      {/* Preload home-specific hero logo — only on this route, not sitewide */}
+      <Helmet>
+        <link rel="preload" href="/assets/images/content/Logo/me-logo.webp" as="image" type="image/webp" />
+      </Helmet>
       {/* HERO */}
       <section id="mesa-hero" ref={heroRef} style={{
         position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden',

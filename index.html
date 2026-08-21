@@ -37,8 +37,8 @@
          on throttled connections and delays first render more than the FOUT costs. -->
     <link rel="preload" href="/assets/fonts/oswald-700.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- Preload home-page hero logo WebP (LCP element on /) -->
-    <link rel="preload" href="/assets/images/content/Logo/me-logo.webp" as="image" type="image/webp" />
+    <!-- NOTE: hero logo preload is in Home.tsx via Helmet (route-specific),
+         not here — prevents loading 69 KB of home-only logo on every page. -->
   </head>
   <body>
     <div id="root"></div>

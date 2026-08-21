@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async';
 import SEO from '../components/SEO';
 import { useBooking } from '../context/BookingContext';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
@@ -41,14 +40,20 @@ export default function About() {
         description="Meet the team behind Modern Explorer — a veteran-founded guide company exploring the mysteries of the San Luis Valley through immersive small-group tours."
         url="/about"
       />
-      {/* Preload the hero background and LCP founder photo so they're discovered early */}
-      <Helmet>
-        <link rel="preload" as="image" href={IMG('Crestone', '20250810_093514-EDIT.webp')} type="image/webp" />
-        <link rel="preload" as="image" href={IMG('Mateo', 'mateo_main.webp')} type="image/webp" />
-      </Helmet>
+      {/* mateo_main preload: img tag has fetchpriority=high already; hero bg is now an <img>
+          Both are high-priority — no extra Helmet preload needed */}
       {/* PAGE HERO */}
       <section style={{ position: 'relative', padding: '100px 0 80px' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_093514-EDIT.webp')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
+        {/* <img> instead of CSS background: allows fetchpriority="high" for LCP */}
+        <img
+          src={IMG('Crestone', '20250810_093514-EDIT.webp')}
+          alt=""
+          fetchPriority="high"
+          loading="eager"
+          width={800}
+          height={533}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.3)' }}
+        />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(11,15,28,0.3), var(--bg))' }} />
         <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">Our Story</span>
