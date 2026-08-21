@@ -144,18 +144,24 @@ export default function Home() {
         />
 
         <div className="container" style={{ paddingTop: 100, paddingBottom: 80, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 3 }}>
-          {/* Large centerpiece logo — ~¼ of the hero area at full width */}
-          <img
-            src="/assets/images/content/Logo/ME Logo Draft 5.png"
-            alt="Modern Explorer"
-            style={{
-              width: 'clamp(300px, 48vw, 700px)',
-              height: 'auto',
-              display: 'block',
-              marginBottom: 14,
-              filter: 'drop-shadow(0 0 60px rgba(203,243,110,0.20)) drop-shadow(0 8px 24px rgba(0,0,0,0.6))',
-            }}
-          />
+          {/* Large centerpiece logo — LCP element, WebP for fast load */}
+          <picture>
+            <source srcSet="/assets/images/content/Logo/me-logo.webp" type="image/webp" />
+            <img
+              src="/assets/images/content/Logo/ME Logo Draft 5.png"
+              alt="Modern Explorer"
+              fetchPriority="high"
+              width={700}
+              height={467}
+              style={{
+                width: 'clamp(300px, 48vw, 700px)',
+                height: 'auto',
+                display: 'block',
+                marginBottom: 14,
+                filter: 'drop-shadow(0 0 60px rgba(203,243,110,0.20)) drop-shadow(0 8px 24px rgba(0,0,0,0.6))',
+              }}
+            />
+          </picture>
 
           {/* Brand tagline */}
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(13px, 1.8vw, 22px)', fontWeight: 600, color: 'rgba(203,243,110,0.9)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10, textShadow: '0 0 20px rgba(203,243,110,0.4), 0 2px 10px rgba(0,0,0,0.8)' }}>Reigniting the Age of Discovery</p>
