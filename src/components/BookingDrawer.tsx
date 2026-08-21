@@ -5,7 +5,9 @@ import { useBooking } from '../context/BookingContext';
 import WaiverModal from './WaiverModal';
 
 // ─── Stripe & API config ──────────────────────────────────────────────────────
-const stripePromise = loadStripe((import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
+// loadStripe() deferred to first drawer open — avoids loading 750 KB of Stripe CDN
+// JS on every page, which was competing with LCP images at page load.
+const STRIPE_KEY = (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY ?? '';
 const API_URL = (import.meta.env.VITE_BOOKING_API_URL as string | undefined) ?? 'http://localhost:3001/api';
 
 const STRIPE_APPEARANCE: import('@stripe/stripe-js').Appearance = {
@@ -777,9 +779,10 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
 }
 
 // ─── STEP 5: Review & Pay ─────────────────────────────────────────────────────
-function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack }: {
+function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack, stripePromise }: {
   slot: Slot; groupSize: number; tourType: TourType; customer: Customer;
   waiverAgreedAt: string; onConfirmed: (r: BookingResult) => void; onBack: () => void;
+  stripePromise: ReturnType<typeof loadStripe> | null;
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading,      setLoading]      = useState(true);
@@ -1141,6 +1144,15 @@ function ConfirmationScreen({ booking, onReset }: { booking: BookingResult; onRe
 export default function BookingDrawer() {
   const { isOpen, close } = useBooking();
 
+  // Defer Stripe.js CDN load until the drawer first opens. loadStripe() injects
+  // ~750 KB from stripe.com; doing it at module-level was competing with LCP images.
+  const [stripePromise, setStripePromise] = useState<ReturnType<typeof loadStripe> | null>(null);
+  useEffect(() => {
+    if (isOpen && !stripePromise) {
+      setStripePromise(loadStripe(STRIPE_KEY));
+    }
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [step,            setStep]            = useState<DrawerStep>('calendar');
   const [tourType,        setTourType]        = useState<TourType | null>(null);
   const [showTourRequest, setShowTourRequest] = useState(false);
@@ -1314,6 +1326,7 @@ export default function BookingDrawer() {
                 waiverAgreedAt={waiverAgreedAt ?? ''}
                 onConfirmed={result => { setBooking(result); setStep('confirmation'); }}
                 onBack={() => setStep('customer')}
+                stripePromise={stripePromise}
               />
             )}
             {step === 'confirmation' && booking && (

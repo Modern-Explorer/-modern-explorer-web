@@ -13,10 +13,10 @@ const values = [
 const gallery = [
   IMG('Crestone', '20250810_090447-EDIT.webp'),
   IMG('Crestone', '20250810_090525-EDIT.webp'),
-  IMG('Crestone', '20250810_090608-EDIT.webp'),
+  IMG('Crestone', '20250810_090608-EDIT.webp'),   // 38 KB (gallery-optimized 300px)
   IMG('Nature', '20241109_165442-EDIT.webp'),
   IMG('Crestone', '20250810_091607-EDIT.webp'),
-  IMG('Nature', '20250510_091707-EDIT.webp'),
+  IMG('Nature', '20250510_091707-EDIT-gallery.webp'), // 7 KB (300px gallery version)
 ];
 
 const coreTeamPlaceholders = [
