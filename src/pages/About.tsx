@@ -72,7 +72,7 @@ export default function About() {
                   alt="Mateo Argüello"
                   fetchPriority="high"
                   width={900}
-                  height={1125}
+                  height={895}
                   style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
                 />
               </picture>

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -22,35 +22,13 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Terms         = lazy(() => import('./pages/Terms'));
 const Tip           = lazy(() => import('./pages/Tip'));
 
-// Non-critical overlays — deferred until first user interaction or idle.
-// This removes their JS from the critical path, directly cutting TBT.
+// Always-present overlays — lazy so they don't block initial paint.
+// Both mount immediately on first render (same as eager imports, just code-split).
+// Deferring to idle caused Stripe.js to inject mid-measurement, spiking TBT.
 const BookingDrawer = lazy(() => import('./components/BookingDrawer'));
 const Mesa          = lazy(() => import('./components/Mesa'));
 
-function useDeferredMount(delayMs = 4000) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    const mount = () => setMounted(true);
-    const events = ['pointerdown', 'scroll', 'touchstart', 'keydown'] as const;
-    events.forEach(e => window.addEventListener(e, mount, { once: true, passive: true }));
-
-    // requestIdleCallback fallback: mount after browser idles, or after delayMs at most
-    const id = 'requestIdleCallback' in window
-      ? (window as any).requestIdleCallback(mount, { timeout: delayMs })
-      : setTimeout(mount, delayMs);
-
-    return () => {
-      events.forEach(e => window.removeEventListener(e, mount));
-      if ('cancelIdleCallback' in window) (window as any).cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
-  }, [delayMs]);
-  return mounted;
-}
-
 export default function App() {
-  const overlaysMounted = useDeferredMount(4000);
-
   return (
     <BookingProvider>
       <BrowserRouter>
@@ -75,12 +53,8 @@ export default function App() {
           </Routes>
         </Suspense>
         <Footer />
-        {overlaysMounted && (
-          <>
-            <Suspense fallback={null}><Mesa /></Suspense>
-            <Suspense fallback={null}><BookingDrawer /></Suspense>
-          </>
-        )}
+        <Suspense fallback={null}><Mesa /></Suspense>
+        <Suspense fallback={null}><BookingDrawer /></Suspense>
       </BrowserRouter>
     </BookingProvider>
   );

@@ -8,11 +8,17 @@ export default function Footer() {
       <div className="container">
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 64 }}>
           <div>
-            <img
-              src="/assets/images/content/Logo/ME Logo Draft 5.png"
-              alt="Modern Explorer"
-              style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: 20 }}
-            />
+            <picture>
+              <source srcSet="/assets/images/content/Logo/me-logo-nav.webp" type="image/webp" />
+              <img
+                src="/assets/images/content/Logo/ME Logo Draft 5.png"
+                alt="Modern Explorer"
+                loading="lazy"
+                width={72}
+                height={48}
+                style={{ height: 48, width: 'auto', objectFit: 'contain', marginBottom: 20 }}
+              />
+            </picture>
             <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7, maxWidth: 320 }}>
               Immersive small-group guided tours rooted in Crestone and the San Luis Valley, Colorado. We explore history,
               mystery, and the unexplained—boots on the ground.
