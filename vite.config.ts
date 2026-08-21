@@ -1,14 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { visualizer } from 'rollup-plugin-visualizer'
-
-const analyze = process.env.ANALYZE === 'true'
 
 export default defineConfig({
-  plugins: [
-    react(),
-    analyze && visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true }),
-  ].filter(Boolean),
+  plugins: [react()],
   server: {
     proxy: {
       '/api': 'http://localhost:3002',
