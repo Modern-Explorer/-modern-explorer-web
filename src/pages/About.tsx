@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import SEO from '../components/SEO';
 import { useBooking } from '../context/BookingContext';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
@@ -10,12 +11,12 @@ const values = [
 ];
 
 const gallery = [
-  IMG('Crestone', '20250810_090447-EDIT.jpg'),
-  IMG('Crestone', '20250810_090525-EDIT.jpg'),
-  IMG('Crestone', '20250810_090608-EDIT.jpg'),
-  IMG('Nature', '20241109_165442-EDIT.jpg'),
-  IMG('Crestone', '20250810_091607-EDIT.jpg'),
-  IMG('Nature', '20250510_091707-EDIT.jpg'),
+  IMG('Crestone', '20250810_090447-EDIT.webp'),
+  IMG('Crestone', '20250810_090525-EDIT.webp'),
+  IMG('Crestone', '20250810_090608-EDIT.webp'),
+  IMG('Nature', '20241109_165442-EDIT.webp'),
+  IMG('Crestone', '20250810_091607-EDIT.webp'),
+  IMG('Nature', '20250510_091707-EDIT.webp'),
 ];
 
 const coreTeamPlaceholders = [
@@ -40,9 +41,14 @@ export default function About() {
         description="Meet the team behind Modern Explorer — a veteran-founded guide company exploring the mysteries of the San Luis Valley through immersive small-group tours."
         url="/about"
       />
+      {/* Preload the hero background and LCP founder photo so they're discovered early */}
+      <Helmet>
+        <link rel="preload" as="image" href={IMG('Crestone', '20250810_093514-EDIT.webp')} type="image/webp" />
+        <link rel="preload" as="image" href={IMG('Mateo', 'mateo_main.webp')} type="image/webp" />
+      </Helmet>
       {/* PAGE HERO */}
       <section style={{ position: 'relative', padding: '100px 0 80px' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_093514-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Crestone', '20250810_093514-EDIT.webp')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(11,15,28,0.3), var(--bg))' }} />
         <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">Our Story</span>
@@ -58,11 +64,18 @@ export default function About() {
         <div className="container">
           <div className="grid-2" style={{ alignItems: 'center', gap: 64 }}>
             <div style={{ position: 'relative' }}>
-              <img
-                src={IMG('Mateo', 'mateo_main.jpg')}
-                alt="Mateo Argüello"
-                style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
-              />
+              {/* LCP element — fetchpriority ensures early load */}
+              <picture>
+                <source srcSet={IMG('Mateo', 'mateo_main.webp')} type="image/webp" />
+                <img
+                  src={IMG('Mateo', 'mateo_main.jpg')}
+                  alt="Mateo Argüello"
+                  fetchPriority="high"
+                  width={900}
+                  height={1125}
+                  style={{ width: '100%', borderRadius: 6, border: '1px solid var(--border)', display: 'block' }}
+                />
+              </picture>
               <div style={{
                 position: 'absolute', bottom: -20, right: -20,
                 background: 'var(--bg-card)', border: '1px solid var(--border-accent)',
@@ -95,7 +108,8 @@ export default function About() {
         <div style={{ display: 'flex', height: 280 }}>
           {gallery.map((src, i) => (
             <div key={i} style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-              <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+              <img src={src} alt="" loading="lazy" decoding="async"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
                 onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.06)')}
                 onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
               />
@@ -280,13 +294,14 @@ export default function About() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
               {[
-                IMG('Crestone', '20250810_093131-EDIT.jpg'),
-                IMG('Crestone', '20250810_091206-EDIT.jpg'),
-                IMG('Crestone', '20250810_093528-EDIT.jpg'),
-                IMG('Nature', '20250510_100646-EDIT.jpg'),
+                IMG('Crestone', '20250810_093131-EDIT.webp'),
+                IMG('Crestone', '20250810_091206-EDIT.webp'),
+                IMG('Crestone', '20250810_093528-EDIT.webp'),
+                IMG('Nature', '20250510_100646-EDIT.webp'),
               ].map((src, i) => (
                 <div key={i} style={{ paddingTop: '80%', position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
-                  <img src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                  <img src={src} alt="" loading="lazy" decoding="async"
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                     onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
                     onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                   />

@@ -36,11 +36,16 @@ export default function Navbar() {
       <div className="container" style={{ display: 'flex', alignItems: 'center', height: 72, gap: 32 }}>
         <Link to="/" style={{ flexShrink: 0 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img
-            src="/assets/images/content/Logo/ME Logo Draft 5.png"
-            alt="Modern Explorer"
-            style={{ height: 40, width: 'auto', objectFit: 'contain' }}
-          />
+          <picture>
+            <source srcSet="/assets/images/content/Logo/me-logo-nav.webp" type="image/webp" />
+            <img
+              src="/assets/images/content/Logo/ME Logo Draft 5.png"
+              alt="Modern Explorer"
+              width={60}
+              height={40}
+              style={{ height: 40, width: 'auto', objectFit: 'contain' }}
+            />
+          </picture>
         </Link>
 
         <div style={{ display: 'flex', gap: 4, flex: 1, alignItems: 'center' }} className="nav-links-desktop">

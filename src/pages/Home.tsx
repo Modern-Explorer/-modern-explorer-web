@@ -15,7 +15,7 @@ const features = [
 ];
 
 const activeTour = {
-  img: IMG('Crestone', '20250810_090739-EDIT.jpg'),
+  img: IMG('Crestone', '20250810_090739-EDIT.webp'),
   stats: [
     { label: 'Duration', value: '45–60 min' },
     { label: 'Group Size', value: '2–12' },
@@ -31,17 +31,16 @@ const activeTour = {
 };
 
 const comingSoon = [
-  { title: 'UFO / UAP Tour', subtitle: 'The Sky Watch Experience', img: IMG('UFOs', 'pexels-miriamespacio-365625.jpg'), eta: 'Fall 2025' },
-  { title: 'Paranormal & Ghosts', subtitle: 'Crestone After Dark', img: IMG('Ghosts', 'ZtDXn.jpg'), eta: 'Winter 2025' },
-  { title: 'Mining & History', subtitle: 'The Hidden Past', img: IMG('History', '20241222_124511-EDIT.jpg'), eta: '2026' },
-  { title: 'Future Expeditions', subtitle: 'Multi-Day Field Operations', img: IMG('Nature', '20250510_124904-EDIT.jpg'), eta: 'In Development' },
+  { title: 'UFO / UAP Tour', subtitle: 'The Sky Watch Experience', img: IMG('UFOs', 'pexels-miriamespacio-365625.webp'), eta: 'Fall 2025' },
+  { title: 'Paranormal & Ghosts', subtitle: 'Crestone After Dark', img: IMG('Ghosts', 'ZtDXn.webp'), eta: 'Winter 2025' },
+  { title: 'Mining & History', subtitle: 'The Hidden Past', img: IMG('History', '20241222_124511-EDIT.webp'), eta: '2026' },
+  { title: 'Future Expeditions', subtitle: 'Multi-Day Field Operations', img: IMG('Nature', '20250510_124904-EDIT.webp'), eta: 'In Development' },
 ];
 
-
 const blogPreviews = [
-  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: IMG('Crestone', '20250810_093828-EDIT.jpg') },
-  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: IMG('Mateo', '20250421_075338-EDIT.jpg') },
-  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests—new perspectives on history and mystery.', img: IMG('History', '20231110_154447.jpg') },
+  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: IMG('Crestone', '20250810_093828-EDIT.webp') },
+  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: IMG('Mateo', '20250421_075338-EDIT.webp') },
+  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests—new perspectives on history and mystery.', img: IMG('History', '20231110_154447.webp') },
 ];
 
 const csTheme: Record<string, string> = {
@@ -117,7 +116,7 @@ export default function Home() {
           ref={bgRef}
           style={{
             position: 'absolute', inset: 0,
-            backgroundImage: `url('${IMG('Nature', 'pexels-walidphotoz-847402.jpg')}')`,
+            backgroundImage: `url('${IMG('Nature', 'pexels-walidphotoz-847402.webp')}')`,
             backgroundSize: 'cover', backgroundPosition: 'center 60%',
             transform: 'scale(1.05)',
             willChange: 'transform',
@@ -131,7 +130,7 @@ export default function Home() {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url('${IMG('Crestone', 'terrain-map-san-luis.jpg')}')`,
+            backgroundImage: `url('${IMG('Crestone', 'terrain-map-san-luis.webp')}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             opacity: 0.35,
@@ -250,6 +249,8 @@ export default function Home() {
               <img
                 src={activeTour.img}
                 alt="Crestone Walking Tour"
+                loading="lazy"
+                decoding="async"
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               />
               <div className="tour-gradient-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 50%, var(--bg-card))' }} />
@@ -321,7 +322,7 @@ export default function Home() {
             {comingSoon.map(tour => (
               <div key={tour.title} data-cs-theme={csTheme[tour.title] || ''} style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--bg-card)' }}>
                 <div style={{ position: 'relative', paddingTop: '48%', overflow: 'hidden' }}>
-                  <img src={tour.img} alt={tour.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.32) saturate(0.5)' }} />
+                  <img src={tour.img} alt={tour.title} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.32) saturate(0.5)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     {iconMap[tour.title] && (
                       <div style={{ marginBottom: 2 }}>{iconMap[tour.title]}</div>
@@ -359,7 +360,7 @@ export default function Home() {
 
       {/* CTA BANNER */}
       <section style={{ position: 'relative', padding: '100px 0', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Nature', '20250518_185929-EDIT.jpg')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.28)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Nature', '20250518_185929-EDIT.webp')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.28)' }} />
         <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
           <span className="eyebrow">Ready?</span>
           <h2 style={{ fontSize: 'clamp(36px, 6vw, 64px)', marginBottom: 24 }}>Adventure Starts at the Edge</h2>
@@ -386,7 +387,7 @@ export default function Home() {
             {blogPreviews.map(post => (
               <div key={post.title} className="card">
                 <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
-                  <img src={post.img} alt={post.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={post.img} alt={post.title} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '20px 22px 24px' }}>
                   <span className="tag">{post.tag}</span>

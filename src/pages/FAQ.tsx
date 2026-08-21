@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import SEO from '../components/SEO';
 import StructuredData from '../components/StructuredData';
 import { useBooking } from '../context/BookingContext';
@@ -76,9 +77,13 @@ export default function FAQ() {
         url="/faq"
       />
       <StructuredData data={faqSchema} />
+      {/* Preload the hero background — it's the LCP element (CSS bg, not discoverable by default) */}
+      <Helmet>
+        <link rel="preload" as="image" href="/assets/images/content/Nature/20250510_091707-EDIT.webp" type="image/webp" />
+      </Helmet>
       {/* HERO */}
       <section style={{ position: 'relative', padding: '80px 0 64px', background: 'var(--bg-section)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Nature/20250510_091707-EDIT.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/assets/images/content/Nature/20250510_091707-EDIT.webp')", backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.25)' }} />
         <div className="container-narrow" style={{ position: 'relative' }}>
           <span className="eyebrow">Got Questions?</span>
           <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', marginBottom: 20 }}>Frequently Asked<br />Questions</h1>
