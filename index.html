@@ -37,8 +37,11 @@
          on throttled connections and delays first render more than the FOUT costs. -->
     <link rel="preload" href="/assets/fonts/oswald-700.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- NOTE: hero logo preload is in Home.tsx via Helmet (route-specific),
-         not here — prevents loading 69 KB of home-only logo on every page. -->
+    <!-- Preload home hero logo — starts downloading at HTML parse, giving the
+         LCP element a 3-second head start before React mounts. On non-home
+         pages the 69 KB downloads in the background (no impact on their LCP
+         since their LCP images are route-specific and discovered later). -->
+    <link rel="preload" href="/assets/images/content/Logo/me-logo.webp" as="image" type="image/webp" />
   </head>
   <body>
     <div id="root"></div>
