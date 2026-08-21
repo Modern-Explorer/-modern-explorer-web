@@ -108,21 +108,17 @@ export default function About() {
         </div>
       </section>
 
-      {/* GALLERY STRIP — CSS backgrounds instead of <img> so Chrome doesn't
-          eager-load them via the 1250px lazy-load threshold. They only load
-          when scrolled into view, keeping bandwidth free for the LCP images. */}
+      {/* GALLERY STRIP */}
       <section style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', height: 280 }}>
           {gallery.map((src, i) => (
-            <div key={i} style={{
-              flex: 1, minWidth: 0, overflow: 'hidden',
-              backgroundImage: `url('${src}')`,
-              backgroundSize: 'cover', backgroundPosition: 'center',
-              transition: 'transform 0.5s ease',
-            }}
-              onMouseEnter={e => ((e.currentTarget as HTMLDivElement).style.transform = 'scale(1.06)')}
-              onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.transform = 'scale(1)')}
-            />
+            <div key={i} style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <img src={src} alt="" loading="lazy" decoding="async"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.06)')}
+                onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+              />
+            </div>
           ))}
         </div>
       </section>
