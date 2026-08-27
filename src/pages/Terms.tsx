@@ -3,7 +3,7 @@ import { useBooking } from '../context/BookingContext';
 
 export default function Terms() {
   const { open: openBooking } = useBooking();
-  const updated = 'June 7, 2026';
+  const updated = 'August 27, 2026';
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
@@ -22,7 +22,7 @@ export default function Terms() {
           {[
             {
               h: '1. Acceptance of Terms',
-              body: `By booking a tour with Modern Explorer, you agree to these terms and conditions. If you do not agree, please do not complete your booking. These terms apply to all tours, expeditions, and events operated by Modern Explorer in Crestone, Colorado and the San Luis Valley.`,
+              body: `These terms govern your use of the Modern Explorer LLC website at modernexplorer.me, any tours or events you book through it, and — if applicable — the Dispatch social-media publishing tool. By using the site or booking a tour you agree to these terms. If you do not agree, please do not use our services.`,
             },
             {
               h: '2. Booking and Payment',
@@ -61,11 +61,15 @@ export default function Terms() {
               body: `All content on this website — including text, photographs, video, field reports, and research — is owned by Modern Explorer or licensed to us. You may not reproduce, distribute, or use our content without explicit written permission.`,
             },
             {
-              h: '11. Governing Law',
+              h: '11. Dispatch Social Publishing Tool',
+              body: `Dispatch is an internal tool that allows Modern Explorer LLC to schedule and publish content to its own Facebook and Instagram pages via the Meta Graph API. Access to Dispatch is restricted to Modern Explorer staff and authorised contractors.\n\nBy connecting a Facebook page to Dispatch you grant Modern Explorer permission to publish posts and read Page-level insights on your behalf. You may revoke this access at any time through Facebook Settings → Apps and Websites. We use the access solely to manage our own social-media presence and never to access or collect data from your followers or other Facebook users.\n\nUse of Dispatch is subject to Meta's Platform Terms (facebook.com/terms/platformterms) and our Privacy Policy.`,
+            },
+            {
+              h: '12. Governing Law',
               body: `These terms are governed by the laws of the State of Colorado. Any disputes arising from these terms or your use of our services shall be resolved in the courts of Saguache County, Colorado.`,
             },
             {
-              h: '12. Contact',
+              h: '13. Contact',
               body: `For questions about these terms, contact us at:\n\nModern Explorer\nCrestone, Colorado 81131\nhello@modernexplorer.me\n(719) 331-4200`,
             },
           ].map(s => (

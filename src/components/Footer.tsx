@@ -79,8 +79,9 @@ export default function Footer() {
               { to: '/faq', label: 'FAQ' },
               { to: '/what-to-expect', label: 'What to Expect' },
               { to: '/contact', label: 'Contact' },
-              { to: '/privacy-policy', label: 'Privacy Policy' },
+              { to: '/privacy', label: 'Privacy Policy' },
               { to: '/terms', label: 'Terms of Service' },
+              { to: '/data-deletion', label: 'Data Deletion' },
             ].map(l => (
               <Link key={l.to} to={l.to} style={{ display: 'block', color: 'var(--text-muted)', fontSize: 14, marginBottom: 12, transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
