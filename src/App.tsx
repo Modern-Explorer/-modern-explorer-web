@@ -28,6 +28,7 @@ const DataDeletion  = lazy(() => import('./pages/DataDeletion'));
 const Tip           = lazy(() => import('./pages/Tip'));
 
 const HeroLab       = lazy(() => import('./pages/HeroLab'));
+const Membership    = lazy(() => import('./pages/Membership'));
 const BookingDrawer = lazy(() => import('./components/BookingDrawer'));
 const Mesa          = lazy(() => import('./components/Mesa'));
 
@@ -89,6 +90,7 @@ function AppInner() {
           <Route path="/data-deletion"  element={<DataDeletion />} />
           <Route path="/tip"            element={<Tip />} />
           <Route path="/hero-lab"       element={<HeroLab />} />
+          <Route path="/membership"     element={<Membership />} />
         </Routes>
       </Suspense>
       <Footer />

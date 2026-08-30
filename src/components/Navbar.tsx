@@ -14,6 +14,10 @@ const links: NavItem[] = [
   { to: '/faq', label: 'FAQ' },
 ];
 
+// Membership Login is a separate action button, not in the main links list,
+// to keep the nav uncluttered while giving it visual separation.
+const MEMBERSHIP_LINK = { to: '/membership', label: 'Member Login' };
+
 export default function Navbar() {
   const { open: openBooking } = useBooking();
   const [scrolled, setScrolled] = useState(false);
@@ -99,6 +103,25 @@ export default function Navbar() {
           ))}
         </div>
 
+        <NavLink
+          to={MEMBERSHIP_LINK.to}
+          style={({ isActive }) => ({
+            flexShrink: 0,
+            padding: '6px 13px',
+            fontFamily: 'var(--font-heading)',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            transition: 'color 0.15s, border-color 0.15s',
+          })}
+        >
+          {MEMBERSHIP_LINK.label}
+        </NavLink>
+
         <button
           onClick={openBooking}
           className="btn btn-primary"
@@ -166,6 +189,23 @@ export default function Navbar() {
               </NavLink>
             )
           ))}
+          <NavLink
+            to={MEMBERSHIP_LINK.to}
+            onClick={() => setOpen(false)}
+            style={({ isActive }) => ({
+              display: 'block',
+              padding: '12px 0',
+              fontFamily: 'var(--font-heading)',
+              fontSize: 16,
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: isActive ? 'var(--accent)' : 'var(--text)',
+              borderBottom: '1px solid var(--border)',
+            })}
+          >
+            {MEMBERSHIP_LINK.label}
+          </NavLink>
           <button
             onClick={() => { openBooking(); setOpen(false); }}
             className="btn btn-primary"
