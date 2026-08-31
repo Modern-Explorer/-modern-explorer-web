@@ -3,6 +3,9 @@ import nodemailer from 'nodemailer';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -123,6 +126,135 @@ app.post('/api/contact', async (req, res) => {
     console.error('Mail send error:', err.message);
     res.status(500).json({ error: 'Failed to send email. Please try again or email us directly.' });
   }
+});
+
+// ── WAITLIST ──────────────────────────────────────────────────────────────────
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const WAITLIST_FILE = path.join(__dirname, 'data', 'waitlist.json');
+
+function loadWaitlist() {
+  try { return JSON.parse(fs.readFileSync(WAITLIST_FILE, 'utf8')); }
+  catch { return []; }
+}
+
+function saveWaitlist(entries) {
+  fs.mkdirSync(path.dirname(WAITLIST_FILE), { recursive: true });
+  fs.writeFileSync(WAITLIST_FILE, JSON.stringify(entries, null, 2));
+}
+
+function buildMailer() {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+  });
+}
+
+app.post('/api/waitlist', async (req, res) => {
+  const { name, email, phone, message, source, website } = req.body;
+
+  // Honeypot
+  if (website) return res.json({ ok: true });
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Name is required.' });
+  }
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+
+  const trimmedName  = name.trim();
+  const trimmedPhone = phone?.trim() || null;
+  const trimmedMsg   = message?.trim() || null;
+
+  const entries = loadWaitlist();
+  const isNew   = !entries.find(e => e.email === trimmedEmail);
+
+  if (isNew) {
+    entries.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: trimmedName, email: trimmedEmail,
+      phone: trimmedPhone, message: trimmedMsg,
+      source: source || 'unknown',
+      createdAt: new Date().toISOString(),
+    });
+    saveWaitlist(entries);
+  }
+
+  // Send emails (fire-and-forget — don't fail the response if mail is down)
+  try {
+    const mailer = buildMailer();
+
+    // Notification to internal waitlist address
+    await mailer.sendMail({
+      from:    `"Modern Explorer" <${process.env.GMAIL_USER}>`,
+      to:      'waitlist@modernexplorer.me',
+      replyTo: trimmedEmail,
+      subject: isNew ? `[Waitlist] New signup — ${trimmedName}` : `[Waitlist] Duplicate attempt — ${trimmedName}`,
+      html: `
+        <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
+          <div style="background:#0b0f1c;padding:24px 28px;border-radius:6px 6px 0 0">
+            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#cbf36e;opacity:.8">Modern Explorer</p>
+            <h1 style="margin:8px 0 0;font-size:20px;color:#fff">${isNew ? 'New Waitlist Signup' : 'Duplicate Waitlist Attempt'}</h1>
+          </div>
+          <div style="background:#f8f8f6;padding:28px;border:1px solid #e5e5e0;border-top:none">
+            <table style="width:100%;border-collapse:collapse;font-size:14px">
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e5e0;width:90px;color:#666;font-weight:600">Name</td><td style="padding:8px 0;border-bottom:1px solid #e5e5e0">${trimmedName}</td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e5e0;color:#666;font-weight:600">Email</td><td style="padding:8px 0;border-bottom:1px solid #e5e5e0"><a href="mailto:${trimmedEmail}" style="color:#1a6cbf">${trimmedEmail}</a></td></tr>
+              ${trimmedPhone ? `<tr><td style="padding:8px 0;border-bottom:1px solid #e5e5e0;color:#666;font-weight:600">Phone</td><td style="padding:8px 0;border-bottom:1px solid #e5e5e0">${trimmedPhone}</td></tr>` : ''}
+              <tr><td style="padding:8px 0;color:#666;font-weight:600">Source</td><td style="padding:8px 0">${source || 'unknown'}</td></tr>
+            </table>
+            ${trimmedMsg ? `<h3 style="margin:20px 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#444">Message</h3><p style="margin:0;color:#333;line-height:1.7;white-space:pre-wrap;font-size:14px">${trimmedMsg}</p>` : ''}
+          </div>
+          <div style="padding:12px 28px;background:#f0f0ec;border:1px solid #e5e5e0;border-top:none;border-radius:0 0 6px 6px">
+            <p style="margin:0;font-size:11px;color:#999">Total waitlist: ${entries.length} · Sent via modernexplorer.me</p>
+          </div>
+        </div>`,
+    });
+
+    // Confirmation to the signer (only for new entries)
+    if (isNew) {
+      await mailer.sendMail({
+        from:    `"Modern Explorer" <${process.env.GMAIL_USER}>`,
+        to:      trimmedEmail,
+        subject: `You're on the waitlist — Modern Explorer`,
+        html: `
+          <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
+            <div style="background:#0b0f1c;padding:24px 28px;border-radius:6px 6px 0 0">
+              <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#cbf36e;opacity:.8">Modern Explorer · The Frontier</p>
+              <h1 style="margin:8px 0 0;font-size:22px;color:#fff">You're on the list, ${trimmedName.split(' ')[0]}.</h1>
+            </div>
+            <div style="background:#f8f8f6;padding:28px;border:1px solid #e5e5e0;border-top:none">
+              <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333">The Frontier isn't open yet — but when it is, you'll hear first. Founding members get locked-in rates and a founding badge that never resets.</p>
+              <p style="margin:0;font-size:15px;line-height:1.7;color:#333">Until then, explore what we're building at <a href="https://modernexplorer.me/membership" style="color:#1a6cbf">modernexplorer.me/membership</a>.</p>
+            </div>
+            <div style="padding:12px 28px;background:#f0f0ec;border:1px solid #e5e5e0;border-top:none;border-radius:0 0 6px 6px">
+              <p style="margin:0;font-size:11px;color:#999">Modern Explorer · Crestone, CO · You're receiving this because you joined our waitlist.</p>
+            </div>
+          </div>`,
+      });
+    }
+  } catch (mailErr) {
+    console.error('Waitlist mail error:', mailErr.message);
+  }
+
+  res.json({ ok: true });
+});
+
+app.get('/api/waitlist/export.csv', (req, res) => {
+  const secret = process.env.ADMIN_SECRET;
+  if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const entries = loadWaitlist();
+  const header  = ['id', 'name', 'email', 'phone', 'message', 'source', 'createdAt'];
+  const rows    = entries.map(e =>
+    header.map(k => `"${String(e[k] ?? '').replace(/"/g, '""')}"`).join(',')
+  );
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="waitlist.csv"');
+  res.send([header.join(','), ...rows].join('\n'));
 });
 
 // ── MESA AI ───────────────────────────────────────────────────────────────────

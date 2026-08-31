@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { LockPulseIcon, FootprintIcon, GhostEyeIcon, MountainIcon } from '../components/Icons';
 import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
 import StructuredData, { TOURIST_TRIP_SCHEMA, ENERGY_FAIR_EVENT_SCHEMA, VORTEX_FESTIVAL_EVENT_SCHEMA } from '../components/StructuredData';
 import { useBooking } from '../context/BookingContext';
+import { useWaitlist } from '../context/WaitlistContext';
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 // ─── Specialty tours (coming soon) ────────────────────────────────────────────
@@ -68,13 +69,11 @@ const expeditions = [
   },
 ];
 
-function NotifyButton({ label = 'Join Waitlist' }: { label?: string }) {
-  const [done, setDone] = useState(false);
-  return done ? (
-    <span style={{ fontSize: 13, color: 'var(--accent)', fontFamily: 'var(--font-alt)', fontWeight: 600 }}>✓ You're on the list</span>
-  ) : (
+function NotifyButton({ label = 'Join Waitlist', source = 'upcoming' }: { label?: string; source?: string }) {
+  const { open } = useWaitlist();
+  return (
     <button
-      onClick={() => setDone(true)}
+      onClick={() => open(source)}
       className="btn btn-outline"
       style={{ fontSize: 13, padding: '9px 20px' }}
     >
@@ -269,7 +268,7 @@ export default function Upcoming() {
                       <span key={tag} style={{ padding: '3px 10px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 2, fontSize: 11, fontFamily: 'var(--font-alt)', fontWeight: 600, color: 'var(--text-dim)' }}>{tag}</span>
                     ))}
                   </div>
-                  <NotifyButton label="Notify Me When Live" />
+                  <NotifyButton label="Notify Me When Live" source="upcoming-specialty" />
                 </div>
               </div>
             ))}
@@ -481,7 +480,7 @@ export default function Upcoming() {
                   </p>
                 </div>
 
-                <NotifyButton label="Join the Expedition" />
+                <NotifyButton label="Join the Expedition" source="upcoming-expedition" />
               </div>
             </div>
           </div>
@@ -532,7 +531,7 @@ export default function Upcoming() {
                     ))}
                   </div>
 
-                  <NotifyButton label="Join the Waitlist" />
+                  <NotifyButton label="Join the Waitlist" source="upcoming-expedition-card" />
                 </div>
               </div>
             ))}

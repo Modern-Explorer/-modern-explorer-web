@@ -33,18 +33,20 @@ export default function WaitlistModal() {
   const { isOpen, source, close } = useWaitlist();
   const formId = useId();
 
-  const [name,   setName]   = useState('');
-  const [email,  setEmail]  = useState('');
-  const [pot,    setPot]    = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errMsg, setErrMsg] = useState('');
+  const [name,    setName]    = useState('');
+  const [email,   setEmail]   = useState('');
+  const [phone,   setPhone]   = useState('');
+  const [message, setMessage] = useState('');
+  const [pot,     setPot]     = useState('');
+  const [status,  setStatus]  = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errMsg,  setErrMsg]  = useState('');
 
   const emailRef = useRef<HTMLInputElement>(null);
 
   // Reset form on open
   useEffect(() => {
     if (isOpen) {
-      setName(''); setEmail(''); setPot('');
+      setName(''); setEmail(''); setPhone(''); setMessage(''); setPot('');
       setStatus('idle'); setErrMsg('');
       setTimeout(() => emailRef.current?.focus(), 80);
     }
@@ -71,6 +73,13 @@ export default function WaitlistModal() {
     e.preventDefault();
     if (pot) return; // honeypot
 
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setErrMsg('Name is required.');
+      setStatus('error');
+      return;
+    }
+
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       setErrMsg('Please enter a valid email address.');
@@ -92,8 +101,10 @@ export default function WaitlistModal() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: trimmedEmail,
-          name:  name.trim() || undefined,
+          name:    trimmedName,
+          email:   trimmedEmail,
+          phone:   phone.trim() || undefined,
+          message: message.trim() || undefined,
           source,
           website: pot,
         }),
@@ -191,6 +202,25 @@ export default function WaitlistModal() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {/* Name (required) */}
+                <div>
+                  <label htmlFor={`${formId}-name`} style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,244,255,0.5)', marginBottom: 7 }}>
+                    Name <span style={{ color: 'var(--accent)' }}>*</span>
+                  </label>
+                  <input
+                    id={`${formId}-name`}
+                    type="text"
+                    value={name}
+                    onChange={e => { setName(e.target.value); if (status === 'error') setStatus('idle'); }}
+                    placeholder="Your name"
+                    required
+                    autoComplete="name"
+                    style={{ ...inputStyle, borderColor: status === 'error' && !name.trim() ? 'rgba(248,113,113,0.6)' : 'rgba(255,255,255,0.12)' }}
+                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(203,243,110,0.45)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                  />
+                </div>
+
                 {/* Email */}
                 <div>
                   <label htmlFor={`${formId}-email`} style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,244,255,0.5)', marginBottom: 7 }}>
@@ -211,19 +241,36 @@ export default function WaitlistModal() {
                   />
                 </div>
 
-                {/* Name (optional) */}
+                {/* Phone (optional) */}
                 <div>
-                  <label htmlFor={`${formId}-name`} style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,244,255,0.5)', marginBottom: 7 }}>
-                    First name <span style={{ opacity: 0.45, fontWeight: 400 }}>(optional)</span>
+                  <label htmlFor={`${formId}-phone`} style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,244,255,0.5)', marginBottom: 7 }}>
+                    Phone <span style={{ opacity: 0.45, fontWeight: 400 }}>(optional)</span>
                   </label>
                   <input
-                    id={`${formId}-name`}
-                    type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder="Your name"
-                    autoComplete="given-name"
+                    id={`${formId}-phone`}
+                    type="tel"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="+1 (555) 000-0000"
+                    autoComplete="tel"
                     style={inputStyle}
+                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(203,243,110,0.45)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                  />
+                </div>
+
+                {/* Message (optional) */}
+                <div>
+                  <label htmlFor={`${formId}-message`} style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,244,255,0.5)', marginBottom: 7 }}>
+                    Message <span style={{ opacity: 0.45, fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <textarea
+                    id={`${formId}-message`}
+                    value={message}
+                    onChange={e => setMessage(e.target.value)}
+                    placeholder="What brings you here?"
+                    rows={3}
+                    style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
                     onFocus={e => (e.currentTarget.style.borderColor = 'rgba(203,243,110,0.45)')}
                     onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
                   />

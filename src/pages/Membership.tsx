@@ -1,5 +1,5 @@
-import { useState, useId } from 'react';
 import SEO from '../components/SEO';
+import { useWaitlist } from '../context/WaitlistContext';
 
 // ─── Feature card data ────────────────────────────────────────────────────────
 
@@ -49,119 +49,10 @@ const TIERS = [
   { name: 'Expedition',  tag: 'All-access — private ops, mentorship, field partner network.' },
 ] as const;
 
-// ─── Waitlist form ─────────────────────────────────────────────────────────────
-
-function WaitlistForm() {
-  const formId = useId();
-  const [name,    setName]    = useState('');
-  const [email,   setEmail]   = useState('');
-  const [pot,     setPot]     = useState(''); // honeypot
-  const [status,  setStatus]  = useState<'idle'|'loading'|'success'|'error'>('idle');
-  const [errMsg,  setErrMsg]  = useState('');
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (pot) return; // honeypot triggered — silently ignore
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim() || undefined, email: email.trim(), source: 'membership-page', website: pot }),
-      });
-      const json = await res.json() as { error?: string };
-      if (!res.ok) throw new Error(json.error ?? 'Something went wrong.');
-      setStatus('success');
-    } catch (err) {
-      setErrMsg(err instanceof Error ? err.message : 'Something went wrong.');
-      setStatus('error');
-    }
-  }
-
-  if (status === 'success') {
-    return (
-      <div style={{ textAlign: 'center', padding: '48px 24px' }}>
-        <div style={{ fontSize: 32, marginBottom: 16, color: 'var(--accent)' }}>◉</div>
-        <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.2rem, 3vw, 1.6rem)', color: 'var(--accent)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
-          You're on the list
-        </p>
-        <p style={{ color: 'var(--text-muted)', maxWidth: 380, margin: '0 auto', lineHeight: 1.7 }}>
-          We'll email you when the doors open. Welcome to The Frontier.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} noValidate>
-      {/* Honeypot — visually hidden, never filled by real users */}
-      <div style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
-        <label htmlFor={`${formId}-hp`}>Leave blank</label>
-        <input id={`${formId}-hp`} type="text" value={pot} onChange={e => setPot(e.target.value)} tabIndex={-1} autoComplete="off" />
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 460, margin: '0 auto' }}>
-        <div>
-          <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
-            Name <span style={{ opacity: 0.5 }}>(optional)</span>
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="Your name"
-            autoComplete="name"
-            style={inputStyle}
-          />
-        </div>
-        <div>
-          <label style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
-            Email <span style={{ color: 'var(--accent)' }}>*</span>
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-            style={inputStyle}
-          />
-        </div>
-
-        {status === 'error' && (
-          <p style={{ color: '#f87171', fontSize: 13, margin: 0 }}>{errMsg}</p>
-        )}
-
-        <button
-          type="submit"
-          disabled={status === 'loading'}
-          className="btn btn-primary"
-          style={{ width: '100%', justifyContent: 'center', padding: '14px 24px', fontSize: 14, opacity: status === 'loading' ? 0.7 : 1 }}
-        >
-          {status === 'loading' ? 'Sending…' : 'Join the Waiting List'}
-        </button>
-      </div>
-    </form>
-  );
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid var(--border)',
-  borderRadius: 'var(--radius)',
-  color: 'var(--text)',
-  fontFamily: 'var(--font-body)',
-  fontSize: 15,
-  padding: '11px 14px',
-  outline: 'none',
-  transition: 'border-color 0.15s',
-};
-
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function Membership() {
+  const { open: openWaitlist } = useWaitlist();
   return (
     <>
       <SEO
@@ -216,13 +107,13 @@ export default function Membership() {
         </p>
 
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginTop: 16 }}>
-          <a
-            href="#waitlist"
+          <button
+            onClick={() => openWaitlist('membership-hero')}
             className="btn btn-primary"
             style={{ padding: '13px 32px', fontSize: 14 }}
           >
             Join the Waiting List
-          </a>
+          </button>
           <a
             href="#inside"
             style={{
@@ -332,7 +223,7 @@ export default function Membership() {
         </div>
       </section>
 
-      {/* ── Waitlist form ─────────────────────────────────────────────────── */}
+      {/* ── Waitlist CTA ──────────────────────────────────────────────────── */}
       <section id="waitlist" className="section" style={{ background: 'var(--bg-section)' }}>
         <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
           <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', opacity: 0.8, marginBottom: 14 }}>
@@ -344,7 +235,13 @@ export default function Membership() {
           <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7, marginBottom: 40 }}>
             We'll email you the moment doors open — and founding members get first access, locked-in rates, and a founding badge that never resets.
           </p>
-          <WaitlistForm />
+          <button
+            onClick={() => openWaitlist('membership-waitlist')}
+            className="btn btn-primary"
+            style={{ padding: '14px 40px', fontSize: 15 }}
+          >
+            Join the Waiting List
+          </button>
         </div>
       </section>
     </>
