@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useWaitlist } from '../context/WaitlistContext';
 
 // ─── Original constellation data ──────────────────────────────────────────────
 type ConstKey = 'gemini' | 'sagittarius' | 'capricornus';
@@ -750,6 +750,7 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function ParticleHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { open: openWaitlist } = useWaitlist();
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -811,7 +812,7 @@ export default function ParticleHero() {
           Colorado · Crestone · San Luis Valley · Near Great Sand Dunes
         </p>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Link to="/membership" className="btn btn-primary" style={{ fontSize: 15, padding: '15px 32px' }}>Join the Research</Link>
+          <button onClick={() => openWaitlist('hero')} className="btn btn-primary" style={{ fontSize: 15, padding: '15px 32px' }}>Join the Research</button>
           <button onClick={() => document.getElementById('mesa-tours')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-ghost" style={{ fontSize: 15, padding: '15px 32px' }}>Explore With Us ↓</button>
         </div>
       </div>

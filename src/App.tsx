@@ -6,6 +6,8 @@ import ScrollToTop from './components/ScrollToTop';
 import Analytics from './components/Analytics';
 import StructuredData, { LOCAL_BUSINESS_SCHEMA } from './components/StructuredData';
 import { BookingProvider, useBooking } from './context/BookingContext';
+import { WaitlistProvider } from './context/WaitlistContext';
+import WaitlistModal from './components/WaitlistModal';
 
 // Eager routes — must paint immediately on direct URL visits (no Suspense gap).
 // Home is the primary landing page; About/FAQ/Terms are top nav destinations with
@@ -94,16 +96,19 @@ function AppInner() {
       <Footer />
       {mesaMounted && <Suspense fallback={null}><Mesa /></Suspense>}
       {bookingMounted && <Suspense fallback={null}><BookingDrawer /></Suspense>}
+      <WaitlistModal />
     </>
   );
 }
 
 export default function App() {
   return (
-    <BookingProvider>
-      <BrowserRouter>
-        <AppInner />
-      </BrowserRouter>
-    </BookingProvider>
+    <WaitlistProvider>
+      <BookingProvider>
+        <BrowserRouter>
+          <AppInner />
+        </BrowserRouter>
+      </BookingProvider>
+    </WaitlistProvider>
   );
 }

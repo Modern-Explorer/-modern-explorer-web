@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import GoogleReviews from '../components/GoogleReviews';
 import { useBooking } from '../context/BookingContext';
+import { useWaitlist } from '../context/WaitlistContext';
 import { useReveal } from '../hooks/useReveal';
 import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import ParticleHero from '../components/ParticleHero';
@@ -87,6 +88,7 @@ const blogPreviews = [
 
 export default function Home() {
   const { open: openBooking } = useBooking();
+  const { open: openWaitlist } = useWaitlist();
   useReveal();
 
   return (
@@ -142,9 +144,9 @@ export default function Home() {
                 <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.75, marginBottom: 36 }}>
                   The waitlist is open now. Founding members shape what gets built first.
                 </p>
-                <Link to="/membership" className="btn btn-primary" style={{ fontSize: 15, padding: '14px 32px' }}>
+                <button onClick={() => openWaitlist('home-frontier')} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 32px' }}>
                   Join the Waitlist →
-                </Link>
+                </button>
               </div>
             </div>
             {/* Right: feature grid */}
@@ -376,7 +378,7 @@ export default function Home() {
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 34px' }}>Book a Tour</button>
-            <Link to="/membership" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 34px' }}>Join the Research</Link>
+            <button onClick={() => openWaitlist('home-cta')} className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 34px' }}>Join the Research</button>
           </div>
         </div>
       </section>
