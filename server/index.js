@@ -147,7 +147,13 @@ function buildMailer() {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+    connectionTimeout: 8000,
+    socketTimeout: 8000,
   });
+}
+
+function mailConfigured() {
+  return !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
 }
 
 app.post('/api/waitlist', async (req, res) => {
@@ -182,8 +188,8 @@ app.post('/api/waitlist', async (req, res) => {
     saveWaitlist(entries);
   }
 
-  // Send emails (fire-and-forget — don't fail the response if mail is down)
-  try {
+  // Send emails (fire-and-forget — only when credentials are configured)
+  if (mailConfigured()) try {
     const mailer = buildMailer();
 
     // Notification to internal waitlist address
@@ -237,6 +243,8 @@ app.post('/api/waitlist', async (req, res) => {
     }
   } catch (mailErr) {
     console.error('Waitlist mail error:', mailErr.message);
+  } else {
+    console.warn('Waitlist: email skipped — GMAIL_USER/GMAIL_APP_PASSWORD not configured');
   }
 
   res.json({ ok: true });
