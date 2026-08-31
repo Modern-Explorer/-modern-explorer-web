@@ -1,8 +1,48 @@
+import { useEffect, useRef, useState } from 'react';
 import SEO from '../components/SEO';
+
+declare global {
+  interface Window { spread_shop_config?: object; }
+}
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
 export default function MerchStore() {
+  const [showFallback, setShowFallback] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    window.spread_shop_config = {
+      shopName: 'modernexplorer',
+      locale: 'us_US',
+      prefix: 'https://modernexplorer.myspreadshop.com',
+      baseId: 'myShop',
+    };
+
+    const script = document.createElement('script');
+    script.src = 'https://modernexplorer.myspreadshop.com/shopfiles/shopclient/shopclient.nocache.js';
+    script.async = true;
+    script.onerror = () => { if (mountedRef.current) setShowFallback(true); };
+    document.head.appendChild(script);
+
+    // If the embed hasn't replaced the placeholder after 6s, show the fallback link.
+    const timer = setTimeout(() => {
+      if (!mountedRef.current) return;
+      const el = document.getElementById('myShop');
+      // Spreadshop replaces the anchor with its own iframe/div; if still just one child it failed.
+      if (!el || el.childElementCount <= 1) setShowFallback(true);
+    }, 6000);
+
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(timer);
+      if (script.parentNode) script.parentNode.removeChild(script);
+      delete window.spread_shop_config;
+    };
+  }, []);
+
   return (
     <main style={{ paddingTop: 72 }}>
       <SEO
@@ -24,19 +64,30 @@ export default function MerchStore() {
       </section>
 
       {/* SPREADSHOP STOREFRONT */}
-      <section style={{ borderBottom: '1px solid var(--border)' }}>
-        <iframe
-          src="https://modernexplorer.myspreadshop.com/"
-          title="Modern Explorer Store"
-          style={{
-            display: 'block',
-            width: '100%',
-            height: 'max(900px, calc(100vh - 180px))',
-            border: 'none',
-          }}
-          allow="payment"
-          loading="eager"
-        />
+      <section style={{ borderBottom: '1px solid var(--border)', minHeight: 600 }}>
+        {showFallback ? (
+          <div style={{ padding: '80px 24px', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 24 }}>
+              Shop on Spreadshop
+            </p>
+            <a
+              href="https://modernexplorer.myspreadshop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+              style={{ fontSize: 15, padding: '14px 32px', display: 'inline-block' }}
+            >
+              Visit the Store →
+            </a>
+            <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', marginTop: 20 }}>
+              Opens in a new tab — apparel, gear, and art from Modern Explorer.
+            </p>
+          </div>
+        ) : (
+          <div id="myShop" style={{ minHeight: 600 }}>
+            <a href="https://modernexplorer.myspreadshop.com">Modern Explorer Store</a>
+          </div>
+        )}
       </section>
 
       {/* SUPPORT MESSAGE */}

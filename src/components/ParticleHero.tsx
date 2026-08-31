@@ -382,7 +382,7 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
   const slots: Slot[] = [
     { constKey: 'gemini',      cx: 0.72, cy: 0.16, scale: isMobile ? 0.14 : 0.20, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 0, lastSymIdx: -1, transitionDelay: 2000, doCycle: !isMobile },
     { constKey: 'sagittarius', cx: 0.14, cy: 0.65, scale: isMobile ? 0.13 : 0.18, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 1, lastSymIdx: -1, transitionDelay: 0,    doCycle: true },
-    { constKey: 'capricornus', cx: 0.82, cy: 0.70, scale: isMobile ? 0.12 : 0.16, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 3, lastSymIdx: -1, transitionDelay: 4000, doCycle: !isMobile },
+    { constKey: 'capricornus', cx: 0.82, cy: 0.60, scale: isMobile ? 0.12 : 0.16, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 3, lastSymIdx: -1, transitionDelay: 4000, doCycle: !isMobile },
   ];
 
   // ── Particle pool ───────────────────────────────────────────────────────────
@@ -429,8 +429,8 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
     const totalLines = data.lines.length;
     const linesToDraw = Math.floor(slot.traceProgress * totalLines);
     const partial = (slot.traceProgress * totalLines) - linesToDraw;
-    ctx.strokeStyle = `rgba(200,218,255,${(op * 0.32).toFixed(3)})`;
-    ctx.lineWidth = isMobile ? 0.5 : 0.8;
+    ctx.strokeStyle = `rgba(200,218,255,${(op * 0.58).toFixed(3)})`;
+    ctx.lineWidth = isMobile ? 0.7 : 1.1;
     ctx.beginPath();
     for (let li = 0; li < linesToDraw; li++) {
       const [ai, bi] = data.lines[li];
@@ -451,8 +451,8 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
       if (sf > vf + 0.05) continue;
       const boost = sf > vf - 0.12 ? 1.6 : 1;
       const sOp = Math.min(0.95, s.op * op * boost);
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(215,232,255,${(sOp * 0.12).toFixed(3)})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(215,232,255,${(sOp * 0.25).toFixed(3)})`; ctx.fill();
       ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(215,232,255,${sOp.toFixed(3)})`; ctx.fill();
     }
@@ -477,8 +477,8 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
     const totalLines = sym.lines.length;
     const linesToDraw = Math.floor(slot.traceProgress * totalLines);
     const partial = (slot.traceProgress * totalLines) - linesToDraw;
-    ctx.strokeStyle = `rgba(200,218,255,${(op * 0.30).toFixed(3)})`;
-    ctx.lineWidth = isMobile ? 0.5 : 0.75;
+    ctx.strokeStyle = `rgba(200,218,255,${(op * 0.55).toFixed(3)})`;
+    ctx.lineWidth = isMobile ? 0.7 : 1.0;
     ctx.beginPath();
     for (let li = 0; li < linesToDraw; li++) {
       const [ai, bi] = sym.lines[li];
@@ -498,8 +498,8 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
       if (sf > slot.traceProgress + 0.05) continue;
       const boost = sf > slot.traceProgress - 0.12 ? 1.6 : 1;
       const sOp = Math.min(0.95, s.op * op * boost);
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(215,232,255,${(sOp * 0.12).toFixed(3)})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(215,232,255,${(sOp * 0.25).toFixed(3)})`; ctx.fill();
       ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(215,232,255,${sOp.toFixed(3)})`; ctx.fill();
     }
