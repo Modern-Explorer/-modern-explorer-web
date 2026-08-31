@@ -353,8 +353,8 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
   const ctx = canvas.getContext('2d')!;
   let W = 0, H = 0;
   const isMobile = window.innerWidth < 768;
-  const PARTICLE_COUNT = isMobile ? 160 : 320;
-  const FORM_COUNT     = isMobile ? 80  : 160;
+  const PARTICLE_COUNT = isMobile ? 110 : 320;
+  const FORM_COUNT     = isMobile ? 60  : 160;
   const GLYPH_SCALE    = () => Math.min(W, H) * (isMobile ? 0.28 : 0.26);
   const GLYPH_CX       = () => W / 2;
   const GLYPH_CY       = () => H * 0.47;
@@ -380,9 +380,9 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
   // Slots: index 0=gemini(upper-right), 1=sagittarius(lower-left), 2=capricornus(lower-right)
   // Stagger transition: sagittarius first, then gemini, then capricornus
   const slots: Slot[] = [
-    { constKey: 'gemini',      cx: 0.72, cy: 0.16, scale: isMobile ? 0.14 : 0.20, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 0, lastSymIdx: -1, transitionDelay: 2000, doCycle: !isMobile },
+    { constKey: 'gemini',      cx: 0.72, cy: 0.16, scale: isMobile ? 0.14 : 0.20, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 0, lastSymIdx: -1, transitionDelay: 2000, doCycle: true },
     { constKey: 'sagittarius', cx: 0.14, cy: 0.65, scale: isMobile ? 0.13 : 0.18, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 1, lastSymIdx: -1, transitionDelay: 0,    doCycle: true },
-    { constKey: 'capricornus', cx: 0.82, cy: 0.60, scale: isMobile ? 0.12 : 0.16, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 3, lastSymIdx: -1, transitionDelay: 4000, doCycle: !isMobile },
+    { constKey: 'capricornus', cx: 0.82, cy: 0.60, scale: isMobile ? 0.12 : 0.16, traceProgress: 0, opacity: 0, targetOpacity: 0, cycleActive: false, cyclePhase: 'fading-intro', cyclePhaseT: 0, symIdx: 3, lastSymIdx: -1, transitionDelay: 4000, doCycle: true },
   ];
 
   // ── Particle pool ───────────────────────────────────────────────────────────
