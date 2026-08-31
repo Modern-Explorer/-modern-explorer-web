@@ -1,21 +1,44 @@
 import { Link } from 'react-router-dom';
-import { useRef, useEffect } from 'react';
-import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
-import { useReveal } from '../hooks/useReveal';
 import SEO from '../components/SEO';
 import GoogleReviews from '../components/GoogleReviews';
 import { useBooking } from '../context/BookingContext';
+import { useReveal } from '../hooks/useReveal';
+import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
+import ParticleHero from '../components/ParticleHero';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
-const features = [
-  { icon: '/assets/images/compass.png', label: 'Small Groups', desc: 'Intimate 2–12 person expeditions for a real, personal experience.' },
-  { icon: '/assets/images/maps-and-flags.png', label: 'Authentic Local Experiences', desc: 'Every tour is rooted in genuine local history, legend, and lore.' },
-  { icon: '/assets/images/backpack.png', label: 'Curated Immersive Travel', desc: 'Thoughtfully designed journeys that go far beyond the typical tour.' },
+// ── Mission pillars ──────────────────────────────────────────────────────────
+const missionPillars = [
+  {
+    icon: '🛸',
+    label: 'UAP & Aerial Phenomena',
+    detail: 'The San Luis Valley is one of North America\'s most documented UAP corridors. We collect witness testimony, correlate it with radar and sensor data, and map the hotspot clusters.',
+  },
+  {
+    icon: '🦶',
+    label: 'Cryptozoology & Bigfoot',
+    detail: 'Systematic footprint casting, hair sample collection, and habitat analysis across the Sangre de Cristo range — applying wildlife forensics to encounters the mainstream ignores.',
+  },
+  {
+    icon: '🏛️',
+    label: 'Lost History & Archaeology',
+    detail: 'Pre-Columbian petroglyphs, anomalous ruins, and oral histories that don\'t fit the accepted timeline. We document, photograph, and cross-reference with academic sources.',
+  },
 ];
 
+// ── Frontier / membership features ──────────────────────────────────────────
+const frontierFeatures = [
+  { icon: '🗄️', label: 'The Arcanum', detail: 'A structured database of incidents, sightings, and field findings — organized by type, location, and confidence level.' },
+  { icon: '📡', label: 'Field Instruments', detail: 'EMF meters, Geiger counters, thermal imaging, and GPS-logged tracks. Real data from real expeditions.' },
+  { icon: '📋', label: 'Ongoing Case Files', detail: 'Active investigations with running notes, evidence chains, and member-contributed data from across the region.' },
+  { icon: '🌐', label: 'Researcher Community', detail: 'Connect with investigators, share findings, and access the collective knowledge of a serious field research network.' },
+];
+
+// ── Tours data ───────────────────────────────────────────────────────────────
 const activeTour = {
-  img: IMG('Crestone', '20250810_090739-EDIT.webp'),
+  img: IMG('Crestone', 'old-crestone.webp'),
+  imgMobile: IMG('Crestone', 'old-crestone-mobile.webp'),
   stats: [
     { label: 'Duration', value: '45–60 min' },
     { label: 'Group Size', value: '2–12' },
@@ -37,12 +60,6 @@ const comingSoon = [
   { title: 'Future Expeditions', subtitle: 'Multi-Day Field Operations', img: IMG('Nature', '20250510_124904-EDIT.webp'), eta: 'In Development' },
 ];
 
-const blogPreviews = [
-  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: IMG('Crestone', '20250810_093828-EDIT.webp') },
-  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: IMG('Mateo', '20250421_075338-EDIT.webp') },
-  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests—new perspectives on history and mystery.', img: IMG('History', '20231110_154447.webp') },
-];
-
 const csTheme: Record<string, string> = {
   'UFO / UAP Tour': 'uap',
   'Paranormal & Ghosts': 'paranormal',
@@ -51,210 +68,137 @@ const csTheme: Record<string, string> = {
 };
 
 const iconMap: Record<string, React.ReactNode> = {
-  'UFO / UAP Tour':     <OrbIcon className="me-orb" />,
+  'UFO / UAP Tour':      <OrbIcon className="me-orb" />,
   'Paranormal & Ghosts': <GhostEyeIcon className="me-ghost-eye" />,
-  'Mining & History':   <LanternIcon />,
-  'Future Expeditions': <CompassIcon className="me-compass" />,
+  'Mining & History':    <LanternIcon />,
+  'Future Expeditions':  <CompassIcon className="me-compass" />,
 };
+
+const blogPreviews = [
+  { tag: 'Field Report', title: 'Stories from the Edge', desc: 'Firsthand accounts of haunted trails, lost ruins, and the mysteries we uncover on every journey.', img: IMG('Crestone', '20250810_093828-EDIT.webp') },
+  { tag: 'Skills', title: 'Field Wisdom & Survival', desc: 'Hard-won lessons, gear tips, and practical know-how for thriving in the unknown.', img: IMG('Mateo', '20250421_075338-EDIT.webp') },
+  { tag: 'Community', title: 'Voices from Our Community', desc: 'Insights from fellow adventurers, local legends, and special guests — new perspectives on history and mystery.', img: IMG('History', '20231110_154447.webp') },
+];
 
 export default function Home() {
   const { open: openBooking } = useBooking();
-  const heroRef = useRef<HTMLElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
-  const topoRef = useRef<HTMLDivElement>(null);
   useReveal();
-
-  useEffect(() => {
-    const section = heroRef.current;
-    if (!section) return;
-    let raf: number;
-    let tx = 0, ty = 0;
-    let bx = 0, by = 0;   // background — slow, laggy
-    let mx = 0, my = 0;   // terrain map — fast, snappy
-
-    const onMove = (e: MouseEvent) => {
-      const r = section.getBoundingClientRect();
-      tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-      ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    };
-
-    const tick = () => {
-      bx += (tx - bx) * 0.038;   // slow lag
-      by += (ty - by) * 0.038;
-      mx += (tx - mx) * 0.080;   // snappy response
-      my += (ty - my) * 0.080;
-      if (bgRef.current) {
-        bgRef.current.style.transform = `translate(${bx * 14}px, ${by * 9}px) scale(1.05)`;
-      }
-      if (topoRef.current) {
-        topoRef.current.style.transform = `translate(${mx * 58}px, ${my * 36}px) scale(1.16)`;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-
-    section.addEventListener('mousemove', onMove);
-    raf = requestAnimationFrame(tick);
-    return () => {
-      section.removeEventListener('mousemove', onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
 
   return (
     <main>
       <SEO
-        title="Modern Explorer | Guided UFO & Paranormal Tours, Crestone CO"
-        description="Small-group guided tours of UFO hotspots, treasure legends, and paranormal history in Crestone, Colorado and the San Luis Valley. Book your expedition today."
+        title="Modern Explorer | UFO, Paranormal & Cryptozoology Research — Crestone, CO"
+        description="Modern Explorer investigates unknown phenomena — UAP, cryptozoology, and lost history — in Crestone, Colorado and the San Luis Valley. Join the research or book a guided expedition."
         url="/"
       />
-      {/* Logo preload is in index.html (fires at HTML parse, not React mount) */}
-      {/* HERO */}
-      <section id="mesa-hero" ref={heroRef} style={{
-        position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden',
-      }}>
-        {/* Background — parallax layer (moves with cursor) */}
-        <div
-          ref={bgRef}
-          style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: `url('${IMG('Nature', 'pexels-walidphotoz-847402.webp')}')`,
-            backgroundSize: 'cover', backgroundPosition: 'center 60%',
-            transform: 'scale(1.05)',
-            willChange: 'transform',
-          }}
-        />
-        {/* Gradient — fixed, above topo layer */}
-        <div className="hero-overlay" style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(135deg, rgba(8,12,23,0.72) 0%, rgba(8,12,23,0.38) 60%, rgba(8,12,23,0.25) 100%)' }} />
-        {/* Terrain map — medium-speed parallax layer between landscape and text */}
-        <div
-          ref={topoRef}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url('${IMG('Crestone', 'terrain-map-san-luis.webp')}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.35,
-            mixBlendMode: 'screen',
-            transform: 'scale(1.16)',
-            willChange: 'transform',
-            zIndex: 1,
-            filter: 'saturate(0.55) brightness(0.9)',
-          }}
-        />
 
-        <div className="container" style={{ paddingTop: 100, paddingBottom: 80, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 3 }}>
-          {/* Large centerpiece logo — LCP element, WebP for fast load */}
-          <picture>
-            <source srcSet="/assets/images/content/Logo/me-logo.webp" type="image/webp" />
-            <img
-              src="/assets/images/content/Logo/ME Logo Draft 5.png"
-              alt="Modern Explorer"
-              fetchPriority="high"
-              width={700}
-              height={467}
-              style={{
-                width: 'clamp(300px, 48vw, 700px)',
-                height: 'auto',
-                display: 'block',
-                marginBottom: 14,
-                filter: 'drop-shadow(0 0 60px rgba(203,243,110,0.20)) drop-shadow(0 8px 24px rgba(0,0,0,0.6))',
-              }}
-            />
-          </picture>
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <ParticleHero />
 
-          {/* Brand tagline */}
-          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(13px, 1.8vw, 22px)', fontWeight: 600, color: 'rgba(203,243,110,0.9)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 10, textShadow: '0 0 20px rgba(203,243,110,0.4), 0 2px 10px rgba(0,0,0,0.8)' }}>Reigniting the Age of Discovery</p>
-
-          {/* Primary tagline — reads as one unit with the logo */}
-          <h1 style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: 'clamp(17px, 2.6vw, 30px)',
-            fontWeight: 500,
-            color: '#bdd96e',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            marginBottom: 28,
-            textShadow: '0 2px 14px rgba(0,0,0,0.75)',
-          }}>
-            Immersive Small-Group Tours Designed For Curious Travelers
-          </h1>
-
-          {/* Location line */}
-          <p style={{
-            fontFamily: 'var(--font-alt)',
-            fontSize: 'clamp(13px, 1.5vw, 18px)',
-            fontWeight: 500,
-            color: 'rgba(240,244,255,0.72)',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            marginBottom: 48,
-          }}>
-            Colorado · Crestone · San Luis Valley · Near Great Sand Dunes National Park
-          </p>
-
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 16, padding: '16px 36px' }}>
-              Explore Journeys
-            </button>
-            <a href="https://www.youtube.com/@ModernExplorer" target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ fontSize: 16, padding: '16px 36px' }}>
-              ▶ See Trailer
-            </a>
-          </div>
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 140, background: 'linear-gradient(to top, var(--bg), transparent)', zIndex: 3 }} />
-      </section>
-
-      {/* FEATURES STRIP */}
-      <section style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '56px 0' }}>
+      {/* ── THE MISSION ──────────────────────────────────────────────────── */}
+      <section className="section" style={{ background: 'var(--bg)' }}>
         <div className="container">
+          <div data-reveal style={{ textAlign: 'center', marginBottom: 56 }}>
+            <span className="eyebrow">What We Investigate</span>
+            <h2 style={{ fontSize: 'clamp(30px, 4.5vw, 52px)', marginBottom: 18 }}>
+              The Mission: Document the Unexplained
+            </h2>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, maxWidth: 580, margin: '0 auto' }}>
+              We operate with modern instruments, structured field protocols, and a commitment to data over speculation. Three primary domains, one valley with more documented incidents per square mile than almost anywhere else on the continent.
+            </p>
+          </div>
+
           <div className="grid-3">
-            {features.map(f => (
-              <div key={f.label} style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-                <div style={{ width: 48, height: 48, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-dim)', border: '1px solid var(--border-accent)', borderRadius: 6 }}>
-                  <img src={f.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'invert(1) sepia(1) hue-rotate(30deg) saturate(2)' }} />
-                </div>
-                <div>
-                  <h4 style={{ fontSize: 16, marginBottom: 6 }}>{f.label}</h4>
-                  <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6 }}>{f.desc}</p>
-                </div>
+            {missionPillars.map(p => (
+              <div key={p.label} data-reveal style={{ padding: '28px 24px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6 }}>
+                <div style={{ fontSize: 32, marginBottom: 14 }}>{p.icon}</div>
+                <h3 style={{ fontSize: 18, marginBottom: 10 }}>{p.label}</h3>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>{p.detail}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* TOURS */}
+      {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
+      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        <div className="container">
+          <div style={{ display: 'flex', gap: 64, flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* Left: copy */}
+            <div style={{ flex: '1 1 340px' }}>
+              <div data-reveal>
+                <span className="eyebrow">The Frontier</span>
+                <h2 style={{ fontSize: 'clamp(28px, 4vw, 46px)', marginBottom: 16, lineHeight: 1.1 }}>
+                  Research Access.<br />Field Tools. Community.
+                </h2>
+                <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.75, marginBottom: 28 }}>
+                  The Frontier is Modern Explorer's research membership — access to the Arcanum phenomenon database, field instrument data, active case files, and a community of serious investigators. We're building the infrastructure that serious field research has always lacked.
+                </p>
+                <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.75, marginBottom: 36 }}>
+                  The waitlist is open now. Founding members shape what gets built first.
+                </p>
+                <Link to="/membership" className="btn btn-primary" style={{ fontSize: 15, padding: '14px 32px' }}>
+                  Join the Waitlist →
+                </Link>
+              </div>
+            </div>
+            {/* Right: feature grid */}
+            <div style={{ flex: '1 1 320px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {frontierFeatures.map(f => (
+                  <div key={f.label} data-reveal style={{ display: 'flex', gap: 14, alignItems: 'flex-start', padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 5 }}>
+                    <span style={{ fontSize: 20, flexShrink: 0 }}>{f.icon}</span>
+                    <div>
+                      <p style={{ fontFamily: 'var(--font-heading)', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4, color: 'var(--accent)' }}>{f.label}</p>
+                      <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55 }}>{f.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── EXPEDITIONS & TOURS ──────────────────────────────────────────── */}
       <section id="mesa-tours" className="section">
         <div className="container">
 
-          <div data-reveal style={{ textAlign: 'center', marginBottom: 64 }}>
-            <span className="eyebrow">Tours & Expeditions</span>
-            <h2 style={{ fontSize: 'clamp(36px, 5vw, 56px)', marginBottom: 20 }}>Travel Beyond The Ordinary</h2>
-            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 18, maxWidth: 560, margin: '0 auto' }}>
-              One tour running now. More launching soon.
+          <div data-reveal style={{ textAlign: 'center', marginBottom: 48 }}>
+            <span className="eyebrow">Expeditions &amp; Tours</span>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 46px)', marginBottom: 16 }}>
+              Guided Tours of Crestone &amp; the San Luis Valley
+            </h2>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
+              One tour running now. Specialty UAP, paranormal, and multi-day expeditions in development.
             </p>
           </div>
 
           {/* Now Available label */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 0 3px rgba(74,222,128,0.2)', animation: 'meLiveDot 2s ease-in-out infinite' }} />
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4ade80' }}>Now Available</span>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
           </div>
 
-          {/* Active tour card */}
+          {/* Active tour card — Crestone Walking Tour */}
           <div className="home-tour-card">
-            {/* Image side */}
-            <div className="home-tour-image" style={{ position: 'relative', minHeight: 440 }}>
-              <img
-                src={activeTour.img}
-                alt="Crestone Walking Tour"
-                loading="lazy"
-                decoding="async"
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-              <div className="tour-gradient-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 50%, var(--bg-card))' }} />
+            <div className="home-tour-image" style={{ position: 'relative', minHeight: 400 }}>
+              <picture>
+                <source
+                  media="(max-width: 640px)"
+                  srcSet={activeTour.imgMobile}
+                  type="image/webp"
+                />
+                <img
+                  src={activeTour.img}
+                  alt="Historic black-and-white photo of old Crestone, Colorado — Crestone tours"
+                  loading="lazy"
+                  decoding="async"
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </picture>
+              <div className="tour-gradient-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 40%, var(--bg-card))' }} />
               <div style={{ position: 'absolute', top: 20, left: 20 }}>
                 <span style={{ display: 'inline-block', padding: '5px 14px', background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.4)', borderRadius: 3 }}>
                   <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#4ade80' }}>Available Now</span>
@@ -273,114 +217,82 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Content side */}
             <div className="home-tour-content" style={{ padding: '44px 44px 44px 40px' }}>
               <span className="eyebrow">The Original Tour</span>
-              <h2 style={{ fontSize: 'clamp(26px, 3vw, 42px)', marginBottom: 16, lineHeight: 1.1 }}>The Crestone<br />Walking Tour</h2>
+              <h2 style={{ fontSize: 'clamp(24px, 2.8vw, 38px)', marginBottom: 14, lineHeight: 1.1 }}>The Crestone<br />Walking Tour</h2>
               <div className="divider" />
-              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.8, marginBottom: 28 }}>
-                Crestone holds more layers of history, mystery, and unexplained phenomena per square mile than almost anywhere in Colorado. This walking tour is the full picture — from the town's spiritual sanctuary status, to its hard-labor mining past, to the UAP sightings locals have been quietly documenting for decades.
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
+                Crestone holds more layers of history, mystery, and unexplained phenomena per square mile than almost anywhere in Colorado. This walking tour covers the full picture — from the town's spiritual sanctuary status and hard-labor mining past to the UAP sightings locals have been quietly documenting for decades.
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 36 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 32 }}>
                 {activeTour.topics.map(t => (
-                  <div key={t.label} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 14px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 4 }}>
-                    <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{t.icon}</span>
+                  <div key={t.label} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '9px 12px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 4 }}>
+                    <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>{t.icon}</span>
                     <div>
-                      <p style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 1 }}>{t.label}</p>
+                      <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 1 }}>{t.label}</p>
                       <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>{t.detail}</p>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="home-tour-booking" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+              <div className="home-tour-booking" style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
                 <div>
-                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$35</span>
-                  <span style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', marginLeft: 6 }}>/ person</span>
+                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 30, fontWeight: 700, color: 'var(--accent)', letterSpacing: '-0.01em' }}>$35</span>
+                  <span style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-muted)', marginLeft: 6 }}>/ person</span>
                   <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Groups of 2–12 · 45–60 min · All ages</p>
                 </div>
-                <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '15px 36px' }}>
+                <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 14, padding: '13px 30px' }}>
                   Book This Tour →
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Coming Soon label */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+          {/* Coming Soon */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '40px 0 24px' }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', display: 'inline-block', boxShadow: '0 0 0 3px rgba(245,158,11,0.2)' }} />
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#f59e0b' }}>Coming Soon</span>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
           </div>
 
-          <div style={{ marginBottom: 32 }}>
-            <h3 style={{ fontSize: 'clamp(22px, 3vw, 34px)', marginBottom: 10 }}>More Tours On The Way</h3>
-            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15 }}>
-              Specialty tours and multi-day expeditions in development. A preview of what's on the horizon.
-            </p>
-          </div>
-
-          <div className="grid-2 home-coming-soon" style={{ marginBottom: 40 }}>
+          <div className="grid-2 home-coming-soon" style={{ marginBottom: 36 }}>
             {comingSoon.map(tour => (
               <div key={tour.title} data-cs-theme={csTheme[tour.title] || ''} style={{ position: 'relative', borderRadius: 6, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--bg-card)' }}>
-                <div style={{ position: 'relative', paddingTop: '48%', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', paddingTop: '46%', overflow: 'hidden' }}>
                   <img src={tour.img} alt={tour.title} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.32) saturate(0.5)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    {iconMap[tour.title] && (
-                      <div style={{ marginBottom: 2 }}>{iconMap[tour.title]}</div>
-                    )}
+                    {iconMap[tour.title] && <div style={{ marginBottom: 2 }}>{iconMap[tour.title]}</div>}
                     <span style={{ fontSize: iconMap[tour.title] ? 18 : 26, opacity: iconMap[tour.title] ? 0.5 : 1 }}>🔒</span>
                     <div style={{ padding: '4px 12px', background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)', borderRadius: 3 }}>
                       <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f59e0b' }}>{tour.eta}</span>
                     </div>
                   </div>
-                  {/* Drift orb overlay for UAP hover */}
-                  {csTheme[tour.title] === 'uap' && (
-                    <div className="cs-drift-orb"><OrbIcon style={{ width: 38, height: 38 }} /></div>
-                  )}
-                  {/* Flicker overlay for paranormal hover */}
-                  {csTheme[tour.title] === 'paranormal' && (
-                    <div className="cs-flicker-layer" />
-                  )}
+                  {csTheme[tour.title] === 'uap' && <div className="cs-drift-orb"><OrbIcon style={{ width: 38, height: 38 }} /></div>}
+                  {csTheme[tour.title] === 'paranormal' && <div className="cs-flicker-layer" />}
                 </div>
-                <div style={{ padding: '16px 20px 20px' }}>
-                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 4 }}>{tour.subtitle}</p>
-                  <h4 style={{ fontSize: 16 }}>{tour.title}</h4>
+                <div style={{ padding: '14px 18px 18px' }}>
+                  <p style={{ fontFamily: 'var(--font-alt)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 3 }}>{tour.subtitle}</p>
+                  <h4 style={{ fontSize: 15 }}>{tour.title}</h4>
                 </div>
               </div>
             ))}
           </div>
 
           <div style={{ textAlign: 'center' }}>
-            <Link to="/upcoming#mesa-upcoming" className="btn btn-ghost" style={{ fontSize: 14, padding: '12px 28px' }}>
-              See What's Coming →
+            <Link to="/upcoming#mesa-upcoming" className="btn btn-ghost" style={{ fontSize: 14, padding: '11px 26px' }}>
+              See All Upcoming Tours →
             </Link>
           </div>
-
         </div>
       </section>
 
-      {/* CTA BANNER */}
-      <section style={{ position: 'relative', padding: '100px 0', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('${IMG('Nature', '20250518_185929-EDIT.webp')}')`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.28)' }} />
-        <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
-          <span className="eyebrow">Ready?</span>
-          <h2 style={{ fontSize: 'clamp(36px, 6vw, 64px)', marginBottom: 24 }}>Adventure Starts at the Edge</h2>
-          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 20, color: 'rgba(240,244,255,0.8)', maxWidth: 560, margin: '0 auto 40px' }}>
-            Ready to seek the unknown? Join our guided journeys—where history, mystery, and wild landscapes come alive.
-          </p>
-          <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 16, padding: '16px 40px' }}>
-            Book Your Expedition
-          </button>
-        </div>
-      </section>
-
-      {/* FIELD REPORTS PREVIEW */}
-      <section id="mesa-reports" className="section" style={{ background: 'var(--bg-section)' }}>
+      {/* ── LATEST FROM THE FIELD ────────────────────────────────────────── */}
+      <section id="mesa-reports" className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 44, flexWrap: 'wrap', gap: 16 }}>
             <div data-reveal>
               <span className="eyebrow">From the Field</span>
-              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>With Modern Explorer<br />You Will Learn…</h2>
+              <h2 style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>Latest From the Field</h2>
             </div>
             <Link to="/field-reports" className="btn btn-ghost" style={{ fontSize: 13, padding: '10px 22px' }}>All Reports →</Link>
           </div>
@@ -390,9 +302,9 @@ export default function Home() {
                 <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
                   <img src={post.img} alt={post.title} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <div style={{ padding: '20px 22px 24px' }}>
+                <div style={{ padding: '18px 20px 22px' }}>
                   <span className="tag">{post.tag}</span>
-                  <h3 style={{ fontSize: 18, margin: '12px 0 10px' }}>{post.title}</h3>
+                  <h3 style={{ fontSize: 17, margin: '10px 0 8px' }}>{post.title}</h3>
                   <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.65 }}>{post.desc}</p>
                 </div>
               </div>
@@ -401,13 +313,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ANOMALY MAP TEASER */}
+      {/* ── ANOMALY MAP TEASER ───────────────────────────────────────────── */}
       <section style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '72px 0' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
             <div>
               <span className="eyebrow">Field Intelligence</span>
-              <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 42px)', lineHeight: 1.1, marginBottom: 8 }}>
+              <h2 style={{ fontSize: 'clamp(24px, 3.2vw, 40px)', lineHeight: 1.1, marginBottom: 8 }}>
                 1,000+ Events.<br />One Valley.
               </h2>
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, maxWidth: 440, lineHeight: 1.65 }}>
@@ -418,23 +330,8 @@ export default function Home() {
               Explore the Full Anomaly Map →
             </Link>
           </div>
-
-          {/* Teaser map */}
-          <div style={{
-            position: 'relative',
-            border: '1px solid rgba(203,243,110,.22)',
-            borderRadius: 6,
-            overflow: 'hidden',
-            boxShadow: '0 0 32px rgba(203,243,110,.06)',
-          }}>
-            {/* Top bar */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
-              background: 'linear-gradient(to bottom, rgba(2,8,4,.9), transparent)',
-              padding: '10px 14px 24px',
-              display: 'flex', alignItems: 'center', gap: 8,
-              pointerEvents: 'none',
-            }}>
+          <div style={{ position: 'relative', border: '1px solid rgba(203,243,110,.22)', borderRadius: 6, overflow: 'hidden', boxShadow: '0 0 32px rgba(203,243,110,.06)' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, background: 'linear-gradient(to bottom, rgba(2,8,4,.9), transparent)', padding: '10px 14px 24px', display: 'flex', alignItems: 'center', gap: 8, pointerEvents: 'none' }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 5px #4ade80', display: 'inline-block' }} />
               <span style={{ fontFamily: "'Courier New', monospace", fontSize: 9, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(203,243,110,.65)', textTransform: 'uppercase' }}>
                 SLV ANOMALY MAP — C. O'BRIEN (1952–2024)
@@ -446,18 +343,8 @@ export default function Home() {
               style={{ display: 'block', width: '100%', height: 320, border: 'none' }}
               loading="lazy"
             />
-            {/* Fade + CTA overlay at bottom */}
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
-              background: 'linear-gradient(to top, rgba(11,15,28,.92) 30%, transparent)',
-              padding: '40px 24px 20px',
-              display: 'flex', justifyContent: 'center',
-              pointerEvents: 'none',
-            }}>
-              <Link to="/field-reports#mesa-map"
-                className="btn btn-outline"
-                style={{ fontSize: 12, pointerEvents: 'auto', backdropFilter: 'blur(4px)' }}
-              >
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10, background: 'linear-gradient(to top, rgba(11,15,28,.92) 30%, transparent)', padding: '40px 24px 20px', display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+              <Link to="/field-reports#mesa-map" className="btn btn-outline" style={{ fontSize: 12, pointerEvents: 'auto', backdropFilter: 'blur(4px)' }}>
                 Explore the Full Anomaly Map →
               </Link>
             </div>
@@ -465,24 +352,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REVIEWS */}
+      {/* ── REVIEWS ──────────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
           <GoogleReviews />
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
       <section style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', padding: '80px 0' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <span className="eyebrow">Don't Wait</span>
-          <h2 style={{ fontSize: 'clamp(32px, 5vw, 54px)', marginBottom: 20 }}>Curious About Crestone's Secrets?</h2>
-          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 18, color: 'var(--text-muted)', maxWidth: 600, margin: '0 auto 40px', lineHeight: 1.65 }}>
-            Step into a world of hidden history, spiritual sanctuaries, and unexplained mysteries. Our guided walking tours are your invitation to explore, question, and connect.
+          <span className="eyebrow">Ready to Investigate?</span>
+          <h2 style={{ fontSize: 'clamp(28px, 4.5vw, 50px)', marginBottom: 18 }}>
+            Guided UFO &amp; Paranormal Tours in Crestone, Colorado
+          </h2>
+          <p style={{ fontFamily: 'var(--font-alt)', fontSize: 17, color: 'var(--text-muted)', maxWidth: 580, margin: '0 auto 36px', lineHeight: 1.7 }}>
+            Join a guided tour of the San Luis Valley's most documented paranormal sites — or join The Frontier and become part of the research.
           </p>
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 36px' }}>Book a Tour</button>
-            <Link to="/about" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 36px' }}>Learn About Us</Link>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 34px' }}>Book a Tour</button>
+            <Link to="/membership" className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 34px' }}>Join the Research</Link>
           </div>
         </div>
       </section>

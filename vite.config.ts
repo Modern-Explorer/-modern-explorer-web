@@ -38,9 +38,6 @@ export default defineConfig({
           if (id.includes('node_modules/@stripe/') || id.includes('node_modules/prop-types/'))
             return 'vendor-stripe'
 
-          // Three.js — lazy-loaded post-LCP by /hero-lab only
-          if (id.includes('node_modules/three/'))
-            return 'vendor-three'
         },
       },
     },
