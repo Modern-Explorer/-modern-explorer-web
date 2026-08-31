@@ -12,7 +12,7 @@ const SITE_NAME  = 'Modern Explorer';
 const GSC_ID     = import.meta.env.VITE_GSC_VERIFICATION as string | undefined;
 const DEFAULT_IMG = '/assets/images/content/Logo/ME Logo Draft 5.png';
 const BASE_URL   = 'https://modernexplorer.me';
-const DEFAULT_KW = 'Crestone Colorado tours, San Luis Valley, Great Sand Dunes, Sangre de Cristo mountains, UFO tours Colorado, paranormal tours, cryptozoology, Spanish treasure, Sasquatch expedition, guided tours Colorado, supernatural Colorado';
+const DEFAULT_KW = 'Crestone Colorado tours, San Luis Valley, Great Sand Dunes, Sangre de Cristo mountains, UFO tours Colorado, paranormal tours, cryptozoology, cryptid research, Spanish treasure, field operations, guided tours Colorado, supernatural Colorado';
 
 export default function SEO({ title, description, keywords, image, url }: SEOProps) {
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;

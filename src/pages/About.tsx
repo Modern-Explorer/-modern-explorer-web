@@ -68,6 +68,22 @@ export default function About() {
             </p>
           </div>
 
+          {/* Four investigation domains */}
+          <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, maxWidth: 900, margin: '48px auto 0' }}>
+            {[
+              { icon: '🛸', label: 'UAP & Aerial Phenomena', sub: 'Witness data, radar correlation, hotspot mapping' },
+              { icon: '🐾', label: 'Cryptozoology', sub: 'Unclassified animals — open biological and anomalous investigation' },
+              { icon: '🏛️', label: 'Lost History & Archaeology', sub: 'Petroglyphs, anomalous ruins, oral histories outside the timeline' },
+              { icon: '🧭', label: 'Field Operations', sub: 'Methodology, instruments, protocols, data chain-of-custody' },
+            ].map(d => (
+              <div key={d.label} style={{ padding: '18px 20px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6 }}>
+                <div style={{ fontSize: 22, marginBottom: 8 }}>{d.icon}</div>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 6 }}>{d.label}</p>
+                <p style={{ fontFamily: 'var(--font-alt)', fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.55 }}>{d.sub}</p>
+              </div>
+            ))}
+          </div>
+
           {/* Loop diagram */}
           <div style={{ marginTop: 56, display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
             {[
@@ -135,6 +151,26 @@ export default function About() {
         </div>
       </section>
 
+      {/* CRYPTOZOOLOGY FRAMING */}
+      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
+        <div className="container">
+          <div style={{ maxWidth: 820, margin: '0 auto' }}>
+            <span className="eyebrow">Cryptozoology</span>
+            <h2 style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: 28 }}>An Open Investigation</h2>
+            <div className="divider" />
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, lineHeight: 1.82, marginBottom: 22 }}>
+              The category covers unclassified animals — Sasquatch, dogman, thunderbirds, lake creatures — but the real question isn't whether they exist. It's what kind of thing they are. Some witnesses describe encounters that are entirely physical: tracks in mud, hair samples, thermal signatures, a large animal moving through terrain in daylight. Other witnesses, at the same locations, report something different — lights, missing time, apparent telepathy, phenomena that don't behave like biology.
+            </p>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, lineHeight: 1.82, marginBottom: 22 }}>
+              We don't resolve that contradiction in advance. We collect both kinds of reports, structure them, and ask what the data shows: Are the physical encounters and the anomalous encounters happening at the same sites? At different times of year? With different witness profiles? What does the geographic distribution actually look like when you map it?
+            </p>
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, lineHeight: 1.82 }}>
+              Sasquatch is the most documented example in the American West — which is why it gets the most fieldwork hours. But it isn't the category. The category is everything the mainstream has decided not to study. We study it.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* GALLERY STRIP */}
       <section style={{ overflow: 'hidden', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', height: 280 }}>
@@ -182,6 +218,7 @@ export default function About() {
                 { title: 'The Arcanum', desc: 'A structured database of field observations across cryptozoology, UAP, and archaeological anomalies. Built to be queried, not just scrolled. This is what separates fieldwork from folklore.' },
                 { title: 'Field Tools', desc: 'Custom instruments, protocols, and software built for the specific demands of high-strangeness research in remote terrain. If the right tool doesn\'t exist, we build it.' },
                 { title: 'Drones, LIDAR & Sensors', desc: 'Modern aerial and ground-sensing platforms for terrain mapping, thermal work, and anomaly detection. The same technology used in legitimate archaeology and conservation — applied here.' },
+                { title: 'Field Operations Methodology', desc: 'Reconnaissance protocols, night operation procedures, site survey standards, and chain-of-custody data handling. The operational framework that makes the other three domains produce evidence instead of stories.' },
               ].map(item => (
                 <div key={item.title} style={{ padding: '22px 28px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 6, display: 'flex', gap: 20, alignItems: 'flex-start' }}>
                   <div style={{ width: 3, flexShrink: 0, alignSelf: 'stretch', background: 'var(--accent)', borderRadius: 2, opacity: 0.6 }} />

@@ -50,7 +50,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
     'https://x.com/ModernExplorer5',
   ],
   hasMap: 'https://modernexplorer.me/field-reports',
-  knowsAbout: ['UFO sightings','paranormal research','San Luis Valley','Crestone Colorado','Spanish treasure','cryptozoology','Sasquatch'],
+  knowsAbout: ['UFO sightings','paranormal research','San Luis Valley','Crestone Colorado','Spanish treasure','cryptozoology','cryptid research','field operations'],
 };
 
 export const TOURIST_TRIP_SCHEMA = {

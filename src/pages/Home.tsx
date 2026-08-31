@@ -16,14 +16,19 @@ const missionPillars = [
     detail: 'The San Luis Valley is one of North America\'s most documented UAP corridors. We collect witness testimony, correlate it with radar and sensor data, and map the hotspot clusters.',
   },
   {
-    icon: '🦶',
-    label: 'Cryptozoology & Bigfoot',
-    detail: 'Systematic footprint casting, hair sample collection, and habitat analysis across the Sangre de Cristo range — applying wildlife forensics to encounters the mainstream ignores.',
+    icon: '🐾',
+    label: 'Cryptozoology',
+    detail: 'Unclassified animals — Sasquatch, dogman, thunderbirds, lake creatures — investigated as an open question: flesh-and-blood biology, something more anomalous, or both? We collect track evidence, hair samples, and structured witness data to find out what the distribution actually shows.',
   },
   {
     icon: '🏛️',
     label: 'Lost History & Archaeology',
     detail: 'Pre-Columbian petroglyphs, anomalous ruins, and oral histories that don\'t fit the accepted timeline. We document, photograph, and cross-reference with academic sources.',
+  },
+  {
+    icon: '🧭',
+    label: 'Field Operations',
+    detail: 'Reconnaissance, night operations, site surveys, drone mapping, and sensor deployment. The methodology — instruments, protocols, chain-of-custody data capture — that turns field time into evidence instead of stories.',
   },
 ];
 
@@ -103,12 +108,12 @@ export default function Home() {
             <h2 style={{ fontSize: 'clamp(30px, 4.5vw, 52px)', marginBottom: 18 }}>
               The Mission: Document the Unexplained
             </h2>
-            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, maxWidth: 580, margin: '0 auto' }}>
-              We operate with modern instruments, structured field protocols, and a commitment to data over speculation. Three primary domains, one valley with more documented incidents per square mile than almost anywhere else on the continent.
+            <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 17, maxWidth: 600, margin: '0 auto' }}>
+              We operate with modern instruments, structured field protocols, and a commitment to data over speculation. Four primary domains — one valley with more documented incidents per square mile than almost anywhere else on the continent.
             </p>
           </div>
 
-          <div className="grid-3">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 16 }}>
             {missionPillars.map(p => (
               <div key={p.label} data-reveal style={{ padding: '28px 24px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6 }}>
                 <div style={{ fontSize: 32, marginBottom: 14 }}>{p.icon}</div>
