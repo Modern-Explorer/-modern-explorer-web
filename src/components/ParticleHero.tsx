@@ -812,7 +812,7 @@ export default function ParticleHero() {
           Colorado · Crestone · San Luis Valley · Near Great Sand Dunes
         </p>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button onClick={() => openWaitlist('hero')} className="btn btn-primary" style={{ fontSize: 15, padding: '15px 32px' }}>Join the Research</button>
+          <button onClick={() => openWaitlist('Home — Join the Research (hero)')} className="btn btn-primary" style={{ fontSize: 15, padding: '15px 32px' }}>Join the Research</button>
           <button onClick={() => document.getElementById('mesa-tours')?.scrollIntoView({ behavior: 'smooth' })} className="btn btn-ghost" style={{ fontSize: 15, padding: '15px 32px' }}>Explore With Us ↓</button>
         </div>
       </div>

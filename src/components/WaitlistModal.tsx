@@ -33,20 +33,21 @@ export default function WaitlistModal() {
   const { isOpen, source, close } = useWaitlist();
   const formId = useId();
 
-  const [name,    setName]    = useState('');
-  const [email,   setEmail]   = useState('');
-  const [phone,   setPhone]   = useState('');
-  const [message, setMessage] = useState('');
-  const [pot,     setPot]     = useState('');
-  const [status,  setStatus]  = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errMsg,  setErrMsg]  = useState('');
+  const [name,     setName]     = useState('');
+  const [email,    setEmail]    = useState('');
+  const [phone,    setPhone]    = useState('');
+  const [interest, setInterest] = useState('');
+  const [message,  setMessage]  = useState('');
+  const [pot,      setPot]      = useState('');
+  const [status,   setStatus]   = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errMsg,   setErrMsg]   = useState('');
 
   const emailRef = useRef<HTMLInputElement>(null);
 
   // Reset form on open
   useEffect(() => {
     if (isOpen) {
-      setName(''); setEmail(''); setPhone(''); setMessage(''); setPot('');
+      setName(''); setEmail(''); setPhone(''); setInterest(''); setMessage(''); setPot('');
       setStatus('idle'); setErrMsg('');
       setTimeout(() => emailRef.current?.focus(), 80);
     }
@@ -101,12 +102,13 @@ export default function WaitlistModal() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name:    trimmedName,
-          email:   trimmedEmail,
-          phone:   phone.trim() || undefined,
-          message: message.trim() || undefined,
+          name:     trimmedName,
+          email:    trimmedEmail,
+          phone:    phone.trim() || undefined,
+          interest: interest || undefined,
+          message:  message.trim() || undefined,
           source,
-          website: pot,
+          website:  pot,
         }),
       });
       const json = await res.json() as { ok?: boolean; error?: string };
@@ -257,6 +259,30 @@ export default function WaitlistModal() {
                     onFocus={e => (e.currentTarget.style.borderColor = 'rgba(203,243,110,0.45)')}
                     onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
                   />
+                </div>
+
+                {/* Interest (optional) */}
+                <div>
+                  <label htmlFor={`${formId}-interest`} style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,244,255,0.5)', marginBottom: 7 }}>
+                    What are you most interested in? <span style={{ opacity: 0.45, fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <select
+                    id={`${formId}-interest`}
+                    value={interest}
+                    onChange={e => setInterest(e.target.value)}
+                    style={{ ...inputStyle, appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer', paddingRight: 36, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240,244,255,0.35)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
+                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(203,243,110,0.45)')}
+                    onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)')}
+                  >
+                    <option value="">— pick one —</option>
+                    <option value="expeditions-tours">Expeditions &amp; Tours</option>
+                    <option value="uap-research">UAP Research</option>
+                    <option value="cryptozoology">Cryptozoology</option>
+                    <option value="lost-history">Lost History &amp; Archaeology</option>
+                    <option value="frontier-membership">The Frontier Membership</option>
+                    <option value="courses-training">Courses &amp; Training</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
 
                 {/* Message (optional) */}

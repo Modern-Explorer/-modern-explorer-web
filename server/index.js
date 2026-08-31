@@ -143,21 +143,45 @@ function saveWaitlist(entries) {
   fs.writeFileSync(WAITLIST_FILE, JSON.stringify(entries, null, 2));
 }
 
-function buildMailer() {
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
-    connectionTimeout: 8000,
-    socketTimeout: 8000,
-  });
-}
+const WAITLIST_INTEREST_LABELS = {
+  'expeditions-tours':   'Expeditions & Tours',
+  'uap-research':        'UAP Research',
+  'cryptozoology':       'Cryptozoology',
+  'lost-history':        'Lost History & Archaeology',
+  'frontier-membership': 'The Frontier Membership',
+  'courses-training':    'Courses & Training',
+  'other':               'Other',
+};
 
 function mailConfigured() {
-  return !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+  return !!process.env.RESEND_API_KEY;
+}
+
+async function sendMail({ from, to, replyTo, subject, html }) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from,
+      to: Array.isArray(to) ? to : [to],
+      reply_to: replyTo,
+      subject,
+      html,
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend ${res.status}: ${body}`);
+  }
+  return res.json();
 }
 
 app.post('/api/waitlist', async (req, res) => {
-  const { name, email, phone, message, source, website } = req.body;
+  const { name, email, phone, interest, message, source, website } = req.body;
 
   // Honeypot
   if (website) return res.json({ ok: true });
@@ -170,9 +194,12 @@ app.post('/api/waitlist', async (req, res) => {
     return res.status(400).json({ error: 'A valid email address is required.' });
   }
 
-  const trimmedName  = name.trim();
-  const trimmedPhone = phone?.trim() || null;
-  const trimmedMsg   = message?.trim() || null;
+  const trimmedName     = name.trim();
+  const trimmedPhone    = phone?.trim() || null;
+  const trimmedMsg      = message?.trim() || null;
+  const trimmedInterest = interest?.trim() || null;
+  const interestLabel   = WAITLIST_INTEREST_LABELS[trimmedInterest] || trimmedInterest || 'Not specified';
+  const sourceLabel     = source || 'unknown';
 
   const entries = loadWaitlist();
   const isNew   = !entries.find(e => e.email === trimmedEmail);
@@ -181,70 +208,113 @@ app.post('/api/waitlist', async (req, res) => {
     entries.push({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: trimmedName, email: trimmedEmail,
-      phone: trimmedPhone, message: trimmedMsg,
-      source: source || 'unknown',
+      phone: trimmedPhone,
+      interest: trimmedInterest,
+      message: trimmedMsg,
+      source: sourceLabel,
       createdAt: new Date().toISOString(),
     });
     saveWaitlist(entries);
   }
 
-  // Send emails (fire-and-forget — only when credentials are configured)
-  if (mailConfigured()) try {
-    const mailer = buildMailer();
+  // Build notification email — sent for BOTH new and repeat signups.
+  // Repeats are a signal (interest confirmed, new context), not noise.
+  if (mailConfigured()) {
+    const firstName  = trimmedName.split(' ')[0];
+    const lastInit   = trimmedName.split(' ').slice(1).map(p => p[0]).join('').toUpperCase();
+    const displayName = lastInit ? `${firstName} ${lastInit}.` : firstName;
+    const statusBadge = isNew
+      ? `<span style="background:#22c55e;color:#fff;border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.06em">NEW</span>`
+      : `<span style="background:#f59e0b;color:#fff;border-radius:3px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.06em">REPEAT</span>`;
+    const ts = new Date().toUTCString();
 
-    // Notification to internal waitlist address
-    await mailer.sendMail({
-      from:    `"Modern Explorer" <${process.env.GMAIL_USER}>`,
-      to:      'waitlist@modernexplorer.me',
-      replyTo: trimmedEmail,
-      subject: isNew ? `[Waitlist] New signup — ${trimmedName}` : `[Waitlist] Duplicate attempt — ${trimmedName}`,
-      html: `
-        <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-          <div style="background:#0b0f1c;padding:24px 28px;border-radius:6px 6px 0 0">
-            <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#cbf36e;opacity:.8">Modern Explorer</p>
-            <h1 style="margin:8px 0 0;font-size:20px;color:#fff">${isNew ? 'New Waitlist Signup' : 'Duplicate Waitlist Attempt'}</h1>
-          </div>
-          <div style="background:#f8f8f6;padding:28px;border:1px solid #e5e5e0;border-top:none">
-            <table style="width:100%;border-collapse:collapse;font-size:14px">
-              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e5e0;width:90px;color:#666;font-weight:600">Name</td><td style="padding:8px 0;border-bottom:1px solid #e5e5e0">${trimmedName}</td></tr>
-              <tr><td style="padding:8px 0;border-bottom:1px solid #e5e5e0;color:#666;font-weight:600">Email</td><td style="padding:8px 0;border-bottom:1px solid #e5e5e0"><a href="mailto:${trimmedEmail}" style="color:#1a6cbf">${trimmedEmail}</a></td></tr>
-              ${trimmedPhone ? `<tr><td style="padding:8px 0;border-bottom:1px solid #e5e5e0;color:#666;font-weight:600">Phone</td><td style="padding:8px 0;border-bottom:1px solid #e5e5e0">${trimmedPhone}</td></tr>` : ''}
-              <tr><td style="padding:8px 0;color:#666;font-weight:600">Source</td><td style="padding:8px 0">${source || 'unknown'}</td></tr>
-            </table>
-            ${trimmedMsg ? `<h3 style="margin:20px 0 8px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#444">Message</h3><p style="margin:0;color:#333;line-height:1.7;white-space:pre-wrap;font-size:14px">${trimmedMsg}</p>` : ''}
-          </div>
-          <div style="padding:12px 28px;background:#f0f0ec;border:1px solid #e5e5e0;border-top:none;border-radius:0 0 6px 6px">
-            <p style="margin:0;font-size:11px;color:#999">Total waitlist: ${entries.length} · Sent via modernexplorer.me</p>
-          </div>
-        </div>`,
-    });
+    const notifSubject = isNew
+      ? `Waitlist: ${interestLabel} — ${displayName}`
+      : `Waitlist (repeat): ${interestLabel} — ${displayName}`;
 
-    // Confirmation to the signer (only for new entries)
-    if (isNew) {
-      await mailer.sendMail({
-        from:    `"Modern Explorer" <${process.env.GMAIL_USER}>`,
-        to:      trimmedEmail,
-        subject: `You're on the waitlist — Modern Explorer`,
-        html: `
-          <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-            <div style="background:#0b0f1c;padding:24px 28px;border-radius:6px 6px 0 0">
-              <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#cbf36e;opacity:.8">Modern Explorer · The Frontier</p>
-              <h1 style="margin:8px 0 0;font-size:22px;color:#fff">You're on the list, ${trimmedName.split(' ')[0]}.</h1>
-            </div>
-            <div style="background:#f8f8f6;padding:28px;border:1px solid #e5e5e0;border-top:none">
-              <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333">The Frontier isn't open yet — but when it is, you'll hear first. Founding members get locked-in rates and a founding badge that never resets.</p>
-              <p style="margin:0;font-size:15px;line-height:1.7;color:#333">Until then, explore what we're building at <a href="https://modernexplorer.me/membership" style="color:#1a6cbf">modernexplorer.me/membership</a>.</p>
-            </div>
-            <div style="padding:12px 28px;background:#f0f0ec;border:1px solid #e5e5e0;border-top:none;border-radius:0 0 6px 6px">
-              <p style="margin:0;font-size:11px;color:#999">Modern Explorer · Crestone, CO · You're receiving this because you joined our waitlist.</p>
-            </div>
-          </div>`,
+    const notifHtml = `
+      <div style="font-family:system-ui,sans-serif;max-width:580px;margin:0 auto;color:#1a1a1a">
+        <div style="background:#0b0f1c;padding:22px 28px;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:14px">
+          <div>
+            <p style="margin:0;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#cbf36e;opacity:.75">Modern Explorer · Waitlist</p>
+            <h1 style="margin:6px 0 0;font-size:19px;font-weight:600;color:#fff">${isNew ? 'New Signup' : 'Repeat Signup'} &nbsp;${statusBadge}</h1>
+          </div>
+        </div>
+        <div style="background:#f8f8f6;padding:0;border:1px solid #e5e5e0;border-top:none">
+          <table style="width:100%;border-collapse:collapse;font-size:14px">
+            <tr style="background:#fff">
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;width:110px;color:#555;font-weight:600;white-space:nowrap">Name</td>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;font-weight:600">${trimmedName}</td>
+            </tr>
+            <tr>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;color:#555;font-weight:600">Email</td>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee"><a href="mailto:${trimmedEmail}" style="color:#1a6cbf">${trimmedEmail}</a></td>
+            </tr>
+            ${trimmedPhone ? `<tr style="background:#fff"><td style="padding:11px 20px;border-bottom:1px solid #eee;color:#555;font-weight:600">Phone</td><td style="padding:11px 20px;border-bottom:1px solid #eee">${trimmedPhone}</td></tr>` : ''}
+            <tr${trimmedPhone ? '' : ' style="background:#fff"'}>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;color:#555;font-weight:600">Interest</td>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;color:#0b0f1c;font-weight:600">${interestLabel}</td>
+            </tr>
+            <tr style="background:#fff">
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;color:#555;font-weight:600">Source</td>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;font-family:ui-monospace,monospace;font-size:12px;color:#666">${sourceLabel}</td>
+            </tr>
+            <tr>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;color:#555;font-weight:600">Signed</td>
+              <td style="padding:11px 20px;border-bottom:1px solid #eee;font-size:13px;color:#666">${ts}</td>
+            </tr>
+            <tr style="background:#fff">
+              <td style="padding:11px 20px;color:#555;font-weight:600">List size</td>
+              <td style="padding:11px 20px;font-weight:600">${entries.length}</td>
+            </tr>
+          </table>
+          ${trimmedMsg ? `
+          <div style="padding:16px 20px 20px;border-top:1px solid #eee">
+            <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#888">Their message</p>
+            <p style="margin:0;color:#222;line-height:1.75;white-space:pre-wrap;font-size:14px;font-style:italic">"${trimmedMsg}"</p>
+          </div>` : ''}
+        </div>
+        <div style="padding:10px 20px;background:#f0f0ec;border:1px solid #e5e5e0;border-top:none;border-radius:0 0 6px 6px">
+          <p style="margin:0;font-size:11px;color:#aaa">modernexplorer.me · Reply-To is set to the signer's address</p>
+        </div>
+      </div>`;
+
+    try {
+      await sendMail({
+        from:    'Modern Explorer <hello@modernexplorer.me>',
+        to:      'waitlist@modernexplorer.me',
+        replyTo: trimmedEmail,
+        subject: notifSubject,
+        html:    notifHtml,
       });
+
+      // Subscriber confirmation — new signups only
+      if (isNew) {
+        await sendMail({
+          from:    'Modern Explorer <hello@modernexplorer.me>',
+          to:      trimmedEmail,
+          subject: `You're on the waitlist — Modern Explorer`,
+          html: `
+            <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
+              <div style="background:#0b0f1c;padding:24px 28px;border-radius:6px 6px 0 0">
+                <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#cbf36e;opacity:.8">Modern Explorer · The Frontier</p>
+                <h1 style="margin:8px 0 0;font-size:22px;color:#fff">You're on the list, ${firstName}.</h1>
+              </div>
+              <div style="background:#f8f8f6;padding:28px;border:1px solid #e5e5e0;border-top:none">
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333">The Frontier isn't open yet — but when it is, you'll hear first. Founding members get locked-in rates and a founding badge that never resets.</p>
+                <p style="margin:0;font-size:15px;line-height:1.7;color:#333">Until then, explore what we're building at <a href="https://modernexplorer.me/membership" style="color:#1a6cbf">modernexplorer.me/membership</a>.</p>
+              </div>
+              <div style="padding:12px 28px;background:#f0f0ec;border:1px solid #e5e5e0;border-top:none;border-radius:0 0 6px 6px">
+                <p style="margin:0;font-size:11px;color:#999">Modern Explorer · Crestone, CO · You're receiving this because you joined our waitlist.</p>
+              </div>
+            </div>`,
+        });
+      }
+    } catch (mailErr) {
+      console.error('Waitlist mail error:', mailErr.message);
     }
-  } catch (mailErr) {
-    console.error('Waitlist mail error:', mailErr.message);
   } else {
-    console.warn('Waitlist: email skipped — GMAIL_USER/GMAIL_APP_PASSWORD not configured');
+    console.warn('Waitlist: email skipped — RESEND_API_KEY not configured');
   }
 
   res.json({ ok: true });
@@ -256,7 +326,7 @@ app.get('/api/waitlist/export.csv', (req, res) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   const entries = loadWaitlist();
-  const header  = ['id', 'name', 'email', 'phone', 'message', 'source', 'createdAt'];
+  const header  = ['id', 'name', 'email', 'phone', 'interest', 'source', 'message', 'createdAt'];
   const rows    = entries.map(e =>
     header.map(k => `"${String(e[k] ?? '').replace(/"/g, '""')}"`).join(',')
   );

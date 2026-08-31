@@ -108,7 +108,7 @@ export default function Membership() {
 
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginTop: 16 }}>
           <button
-            onClick={() => openWaitlist('membership-hero')}
+            onClick={() => openWaitlist('Membership — Hero section')}
             className="btn btn-primary"
             style={{ padding: '13px 32px', fontSize: 14 }}
           >
@@ -236,7 +236,7 @@ export default function Membership() {
             We'll email you the moment doors open — and founding members get first access, locked-in rates, and a founding badge that never resets.
           </p>
           <button
-            onClick={() => openWaitlist('membership-waitlist')}
+            onClick={() => openWaitlist('Membership — Waitlist CTA')}
             className="btn btn-primary"
             style={{ padding: '14px 40px', fontSize: 15 }}
           >

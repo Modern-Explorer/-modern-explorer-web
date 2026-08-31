@@ -144,7 +144,7 @@ export default function Home() {
                 <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.75, marginBottom: 36 }}>
                   The waitlist is open now. Founding members shape what gets built first.
                 </p>
-                <button onClick={() => openWaitlist('home-frontier')} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 32px' }}>
+                <button onClick={() => openWaitlist('Home — The Frontier section')} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 32px' }}>
                   Join the Waitlist →
                 </button>
               </div>
@@ -378,7 +378,7 @@ export default function Home() {
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={openBooking} className="btn btn-primary" style={{ fontSize: 15, padding: '14px 34px' }}>Book a Tour</button>
-            <button onClick={() => openWaitlist('home-cta')} className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 34px' }}>Join the Research</button>
+            <button onClick={() => openWaitlist('Home — Bottom CTA')} className="btn btn-ghost" style={{ fontSize: 15, padding: '14px 34px' }}>Join the Research</button>
           </div>
         </div>
       </section>

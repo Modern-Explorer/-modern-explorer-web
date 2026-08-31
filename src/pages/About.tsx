@@ -147,7 +147,7 @@ export default function About() {
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.78, marginBottom: 32 }}>
                 Modern Explorer exists because the San Luis Valley demands it. There's more genuinely unexplained activity concentrated here than almost anywhere in the United States, and almost none of it is being studied rigorously. That's the gap we're filling.
               </p>
-              <button onClick={() => openWaitlist('about-mateo')} className="btn btn-primary">Join the Research</button>
+              <button onClick={() => openWaitlist('About — Founder bio')} className="btn btn-primary">Join the Research</button>
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default function About() {
               ))}
             </div>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <button onClick={() => openWaitlist('about-building')} className="btn btn-primary">Join the Research</button>
+              <button onClick={() => openWaitlist('About — Building section')} className="btn btn-primary">Join the Research</button>
               <Link to="/#mesa-tours" className="btn btn-ghost">Browse Tours</Link>
             </div>
           </div>
