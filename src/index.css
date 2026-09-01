@@ -784,7 +784,8 @@ h1, h2, h3, h4, h5 {
   gap: 14px;
   padding: 6vh 0 0;
   overflow: hidden;
-  background: rgba(255, 240, 210, 0.022); /* barely-perceptible warm ground so char reads darker */
+  /* Warm parchment-dark ground: char (dark brown) reads as carved mark against this */
+  background: radial-gradient(ellipse 88% 75% at 50% 46%, rgba(185, 140, 55, 0.14) 0%, transparent 100%);
 }
 .gc-col-left  { left: 40px; }
 .gc-col-right { right: 40px; }
@@ -828,12 +829,12 @@ h1, h2, h3, h4, h5 {
   100% { filter: drop-shadow(0 -0.5px 0 rgba(200, 130, 50, 0.10)) drop-shadow(0 1px 0 rgba(0, 0, 0, 0.95)); }
 }
 
-/* Burned state: scorched near-black char; canvas overlay drives the actual reveal */
+/* Burned state: dark scorched char visible against warm column ground */
 .gc-glyph.gc-glyph-burned {
-  color: rgba(30, 20, 12, 0.90);
+  color: rgba(58, 40, 22, 0.93);
   text-shadow:
-    0 0 4px rgba(160, 90, 30, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.95);
+    0 0 5px rgba(120, 70, 20, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.90);
   animation: gc-burn-glow 3s ease-out forwards;
 }
 

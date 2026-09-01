@@ -155,7 +155,7 @@ function LidarMark() {
 
 // ── Canvas fire-burn helper ───────────────────────────────────────────────────
 
-const BURN_BG = '#0b0f1c';
+const BURN_BG = 'rgb(16, 13, 9)'; // warm dark to match amber column ground, not cold navy
 
 function startBurn(el: HTMLElement, delay: number): () => void {
   const canvas = document.createElement('canvas');
