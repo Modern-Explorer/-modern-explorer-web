@@ -27,13 +27,14 @@ export default function MerchStore() {
     script.onerror = () => { if (mountedRef.current) setShowFallback(true); };
     document.head.appendChild(script);
 
-    // If the embed hasn't replaced the placeholder after 6s, show the fallback link.
+    // If the embed hasn't replaced the placeholder after 8s, show the fallback link.
+    // Check: if the first child is still the original <a> tag, Spreadshop never took over.
     const timer = setTimeout(() => {
       if (!mountedRef.current) return;
       const el = document.getElementById('myShop');
-      // Spreadshop replaces the anchor with its own iframe/div; if still just one child it failed.
-      if (!el || el.childElementCount <= 1) setShowFallback(true);
-    }, 6000);
+      const firstChild = el?.firstElementChild;
+      if (!el || firstChild?.tagName === 'A') setShowFallback(true);
+    }, 8000);
 
     return () => {
       mountedRef.current = false;
@@ -84,9 +85,11 @@ export default function MerchStore() {
             </p>
           </div>
         ) : (
-          <div id="myShop" style={{ minHeight: 600 }}>
-            <a href="https://modernexplorer.myspreadshop.com">Modern Explorer Store</a>
-          </div>
+          <div
+            id="myShop"
+            style={{ minHeight: 600 }}
+            dangerouslySetInnerHTML={{ __html: '<a href="https://modernexplorer.myspreadshop.com">Modern Explorer Store</a>' }}
+          />
         )}
       </section>
 
