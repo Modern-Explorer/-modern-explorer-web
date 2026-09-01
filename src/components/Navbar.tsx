@@ -1,18 +1,13 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useBooking } from '../context/BookingContext';
+import rawLinks from '../data/navLinks.json';
 
 type NavItem = { to: string; label: string } | { href: string; label: string };
-const links: NavItem[] = [
-  { to: '/', label: 'Home' },
-  { to: '/about', label: 'About' },
-  { to: '/field-reports', label: 'Field Reports' },
-  { to: '/upcoming', label: 'Upcoming' },
-  { href: '/lab', label: 'Field Lab' },
-  { to: '/merch', label: 'Merch' },
-  { to: '/contact', label: 'Contact' },
-  { to: '/faq', label: 'FAQ' },
-];
+type RawLink = { href: string; label: string; external?: boolean };
+const links: NavItem[] = (rawLinks as RawLink[]).map(l =>
+  l.external ? { href: l.href, label: l.label } : { to: l.href, label: l.label }
+);
 
 // Membership Login is a separate action button, not in the main links list,
 // to keep the nav uncluttered while giving it visual separation.

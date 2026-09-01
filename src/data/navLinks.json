@@ -1,0 +1,11 @@
+[
+  { "href": "/", "label": "Home" },
+  { "href": "/about", "label": "About" },
+  { "href": "/field-reports", "label": "Field Reports" },
+  { "href": "/upcoming", "label": "Upcoming" },
+  { "href": "/lab", "label": "Field Lab", "external": true },
+  { "href": "/merch", "label": "Merch" },
+  { "href": "/contact", "label": "Contact" },
+  { "href": "/faq", "label": "FAQ" },
+  { "href": "/nav-verify", "label": "NavVerify" }
+]
