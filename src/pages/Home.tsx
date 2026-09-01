@@ -287,6 +287,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* bottom boundary for margin cipher — JS reads this to clip columns */}
+      <div data-gc-end />
 
       <GlyphDivider />
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}

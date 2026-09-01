@@ -315,6 +315,7 @@ export default function GlyphColumns() {
   const [show, setShow] = useState(false);
   const [lens, setLens] = useState<LensState | null>(null);
   const lensRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1440px)');
@@ -323,6 +324,23 @@ export default function GlyphColumns() {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
+
+  // Clip wrapper height to the sentinel placed after the Mission section
+  useEffect(() => {
+    if (!show) return;
+    const measure = () => {
+      const sentinel = document.querySelector('[data-gc-end]') as HTMLElement | null;
+      const wrapper = wrapperRef.current;
+      if (!sentinel || !wrapper) return;
+      const sentinelTop = sentinel.getBoundingClientRect().top + window.pageYOffset;
+      const wrapperTop = wrapper.getBoundingClientRect().top + window.pageYOffset;
+      wrapper.style.height = `${Math.max(0, sentinelTop - wrapperTop)}px`;
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [show]);
 
   // Follow mouse with lens (no CSS transition on position — direct assignment for lag-free tracking)
   useEffect(() => {
@@ -380,7 +398,7 @@ export default function GlyphColumns() {
       </div>
 
       {/* ── Column wrapper ─────────────────────────────────────────────── */}
-      <div className="gc-wrapper" aria-hidden="true">
+      <div ref={wrapperRef} className="gc-wrapper" aria-hidden="true">
         <GlyphColumn
           stanzas={LEFT_STANZAS}
           dividers={LEFT_DIVIDERS}

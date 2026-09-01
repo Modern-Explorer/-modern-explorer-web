@@ -762,7 +762,10 @@ h1, h2, h3, h4, h5 {
 
 .gc-wrapper {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 185vh; /* fallback before JS measures sentinel */
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
@@ -771,13 +774,15 @@ h1, h2, h3, h4, h5 {
 .gc-col {
   position: absolute;
   top: 0;
-  bottom: 0;
+  height: auto;
+  max-height: 185vh; /* sentinel JS refines this; rough clip covers hero + mission */
   width: clamp(150px, calc((100vw - 1280px) / 2), 200px);
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   align-items: center;
-  padding: 6vh 0 5vh;
+  gap: 14px;
+  padding: 6vh 0 0;
   overflow: hidden;
 }
 .gc-col-left  { left: 40px; }
@@ -789,14 +794,15 @@ h1, h2, h3, h4, h5 {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  gap: 6px;
 }
 
 /* Individual glyph cell — text rendered via Noto script fonts */
 .gc-glyph {
   width: 100%;
   text-align: center;
-  font-size: clamp(105px, calc((100vw - 1280px) * 0.35), 140px);
-  line-height: 1.05;
+  font-size: clamp(76px, calc((100vw - 1280px) * 0.22), 98px);
+  line-height: 1.0;
   color: rgba(203, 243, 110, 0);
   pointer-events: auto;
   user-select: text;
@@ -888,8 +894,8 @@ h1, h2, h3, h4, h5 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 6px 0;
+  gap: 4px;
+  padding: 4px 0;
   pointer-events: none;
 }
 .gc-divider-rule {
@@ -904,7 +910,7 @@ h1, h2, h3, h4, h5 {
   gap: 4px;
 }
 .gc-concept-glyph {
-  font-size: 26px;
+  font-size: 22px;
   color: rgba(203, 243, 110, 0.45);
   line-height: 1;
   pointer-events: auto;
