@@ -6,6 +6,5 @@
   { "href": "/lab", "label": "Field Lab", "external": true },
   { "href": "/merch", "label": "Merch" },
   { "href": "/contact", "label": "Contact" },
-  { "href": "/faq", "label": "FAQ" },
-  { "href": "/nav-verify", "label": "NavVerify" }
+  { "href": "/faq", "label": "FAQ" }
 ]
