@@ -3,10 +3,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type GlyphEntry = {
-  char: string;   // Unicode character(s)
-  trans: string;  // Transliteration shown in hover lens
-  uname: string;  // Gardiner / sign-list code shown in hover lens
+  char: string;       // Unicode character(s)
+  phon: string;       // Phonetic value: "ı͗", "dingir", "ka"
+  uname: string;      // Gardiner / sign-list code: "M017", "AN", "KA"
   font: 'egy' | 'sux';
+  word: string;       // Script word this glyph contributes to, e.g. "nṯr", "dingir-e-ne"
+  gloss: string;      // Word meaning, e.g. "gods", "the gods"
+  stanzaEn: string;   // Full English sentence for this stanza
+  highlight: string;  // Substring of stanzaEn to emphasise when this glyph is hovered
 };
 
 type DividerData = {
@@ -19,43 +23,41 @@ type DividerData = {
 };
 
 type LensState =
-  | { kind: 'glyph'; char: string; trans: string; uname: string; font: 'egy' | 'sux' }
+  | { kind: 'glyph'; char: string; phon: string; uname: string; font: 'egy' | 'sux'; word: string; gloss: string; stanzaEn: string; highlight: string }
   | { kind: 'symbol'; char: string; name: string };
 
 // ── Verified Egyptian Hieroglyph data (Unicode 15, confirmed via unicodedata) ─
 // Sources: Gardiner Sign List; TLA (thesaurus-linguae-aegyptiae.de);
 //          Unicode 15.0 code chart Egyptian Hieroglyphs (U+13000–U+1342F)
 
+const S1L = 'Do the gods hold the answers?';
+const S2L = 'Where is the deepest wisdom? Thoth knows.';
+const S3L = 'Who built the pyramids?';
+
 const LEFT_STANZAS: GlyphEntry[][] = [
   // Stanza 1 — "Do the gods hold the answers?" (in-iw nṯrw ḫr wšbw)
-  // Attested: M017 (reed) = ı͗ interrogative; N035 (water) = n; G007 (falcon) = nṯr det.;
-  //           D021 (mouth) = r; D004 (Horus eye) = Wḏꜣt (sacred seeing)
   [
-    { char: '\u{131CB}', trans: 'ı͗ — reed (interrogative)', uname: 'M017', font: 'egy' },
-    { char: '\u{13216}', trans: 'n — water ripple', uname: 'N035', font: 'egy' },
-    { char: '\u{13146}', trans: 'nṯr — Horus on standard', uname: 'G007', font: 'egy' },
-    { char: '\u{1308B}', trans: 'r — mouth', uname: 'D021', font: 'egy' },
-    { char: '\u{13079}', trans: 'Wḏꜣt — Eye of Horus', uname: 'D004', font: 'egy' },
+    { char: '\u{131CB}', phon: 'ı͗', uname: 'M017', font: 'egy', word: 'ı͗',    gloss: 'interrogative',     stanzaEn: S1L, highlight: 'Do' },
+    { char: '\u{13216}', phon: 'n',  uname: 'N035', font: 'egy', word: 'nṯrw', gloss: 'the gods',          stanzaEn: S1L, highlight: 'the gods' },
+    { char: '\u{13146}', phon: 'nṯr',uname: 'G007', font: 'egy', word: 'nṯrw', gloss: 'gods (divine)',     stanzaEn: S1L, highlight: 'the gods' },
+    { char: '\u{1308B}', phon: 'r',  uname: 'D021', font: 'egy', word: 'ḫr',   gloss: 'hold / possess',    stanzaEn: S1L, highlight: 'hold' },
+    { char: '\u{13079}', phon: 'Wḏꜣt',uname:'D004',font: 'egy', word: 'Wḏꜣt', gloss: 'the answers',       stanzaEn: S1L, highlight: 'the answers?' },
   ],
   // Stanza 2 — "Where is the deepest wisdom? Thoth knows." (Ḏḥwty rḫ sb3yt wr)
-  // Attested: C003 (seated deity) = nṯr det.; E010 (ibis) = Ḏḥwty (Thoth);
-  //           G001 (vulture) = ꜣ; N005 (sun disk) = Rꜥ; D028 (ka-arms) = kꜣ/rḫ
   [
-    { char: '\u{1305F}', trans: 'nṯr — seated deity', uname: 'C003', font: 'egy' },
-    { char: '\u{130DD}', trans: 'Ḏḥwty — Thoth ibis', uname: 'E010', font: 'egy' },
-    { char: '\u{1313F}', trans: 'ꜣ — Egyptian vulture', uname: 'G001', font: 'egy' },
-    { char: '\u{131F3}', trans: 'Rꜥ — sun disk', uname: 'N005', font: 'egy' },
-    { char: '\u{13093}', trans: 'kꜣ — ka arms', uname: 'D028', font: 'egy' },
+    { char: '\u{1305F}', phon: 'nṯr', uname: 'C003', font: 'egy', word: 'nṯr',   gloss: 'divine / sacred', stanzaEn: S2L, highlight: 'Where' },
+    { char: '\u{130DD}', phon: 'Ḏḥwty',uname:'E010',font: 'egy', word: 'Ḏḥwty', gloss: 'Thoth',           stanzaEn: S2L, highlight: 'Thoth' },
+    { char: '\u{1313F}', phon: 'ꜣ',  uname: 'G001', font: 'egy', word: 'sb3yt', gloss: 'the deepest wisdom',stanzaEn: S2L, highlight: 'the deepest wisdom?' },
+    { char: '\u{131F3}', phon: 'Rꜥ', uname: 'N005', font: 'egy', word: 'sb3yt', gloss: 'wisdom',           stanzaEn: S2L, highlight: 'the deepest wisdom?' },
+    { char: '\u{13093}', phon: 'kꜣ', uname: 'D028', font: 'egy', word: 'rḫ',   gloss: 'knows',            stanzaEn: S2L, highlight: 'Thoth knows.' },
   ],
   // Stanza 3 — "Who built the pyramids?" (in-m ḳd mrw)
-  // Attested: A001 (seated man) = rmṯ det.; M017A (two reeds) = y; G043 (quail) = w;
-  //           O024 (pyramid) = mr; C002 (deity w/ two feathers) = nṯr form
   [
-    { char: '\u{13000}', trans: 'rmṯ — seated man', uname: 'A001', font: 'egy' },
-    { char: '\u{131CC}', trans: 'y — two reeds', uname: 'M017A', font: 'egy' },
-    { char: '\u{13171}', trans: 'w — quail chick', uname: 'G043', font: 'egy' },
-    { char: '\u{13274}', trans: 'mr — pyramid', uname: 'O024', font: 'egy' },
-    { char: '\u{1305B}', trans: 'nṯr — deity form', uname: 'C002', font: 'egy' },
+    { char: '\u{13000}', phon: 'rmṯ', uname: 'A001', font: 'egy', word: 'in-m', gloss: 'who',             stanzaEn: S3L, highlight: 'Who' },
+    { char: '\u{131CC}', phon: 'y',  uname: 'M017A',font: 'egy', word: 'ḳd',   gloss: 'built / shaped',  stanzaEn: S3L, highlight: 'built' },
+    { char: '\u{13171}', phon: 'w',  uname: 'G043', font: 'egy', word: 'ḳd',   gloss: 'built',           stanzaEn: S3L, highlight: 'built' },
+    { char: '\u{13274}', phon: 'mr', uname: 'O024', font: 'egy', word: 'mrw',  gloss: 'the pyramids',    stanzaEn: S3L, highlight: 'the pyramids?' },
+    { char: '\u{1305B}', phon: 'nṯr',uname: 'C002', font: 'egy', word: 'mrw',  gloss: 'pyramid (divine)',stanzaEn: S3L, highlight: 'the pyramids?' },
   ],
 ];
 
@@ -69,38 +71,38 @@ const LEFT_DIVIDERS: DividerData[] = [
 // Sources: ePSD (Pennsylvania Sumerian Dictionary); ETCSL (Oxford);
 //          Unicode 15.0 code chart Cuneiform (U+12000–U+1242F)
 
+const S1R = 'Who were the gods?';
+const S2R = 'Were they the sky-people? The old ones from the east?';
+const S3R = 'The secrets lie beneath.';
+
 const RIGHT_STANZAS: GlyphEntry[][] = [
   // Stanza 1 — "Who were the gods?" (a-ba dingir-e-ne)
-  // Attested: a-ba = "who" question construction (ePSD); dingir-e-ne = "the gods" (ETCSL)
+  // Attested: a-ba = "who" (ePSD); dingir-e-ne = "the gods" (ETCSL)
   [
-    { char: '\u{12000}', trans: 'a — who', uname: 'A', font: 'sux' },
-    { char: '\u{12040}', trans: 'ba — were (past marker)', uname: 'BA', font: 'sux' },
-    { char: '\u{1202D}', trans: 'dingir — divine (AN)', uname: 'AN', font: 'sux' },
-    { char: '\u{1208A}', trans: 'e — verbal complex', uname: 'E', font: 'sux' },
-    { char: '\u{12248}', trans: 'ne — plural/demonstrative', uname: 'NE', font: 'sux' },
+    { char: '\u{12000}', phon: 'a',      uname: 'A',   font: 'sux', word: 'a-ba',       gloss: 'who',          stanzaEn: S1R, highlight: 'Who' },
+    { char: '\u{12040}', phon: 'ba',     uname: 'BA',  font: 'sux', word: 'a-ba',       gloss: 'were',         stanzaEn: S1R, highlight: 'were' },
+    { char: '\u{1202D}', phon: 'dingir', uname: 'AN',  font: 'sux', word: 'dingir-e-ne',gloss: 'the gods',     stanzaEn: S1R, highlight: 'the gods?' },
+    { char: '\u{1208A}', phon: 'e',      uname: 'E',   font: 'sux', word: 'dingir-e-ne',gloss: 'verbal marker',stanzaEn: S1R, highlight: 'the gods?' },
+    { char: '\u{12248}', phon: 'ne',     uname: 'NE',  font: 'sux', word: 'dingir-e-ne',gloss: 'plural (gods)',stanzaEn: S1R, highlight: 'the gods?' },
   ],
-  // Stanza 2 — "Were they the sky-people? Were they the old ones from the east?"
-  // COINED: lú-an-na = sky-person (alien); lú-kur-utu-è = east-people (Denisovans)
-  // Note: lú-an "sky-person" construction appears in some ETCSL contexts;
-  //       lú-kur-utu-è is coined — documented in GLYPH-KEY.md
+  // Stanza 2 — "Were they the sky-people? The old ones from the east?"
+  // lú-an-na = sky-person (semi-coined); lú-kur-utu-è = east-people (coined, see GLYPH-KEY.md)
   [
-    { char: '\u{121FD}', trans: 'lú — person', uname: 'LU2', font: 'sux' },
-    { char: '\u{1202D}', trans: 'an — sky/heaven', uname: 'AN', font: 'sux' },
-    { char: '\u{1223E}', trans: 'na — genitive marker', uname: 'NA', font: 'sux' },
-    { char: '\u{121B3}', trans: 'kur — mountain/eastern land', uname: 'KUR', font: 'sux' },
-    { char: '\u{12313}', trans: 'utu — sun / sunrise / east', uname: 'UD', font: 'sux' },
-    { char: '\u{1208D}', trans: 'è — to exit / to rise', uname: 'E2', font: 'sux' },
+    { char: '\u{121FD}', phon: 'lú',   uname: 'LU2', font: 'sux', word: 'lú-an-na',    gloss: 'sky-people',         stanzaEn: S2R, highlight: 'sky-people?' },
+    { char: '\u{1202D}', phon: 'an',   uname: 'AN',  font: 'sux', word: 'lú-an-na',    gloss: 'sky / heaven',       stanzaEn: S2R, highlight: 'the sky-people?' },
+    { char: '\u{1223E}', phon: 'na',   uname: 'NA',  font: 'sux', word: 'lú-an-na',    gloss: 'genitive of sky',    stanzaEn: S2R, highlight: 'the sky-people?' },
+    { char: '\u{121B3}', phon: 'kur',  uname: 'KUR', font: 'sux', word: 'lú-kur-utu-è',gloss: 'eastern ones',       stanzaEn: S2R, highlight: 'The old ones from the east?' },
+    { char: '\u{12313}', phon: 'utu',  uname: 'UD',  font: 'sux', word: 'lú-kur-utu-è',gloss: 'sunrise / east',     stanzaEn: S2R, highlight: 'from the east?' },
+    { char: '\u{1208D}', phon: 'è',    uname: 'E2',  font: 'sux', word: 'lú-kur-utu-è',gloss: 'arising from',       stanzaEn: S2R, highlight: 'from the east?' },
   ],
   // Stanza 3 — "The secrets lie beneath." (ad-ḫal ki-ta gál)
-  // ad-ḫal: KA (voice/word) + HAL (to conceal) → "concealed word / secret"
-  // ki-ta gál: KI (earth/place) + TA (ablative) + GAL (to exist) → "lies beneath"
-  // All signs attested; compound ad-ḫal for "secret" is semi-coined (see key)
+  // ad-ḫal: concealed word/secret; ki-ta gál: lies beneath (all signs attested)
   [
-    { char: '\u{12157}', trans: 'ka — mouth / voice', uname: 'KA', font: 'sux' },
-    { char: '\u{1212C}', trans: 'ḫal — to conceal / secret', uname: 'HAL', font: 'sux' },
-    { char: '\u{121A0}', trans: 'ki — earth / place', uname: 'KI', font: 'sux' },
-    { char: '\u{122EB}', trans: 'ta — from (ablative)', uname: 'TA', font: 'sux' },
-    { char: '\u{120F2}', trans: 'gál — to exist / to lie', uname: 'GAL', font: 'sux' },
+    { char: '\u{12157}', phon: 'ka',  uname: 'KA',  font: 'sux', word: 'ad-ḫal', gloss: 'the secrets',   stanzaEn: S3R, highlight: 'The secrets' },
+    { char: '\u{1212C}', phon: 'ḫal', uname: 'HAL', font: 'sux', word: 'ad-ḫal', gloss: 'concealed',     stanzaEn: S3R, highlight: 'The secrets' },
+    { char: '\u{121A0}', phon: 'ki',  uname: 'KI',  font: 'sux', word: 'ki-ta',  gloss: 'earth / below', stanzaEn: S3R, highlight: 'lie beneath.' },
+    { char: '\u{122EB}', phon: 'ta',  uname: 'TA',  font: 'sux', word: 'ki-ta',  gloss: 'from beneath',  stanzaEn: S3R, highlight: 'lie beneath.' },
+    { char: '\u{120F2}', phon: 'gál', uname: 'GAL', font: 'sux', word: 'gál',    gloss: 'to lie / exist',stanzaEn: S3R, highlight: 'lie beneath.' },
   ],
 ];
 
@@ -348,8 +350,8 @@ export default function GlyphColumns() {
     const onMove = (e: MouseEvent) => {
       const el = lensRef.current;
       if (el) {
-        el.style.left = `${e.clientX - 90}px`;
-        el.style.top  = `${e.clientY - 90}px`;
+        el.style.left = `${e.clientX - 130}px`;
+        el.style.top  = `${e.clientY + 16}px`;
       }
     };
     document.addEventListener('mousemove', onMove, { passive: true });
@@ -357,7 +359,7 @@ export default function GlyphColumns() {
   }, [show]);
 
   const onGlyphEnter = useCallback((entry: GlyphEntry) => {
-    setLens({ kind: 'glyph', char: entry.char, trans: entry.trans, uname: entry.uname, font: entry.font });
+    setLens({ kind: 'glyph', char: entry.char, phon: entry.phon, uname: entry.uname, font: entry.font, word: entry.word, gloss: entry.gloss, stanzaEn: entry.stanzaEn, highlight: entry.highlight });
   }, []);
 
   const onGlyphLeave = useCallback(() => setLens(null), []);
@@ -380,19 +382,31 @@ export default function GlyphColumns() {
         className={`gc-lens${lensVisible ? ' gc-lens-visible' : ''}`}
         aria-hidden="true"
       >
-        {lens && (
-          <>
-            <span
-              className={`gc-lens-char${lens.kind === 'glyph' ? ` gc-font-${lens.font}` : ''}`}
-            >
-              {lens.char}
-            </span>
-            <span className="gc-lens-trans">
-              {lens.kind === 'glyph' ? lens.trans : lens.name}
-            </span>
-            {lens.kind === 'glyph' && (
+        {lens && lens.kind === 'glyph' && (() => {
+          const before = lens.stanzaEn.indexOf(lens.highlight);
+          const after  = before + lens.highlight.length;
+          return (
+            <>
+              <span className={`gc-lens-char gc-font-${lens.font}`}>{lens.char}</span>
+              <span className="gc-lens-phon">{lens.phon}</span>
+              <span className="gc-lens-word">{lens.word} — {lens.gloss}</span>
+              <span className="gc-lens-sentence">
+                {before >= 0 ? (
+                  <>
+                    {lens.stanzaEn.slice(0, before)}
+                    <strong>{lens.stanzaEn.slice(before, after)}</strong>
+                    {lens.stanzaEn.slice(after)}
+                  </>
+                ) : lens.stanzaEn}
+              </span>
               <span className="gc-lens-uname">{lens.uname}</span>
-            )}
+            </>
+          );
+        })()}
+        {lens && lens.kind === 'symbol' && (
+          <>
+            <span className="gc-lens-char">{lens.char}</span>
+            <span className="gc-lens-phon">{lens.name}</span>
           </>
         )}
       </div>
