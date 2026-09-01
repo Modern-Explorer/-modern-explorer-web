@@ -10,25 +10,181 @@ import GlyphColumns, { GlyphDivider } from '../components/GlyphColumns';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
+// ── Mission pillar SVG icons ─────────────────────────────────────────────────
+const P = { viewBox: '0 0 72 72', fill: 'none', stroke: 'currentColor', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true };
+
+function UAPPillarIcon() {
+  return (
+    <svg {...P} strokeWidth="1.5">
+      {/* Hull upper curve — convex top surface */}
+      <path d="M10,40 Q18,24 36,20 Q54,24 62,38"/>
+      {/* Hull lower curve — flat belly */}
+      <path d="M10,40 Q18,52 36,54 Q54,52 62,38"/>
+      {/* Dome */}
+      <path d="M26,38 Q28,22 36,18 Q44,22 46,38"/>
+      {/* Dome window port */}
+      <ellipse cx="36" cy="30" rx="6" ry="4"/>
+      {/* Dome inner strut lines */}
+      <line x1="30" y1="30" x2="36" y2="26" strokeWidth="1"/>
+      <line x1="42" y1="30" x2="36" y2="26" strokeWidth="1"/>
+      {/* Hull panel seam lines */}
+      <path d="M18,44 Q36,50 56,40" strokeWidth="1" strokeDasharray="4 3"/>
+      <path d="M14,41 Q36,48 60,39" strokeWidth="1" strokeDasharray="2 4"/>
+      {/* Belly ring */}
+      <ellipse cx="36" cy="46" rx="18" ry="4.5" strokeDasharray="5 3"/>
+      {/* Running lights — filled dots */}
+      <circle cx="9" cy="40" r="2.5" fill="currentColor" stroke="none"/>
+      <circle cx="63" cy="38" r="2.5" fill="currentColor" stroke="none"/>
+      <circle cx="36" cy="56" r="2.5" fill="currentColor" stroke="none"/>
+      {/* Glow halos around running lights */}
+      <circle cx="9" cy="40" r="5.5" strokeWidth="0.75" strokeDasharray="2 2"/>
+      <circle cx="63" cy="38" r="5.5" strokeWidth="0.75" strokeDasharray="2 2"/>
+      {/* Exhaust shimmer */}
+      <path d="M30,56 L26,64" strokeWidth="1" strokeDasharray="2 2"/>
+      <path d="M36,58 L36,66" strokeWidth="1" strokeDasharray="2 2"/>
+      <path d="M42,56 L46,64" strokeWidth="1" strokeDasharray="2 2"/>
+    </svg>
+  );
+}
+
+function CryptozooIcon() {
+  return (
+    <svg {...P} strokeWidth="1.5">
+      {/* Main foot pad — slightly asymmetric */}
+      <path d="M16,36 Q12,24 16,16 Q22,8 36,10 Q50,8 56,16 Q60,26 56,38 Q50,54 36,58 Q22,56 16,36 Z"/>
+      {/* Ball of foot / metatarsal ridge */}
+      <path d="M20,32 Q30,26 46,30 Q50,34 46,38 Q30,34 20,32"/>
+      {/* Arch inner detail */}
+      <path d="M22,46 Q20,52 22,56" strokeWidth="1"/>
+      <path d="M50,46 Q52,52 50,56" strokeWidth="1"/>
+      {/* Toe pads — 5, anatomically sized big-to-small from medial */}
+      <ellipse cx="20" cy="10" rx="5.5" ry="4.5"/>
+      <ellipse cx="28" cy="6" rx="5.5" ry="4.5"/>
+      <ellipse cx="36" cy="4" rx="6" ry="4.5"/>
+      <ellipse cx="44" cy="6" rx="5" ry="4.5"/>
+      <ellipse cx="52" cy="10" rx="4.5" ry="4"/>
+      {/* Nail lines on toes */}
+      <line x1="17" y1="9" x2="23" y2="9" strokeWidth="1"/>
+      <line x1="25" y1="5" x2="31" y2="5" strokeWidth="1"/>
+      <line x1="33" y1="3" x2="39" y2="3" strokeWidth="1"/>
+      <line x1="41" y1="5" x2="47" y2="5" strokeWidth="1"/>
+      <line x1="49" y1="9" x2="55" y2="9" strokeWidth="1"/>
+      {/* Dermal ridges across the pad */}
+      <path d="M22,34 Q36,40 48,34" strokeDasharray="3 2" strokeWidth="1"/>
+      <path d="M24,42 Q36,48 46,42" strokeDasharray="3 2" strokeWidth="1"/>
+      {/* Evidence ruler/scale at bottom */}
+      <line x1="10" y1="66" x2="62" y2="66"/>
+      <line x1="10" y1="64" x2="10" y2="68" strokeWidth="1"/>
+      <line x1="36" y1="64" x2="36" y2="68" strokeWidth="1"/>
+      <line x1="62" y1="64" x2="62" y2="68" strokeWidth="1"/>
+      <line x1="23" y1="65" x2="23" y2="67" strokeWidth="1"/>
+      <line x1="49" y1="65" x2="49" y2="67" strokeWidth="1"/>
+    </svg>
+  );
+}
+
+function ArchaeologyIcon() {
+  return (
+    <svg {...P} strokeWidth="1.5">
+      {/* Ground line */}
+      <line x1="2" y1="62" x2="70" y2="62"/>
+      {/* Left column — intact, fluted */}
+      <rect x="8" y="22" width="12" height="38" rx="1"/>
+      <line x1="11" y1="22" x2="11" y2="60" strokeWidth="0.75"/>
+      <line x1="14" y1="22" x2="14" y2="60" strokeWidth="0.75"/>
+      <line x1="17" y1="22" x2="17" y2="60" strokeWidth="0.75"/>
+      {/* Left capital */}
+      <path d="M6,22 Q14,18 22,22"/>
+      <line x1="6" y1="22" x2="22" y2="22"/>
+      {/* Right column — leaning, broken top */}
+      <path d="M50,62 L52,28 L62,30 L62,62" />
+      <line x1="53" y1="40" x2="62" y2="41" strokeWidth="0.75"/>
+      <line x1="52" y1="50" x2="62" y2="51" strokeWidth="0.75"/>
+      {/* Broken drum fragment off right column */}
+      <path d="M52,26 Q57,22 62,26"/>
+      <path d="M54,20 Q60,16 64,22 Q62,26 52,26"/>
+      {/* Fallen lintel spanning across */}
+      <path d="M20,28 Q36,24 50,28"/>
+      <path d="M22,32 Q36,28 48,32"/>
+      {/* Fallen lintel segment on ground */}
+      <path d="M24,62 L46,58 L46,62 Z" strokeWidth="1"/>
+      {/* Crack weathering on left column */}
+      <path d="M12,36 Q11,39 13,42" strokeWidth="0.75"/>
+      <path d="M16,48 Q17,51 15,53" strokeWidth="0.75"/>
+      {/* Half-buried step */}
+      <path d="M4,62 Q10,56 22,58 Q26,59 26,62" strokeWidth="1"/>
+      {/* Rubble debris */}
+      <path d="M30,60 Q35,56 40,60" strokeWidth="1"/>
+      <path d="M48,60 L52,56 L56,60" strokeWidth="1"/>
+      <circle cx="43" cy="61" r="1.5" fill="currentColor" stroke="none"/>
+    </svg>
+  );
+}
+
+function FieldCompassIcon() {
+  return (
+    <svg {...P} strokeWidth="1.5">
+      {/* Outer bezel */}
+      <circle cx="36" cy="36" r="32"/>
+      {/* Inner bezel ring */}
+      <circle cx="36" cy="36" r="27"/>
+      {/* Cardinal ticks — long */}
+      <line x1="36" y1="9" x2="36" y2="4"/>
+      <line x1="63" y1="36" x2="68" y2="36"/>
+      <line x1="36" y1="63" x2="36" y2="68"/>
+      <line x1="9" y1="36" x2="4" y2="36"/>
+      {/* Intercardinal ticks */}
+      <line x1="58.6" y1="13.4" x2="61.2" y2="10.8" strokeWidth="1"/>
+      <line x1="58.6" y1="58.6" x2="61.2" y2="61.2" strokeWidth="1"/>
+      <line x1="13.4" y1="58.6" x2="10.8" y2="61.2" strokeWidth="1"/>
+      <line x1="13.4" y1="13.4" x2="10.8" y2="10.8" strokeWidth="1"/>
+      {/* Minor ticks — 15° intervals (8 of them) */}
+      <line x1="47" y1="5.5" x2="47.8" y2="4" strokeWidth="1"/>
+      <line x1="25" y1="5.5" x2="24.2" y2="4" strokeWidth="1"/>
+      <line x1="66.5" y1="25" x2="68" y2="24.2" strokeWidth="1"/>
+      <line x1="66.5" y1="47" x2="68" y2="47.8" strokeWidth="1"/>
+      <line x1="47" y1="66.5" x2="47.8" y2="68" strokeWidth="1"/>
+      <line x1="25" y1="66.5" x2="24.2" y2="68" strokeWidth="1"/>
+      <line x1="5.5" y1="25" x2="4" y2="24.2" strokeWidth="1"/>
+      <line x1="5.5" y1="47" x2="4" y2="47.8" strokeWidth="1"/>
+      {/* Compass rose — N/S arms */}
+      <path d="M36,36 L33,20 L36,9 L39,20 Z"/>
+      {/* S arm — lighter (outline only) */}
+      <path d="M36,36 L33,52 L36,63 L39,52 Z" strokeDasharray="none"/>
+      {/* E/W arms */}
+      <path d="M36,36 L52,33 L63,36 L52,39 Z"/>
+      <path d="M36,36 L20,33 L9,36 L20,39 Z"/>
+      {/* Needle — magnetic declination (pointing slightly west of north) */}
+      <path d="M36,36 L33,14" strokeWidth="2.5"/>
+      <path d="M36,36 L39,58" strokeWidth="1.25"/>
+      {/* Pivot */}
+      <circle cx="36" cy="36" r="4"/>
+      <circle cx="36" cy="36" r="1.5" fill="currentColor" stroke="none"/>
+      {/* N label suggestion — tick with serif */}
+      <line x1="34" y1="4" x2="38" y2="4" strokeWidth="1.5"/>
+    </svg>
+  );
+}
+
 // ── Mission pillars ──────────────────────────────────────────────────────────
 const missionPillars = [
   {
-    icon: '🛸',
+    Icon: UAPPillarIcon,
     label: 'UAP & Aerial Phenomena',
     detail: 'The San Luis Valley is one of North America\'s most documented UAP corridors. We collect witness testimony, correlate it with radar and sensor data, and map the hotspot clusters.',
   },
   {
-    icon: '🐾',
+    Icon: CryptozooIcon,
     label: 'Cryptozoology',
     detail: 'Unclassified animals — Sasquatch, dogman, thunderbirds, lake creatures — investigated as an open question: flesh-and-blood biology, something more anomalous, or both? We collect track evidence, hair samples, and structured witness data to find out what the distribution actually shows.',
   },
   {
-    icon: '🏛️',
+    Icon: ArchaeologyIcon,
     label: 'Lost History & Archaeology',
     detail: 'Pre-Columbian petroglyphs, anomalous ruins, and oral histories that don\'t fit the accepted timeline. We document, photograph, and cross-reference with academic sources.',
   },
   {
-    icon: '🧭',
+    Icon: FieldCompassIcon,
     label: 'Field Operations',
     detail: 'Reconnaissance, night operations, site surveys, drone mapping, and sensor deployment. The methodology — instruments, protocols, chain-of-custody data capture — that turns field time into evidence instead of stories.',
   },
@@ -121,7 +277,9 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 16 }}>
             {missionPillars.map(p => (
               <div key={p.label} data-reveal style={{ padding: '28px 24px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6 }}>
-                <div style={{ fontSize: 32, marginBottom: 14 }}>{p.icon}</div>
+                <div style={{ width: 64, height: 64, marginBottom: 18, color: 'var(--accent)' }}>
+                  <p.Icon />
+                </div>
                 <h3 style={{ fontSize: 18, marginBottom: 10 }}>{p.label}</h3>
                 <p style={{ fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>{p.detail}</p>
               </div>

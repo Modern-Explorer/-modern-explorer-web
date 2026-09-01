@@ -733,7 +733,7 @@ h1, h2, h3, h4, h5 {
   .ph-compass-ring { animation: none; }
 }
 
-/* ── Margin glyph columns ────────────────────────────────────────────────── */
+/* ── Margin narrative register columns ───────────────────────────────────── */
 
 /* Wrapper spans full page height, sits behind content */
 .mg-wrapper {
@@ -744,64 +744,72 @@ h1, h2, h3, h4, h5 {
   overflow: hidden;
 }
 
-/* Each column: thin strip pinned to the page edge */
+/* Carved stone panel columns — responsive width fills the gutter */
 .mg-col {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 44px;
+  width: clamp(80px, calc((100vw - 1280px) / 2), 200px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 8vh 0 6vh;
+  justify-content: space-evenly;
+  padding: 7vh 0 5vh;
 }
-.mg-col-left  { left: 6px; }
-.mg-col-right { right: 6px; }
+.mg-col-left  { left: 40px; }
+.mg-col-right { right: 40px; }
 
-/* Individual glyph container */
-.mg-glyph {
-  width: 40px;
-  height: 40px;
-  color: rgba(203, 243, 110, 0.28);
+/* Register band — horizontal row of 2–4 symbols with register-line borders */
+.mg-register {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border-top: 1px solid rgba(203, 243, 110, 0.07);
+  color: rgba(203, 243, 110, 0.72);
+  background: rgba(11, 15, 28, 0.12);
   opacity: 0;
 }
-.mg-glyph svg {
+.mg-register:last-child {
+  border-bottom: 1px solid rgba(203, 243, 110, 0.07);
+}
+.mg-register svg {
+  flex: 1;
+  min-width: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
 }
 
-/* Burn-in reveal — sweep left→right then settle to embossed */
-.mg-glyph.mg-revealed {
+/* Burn-in reveal — etched edge sweeps across the whole band, settles embossed */
+.mg-register.mg-revealed {
   opacity: 1;
-}
-.mg-glyph.mg-revealed svg {
-  animation: mg-burnin 0.9s ease-out forwards;
+  animation: mg-register-burnin 0.9s ease-out forwards;
 }
 
-@keyframes mg-burnin {
-  0%   {
+@keyframes mg-register-burnin {
+  0% {
     clip-path: inset(0 100% 0 0);
-    filter: brightness(5) saturate(2);
-    color: rgba(255, 255, 220, 0.9);
+    filter: brightness(9) saturate(3) blur(0.5px);
+    color: rgba(255, 255, 230, 1);
   }
-  55%  {
+  50% {
     clip-path: inset(0 0% 0 0);
-    filter: brightness(2.5) saturate(1.5);
-    color: rgba(240, 255, 200, 0.7);
+    filter: brightness(3.5) saturate(1.6);
+    color: rgba(235, 255, 190, 0.88);
   }
   100% {
     clip-path: inset(0 0% 0 0);
-    filter: drop-shadow(0 1px 0 rgba(0,0,0,0.85))
-            drop-shadow(0 -1px 0 rgba(203,243,110,0.18))
-            drop-shadow(1px 0 0 rgba(0,0,0,0.5));
-    color: rgba(203, 243, 110, 0.28);
+    filter:
+      drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.92))
+      drop-shadow(0 -0.5px 0 rgba(203, 243, 110, 0.20));
+    color: rgba(203, 243, 110, 0.72);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mg-glyph { opacity: 0; transition: opacity 0.4s; }
-  .mg-glyph.mg-revealed { opacity: 1; }
-  .mg-glyph.mg-revealed svg { animation: none; }
+  .mg-register { opacity: 0; transition: opacity 0.4s; }
+  .mg-register.mg-revealed { opacity: 1; animation: none; }
 }
 
 /* Mobile/tablet glyph divider between sections */
@@ -813,7 +821,7 @@ h1, h2, h3, h4, h5 {
 }
 .mg-divider svg { width: 120px; height: 24px; }
 
-@media (max-width: 1279px) {
+@media (max-width: 1439px) {
   .mg-divider { display: flex; }
 }
 
