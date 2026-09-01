@@ -242,31 +242,49 @@ function startBurn(el: HTMLElement, delay: number): () => void {
 
 interface GlyphCellProps {
   entry: GlyphEntry;
-  delay: number;
-  burned: boolean;
   onEnter: (entry: GlyphEntry) => void;
   onLeave: () => void;
 }
 
-function GlyphCell({ entry, delay, burned, onEnter, onLeave }: GlyphCellProps) {
+// Each glyph observes itself — individual ignition as it enters the viewport.
+// jitterRef stores a stable random delay (0–0.4 s) so nearby glyphs stagger.
+function GlyphCell({ entry, onEnter, onLeave }: GlyphCellProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [burned, setBurned] = useState(false);
   const started = useRef(false);
+  const jitterRef = useRef<number | null>(null);
+  if (jitterRef.current === null) jitterRef.current = Math.random() * 0.4;
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([obs]) => {
+        if (obs.isIntersecting) {
+          setBurned(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0, rootMargin: '0px 0px -40% 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!burned || started.current) return;
     started.current = true;
     const el = ref.current;
     if (!el) return;
-    // Skip canvas animation for reduced-motion; CSS handles final state
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    return startBurn(el, delay);
-  }, [burned, delay]);
+    return startBurn(el, jitterRef.current!);
+  }, [burned]);
 
   return (
     <div
       ref={ref}
       className={`gc-glyph${burned ? ' gc-glyph-burned' : ''}`}
-      style={{ animationDelay: `${delay}s` }}
+      style={burned ? { animationDelay: `${jitterRef.current}s` } : undefined}
       onMouseEnter={() => onEnter(entry)}
       onMouseLeave={onLeave}
     >
@@ -285,33 +303,12 @@ interface StanzaProps {
 }
 
 function GlyphStanza({ glyphs, lang, onGlyphEnter, onGlyphLeave }: StanzaProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [burned, setBurned] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setBurned(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0, rootMargin: '0px 0px -40% 0px' }  // triggers at ~60% down viewport
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
   return (
-    <div ref={ref} className="gc-stanza" lang={lang}>
+    <div className="gc-stanza" lang={lang}>
       {glyphs.map((g, i) => (
         <GlyphCell
           key={i}
           entry={g}
-          delay={i * 0.5}
-          burned={burned}
           onEnter={onGlyphEnter}
           onLeave={onGlyphLeave}
         />
