@@ -96,6 +96,11 @@ h1, h2, h3, h4, h5 {
 
 .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 .container-narrow { width: 100%; max-width: 800px; margin: 0 auto; padding: 0 24px; }
+/* At 1440–1580px give the margin register columns 190px gutter (40px inset + 150px panel).
+   min() naturally reverts to 1200px above ~1580px so nothing changes at wider viewports. */
+@media (min-width: 1440px) {
+  .container { max-width: min(1200px, calc(100vw - 380px)); }
+}
 
 .section { padding: 100px 0; }
 .section-sm { padding: 64px 0; }
@@ -749,7 +754,7 @@ h1, h2, h3, h4, h5 {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: clamp(80px, calc((100vw - 1280px) / 2), 200px);
+  width: clamp(150px, calc((100vw - 1280px) / 2), 200px);
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
