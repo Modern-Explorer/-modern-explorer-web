@@ -423,16 +423,24 @@ export default function GlyphColumns() {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Clip wrapper height to the sentinel placed after the Mission section
+  // Clip wrapper height to sentinel; set column top offset from hero's bottom
   useEffect(() => {
     if (!show) return;
     const measure = () => {
+      const hero     = document.querySelector('#mesa-hero') as HTMLElement | null;
       const sentinel = document.querySelector('[data-gc-end]') as HTMLElement | null;
-      const wrapper = wrapperRef.current;
-      if (!sentinel || !wrapper) return;
-      const sentinelTop = sentinel.getBoundingClientRect().top + window.pageYOffset;
+      const wrapper  = wrapperRef.current;
+      if (!wrapper) return;
       const wrapperTop = wrapper.getBoundingClientRect().top + window.pageYOffset;
-      wrapper.style.height = `${Math.max(0, sentinelTop - wrapperTop)}px`;
+      if (sentinel) {
+        const sentinelTop = sentinel.getBoundingClientRect().top + window.pageYOffset;
+        wrapper.style.height = `${Math.max(0, sentinelTop - wrapperTop)}px`;
+      }
+      if (hero) {
+        const heroBottom = hero.getBoundingClientRect().bottom + window.pageYOffset;
+        // Push columns so first glyph starts clear of the hero section
+        wrapper.style.setProperty('--gc-col-top', `${Math.max(0, heroBottom - wrapperTop)}px`);
+      }
     };
     measure();
     const ro = new ResizeObserver(measure);

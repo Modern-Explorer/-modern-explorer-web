@@ -781,8 +781,8 @@ h1, h2, h3, h4, h5 {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: 14px;
-  padding: 6vh 0 0;
+  gap: 8px;
+  padding: var(--gc-col-top, 6vh) 0 0; /* JS sets --gc-col-top to hero's bottom edge */
   overflow: hidden;
   /* Warm parchment-dark ground: char (dark brown) reads as carved mark against this */
   background: radial-gradient(ellipse 88% 75% at 50% 46%, rgba(185, 140, 55, 0.14) 0%, transparent 100%);
@@ -796,7 +796,7 @@ h1, h2, h3, h4, h5 {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 6px;
+  gap: 4px;
 }
 
 /* Individual glyph cell — text rendered via Noto script fonts */
@@ -804,7 +804,7 @@ h1, h2, h3, h4, h5 {
   position: relative;  /* canvas overlay anchors here */
   width: 100%;
   text-align: center;
-  font-size: clamp(76px, calc((100vw - 1280px) * 0.22), 98px);
+  font-size: clamp(60px, calc((100vw - 1280px) * 0.17), 78px);
   line-height: 1.0;
   color: transparent;  /* canvas reveals; burned state: set by .gc-glyph-burned */
   pointer-events: auto;
@@ -816,7 +816,7 @@ h1, h2, h3, h4, h5 {
 .gc-col-right .gc-glyph {
   font-family: 'Noto Cuneiform', serif;
   /* erode thick cuneiform wedges to match Egyptian carved weight */
-  font-size: clamp(68px, calc((100vw - 1280px) * 0.19), 88px);
+  font-size: clamp(54px, calc((100vw - 1280px) * 0.15), 70px);
   -webkit-text-stroke: 0.8px #0b0f1c;
   paint-order: fill stroke;
 }
