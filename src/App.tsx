@@ -30,6 +30,7 @@ const DataDeletion  = lazy(() => import('./pages/DataDeletion'));
 const Tip           = lazy(() => import('./pages/Tip'));
 
 const Membership    = lazy(() => import('./pages/Membership'));
+const Threshold     = lazy(() => import('./pages/Threshold'));
 const BookingDrawer = lazy(() => import('./components/BookingDrawer'));
 const Mesa          = lazy(() => import('./components/Mesa'));
 
@@ -91,6 +92,7 @@ function AppInner() {
           <Route path="/data-deletion"  element={<DataDeletion />} />
           <Route path="/tip"            element={<Tip />} />
           <Route path="/membership"     element={<Membership />} />
+          <Route path="/threshold"      element={<Threshold />} />
         </Routes>
       </Suspense>
       <Footer />

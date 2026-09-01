@@ -30,7 +30,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 export default function WaitlistModal() {
-  const { isOpen, source, close } = useWaitlist();
+  const { isOpen, source, presetInterest, close } = useWaitlist();
   const formId = useId();
 
   const [name,     setName]     = useState('');
@@ -44,14 +44,15 @@ export default function WaitlistModal() {
 
   const emailRef = useRef<HTMLInputElement>(null);
 
-  // Reset form on open
+  // Reset form on open; apply any preset from context (e.g. /threshold page)
   useEffect(() => {
     if (isOpen) {
-      setName(''); setEmail(''); setPhone(''); setInterest(''); setMessage(''); setPot('');
+      setName(''); setEmail(''); setPhone(''); setMessage(''); setPot('');
+      setInterest(presetInterest || '');
       setStatus('idle'); setErrMsg('');
       setTimeout(() => emailRef.current?.focus(), 80);
     }
-  }, [isOpen]);
+  }, [isOpen, presetInterest]);
 
   // Close on Escape
   useEffect(() => {

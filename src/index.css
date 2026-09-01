@@ -738,10 +738,29 @@ h1, h2, h3, h4, h5 {
   .ph-compass-ring { animation: none; }
 }
 
-/* ── Margin narrative register columns ───────────────────────────────────── */
+/* ── Noto script fonts (self-hosted, script-range only) ──────────────────── */
 
-/* Wrapper spans full page height, sits behind content */
-.mg-wrapper {
+@font-face {
+  font-family: 'Noto Egyptian Hieroglyphs';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/noto-egyptian-hieroglyphs.woff2') format('woff2');
+  unicode-range: U+13000-1342F;
+}
+
+@font-face {
+  font-family: 'Noto Cuneiform';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/noto-cuneiform.woff2') format('woff2');
+  unicode-range: U+12000-1242F;
+}
+
+/* ── Two-script margin cipher columns ────────────────────────────────────── */
+
+.gc-wrapper {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -749,8 +768,7 @@ h1, h2, h3, h4, h5 {
   overflow: hidden;
 }
 
-/* Carved stone panel columns — responsive width fills the gutter */
-.mg-col {
+.gc-col {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -758,64 +776,228 @@ h1, h2, h3, h4, h5 {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  padding: 7vh 0 5vh;
-}
-.mg-col-left  { left: 40px; }
-.mg-col-right { right: 40px; }
-
-/* Register band — horizontal row of 2–4 symbols with register-line borders */
-.mg-register {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 4px;
-  padding: 10px 8px;
-  border-top: 1px solid rgba(203, 243, 110, 0.07);
-  color: rgba(203, 243, 110, 0.72);
-  background: rgba(11, 15, 28, 0.12);
-  opacity: 0;
+  padding: 6vh 0 5vh;
+  overflow: hidden;
 }
-.mg-register:last-child {
-  border-bottom: 1px solid rgba(203, 243, 110, 0.07);
-}
-.mg-register svg {
-  flex: 1;
-  min-width: 0;
+.gc-col-left  { left: 40px; }
+.gc-col-right { right: 40px; }
+
+/* Stanza: vertical stack of glyphs */
+.gc-stanza {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
 }
 
-/* Burn-in reveal — etched edge sweeps across the whole band, settles embossed */
-.mg-register.mg-revealed {
-  opacity: 1;
-  animation: mg-register-burnin 0.9s ease-out forwards;
+/* Individual glyph cell — text rendered via Noto script fonts */
+.gc-glyph {
+  width: 100%;
+  text-align: center;
+  font-size: clamp(105px, calc((100vw - 1280px) * 0.35), 140px);
+  line-height: 1.05;
+  color: rgba(203, 243, 110, 0);
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='10' cy='10' r='7' stroke='rgba(203,243,110,0.9)' stroke-width='1.5' fill='none'/%3E%3Cline x1='15.5' y1='15.5' x2='21' y2='21' stroke='rgba(203,243,110,0.9)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, zoom-in;
+}
+.gc-col-left  .gc-glyph { font-family: 'Noto Egyptian Hieroglyphs', serif; }
+.gc-col-right .gc-glyph { font-family: 'Noto Cuneiform', serif; }
+
+/* Burn-through reveal: ember eats downward, cools to embossed relief */
+.gc-glyph.gc-glyph-burned {
+  animation: gc-burn 2.2s ease-out forwards;
 }
 
-@keyframes mg-register-burnin {
+@keyframes gc-burn {
   0% {
-    clip-path: inset(0 100% 0 0);
-    filter: brightness(9) saturate(3) blur(0.5px);
-    color: rgba(255, 255, 230, 1);
+    clip-path: inset(0 0 100% 0);
+    color: rgba(255, 252, 230, 1);
+    text-shadow: 0 0 20px rgba(255, 160, 50, 1), 0 0 40px rgba(255, 80, 0, 0.7);
+    filter: brightness(20) saturate(5);
   }
-  50% {
-    clip-path: inset(0 0% 0 0);
-    filter: brightness(3.5) saturate(1.6);
-    color: rgba(235, 255, 190, 0.88);
+  4% {
+    clip-path: inset(0 0 95% 0 round 0 0 6px 6px);
+    color: rgba(255, 245, 200, 1);
+    text-shadow: 0 0 16px rgba(255, 140, 40, 0.9);
+    filter: brightness(16) saturate(4.5);
+  }
+  12% {
+    clip-path: inset(0 0 78% 0 round 0 0 14px 10px);
+    color: rgba(255, 210, 130, 1);
+    text-shadow: 0 0 10px rgba(255, 120, 30, 0.8);
+    filter: brightness(11) saturate(3.8);
+  }
+  24% {
+    clip-path: inset(0 0 55% 0 round 0 0 22px 16px);
+    color: rgba(255, 175, 70, 1);
+    text-shadow: 0 0 7px rgba(255, 100, 20, 0.65);
+    filter: brightness(7) saturate(3);
+  }
+  40% {
+    clip-path: inset(0 0 28% 0 round 0 0 28px 20px);
+    color: rgba(235, 255, 160, 0.95);
+    text-shadow: 0 0 5px rgba(203, 243, 110, 0.5);
+    filter: brightness(4.5) saturate(2.2);
+  }
+  58% {
+    clip-path: inset(0 0 8% 0 round 0 0 16px 12px);
+    color: rgba(220, 255, 135, 0.92);
+    text-shadow: 0 0 3px rgba(203, 243, 110, 0.35);
+    filter: brightness(2.8) saturate(1.7);
+  }
+  74% {
+    clip-path: inset(0 0 0% 0);
+    color: rgba(203, 243, 110, 0.88);
+    text-shadow: none;
+    filter: brightness(2) saturate(1.4);
+  }
+  90% {
+    clip-path: inset(0 0 0% 0);
+    color: rgba(203, 243, 110, 0.82);
+    text-shadow: none;
+    filter: brightness(1.3);
   }
   100% {
-    clip-path: inset(0 0% 0 0);
+    clip-path: inset(0 0 0% 0);
+    color: rgba(203, 243, 110, 0.75);
+    text-shadow: none;
     filter:
-      drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.92))
-      drop-shadow(0 -0.5px 0 rgba(203, 243, 110, 0.20));
-    color: rgba(203, 243, 110, 0.72);
+      drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.9))
+      drop-shadow(0 -0.5px 0 rgba(203, 243, 110, 0.15));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mg-register { opacity: 0; transition: opacity 0.4s; }
-  .mg-register.mg-revealed { opacity: 1; animation: none; }
+  .gc-glyph {
+    transition: color 0.3s ease, filter 0.3s ease;
+  }
+  .gc-glyph.gc-glyph-burned {
+    color: rgba(203, 243, 110, 0.75);
+    filter: drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.9));
+    animation: none;
+    text-shadow: none;
+  }
 }
+
+/* Stanza divider band */
+.gc-divider-band {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 0;
+  pointer-events: none;
+}
+.gc-divider-rule {
+  width: 80%;
+  height: 1px;
+  background: rgba(203, 243, 110, 0.1);
+}
+.gc-divider-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.gc-concept-glyph {
+  font-size: 26px;
+  color: rgba(203, 243, 110, 0.45);
+  line-height: 1;
+  pointer-events: auto;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='10' cy='10' r='7' stroke='rgba(203,243,110,0.9)' stroke-width='1.5' fill='none'/%3E%3Cline x1='15.5' y1='15.5' x2='21' y2='21' stroke='rgba(203,243,110,0.9)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, zoom-in;
+}
+.gc-divider-marks {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: rgba(203, 243, 110, 0.22);
+}
+.gc-lidar-mark {
+  color: rgba(203, 243, 110, 0.28);
+}
+
+/* Hover lens — one reused circular element */
+.gc-lens {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 18px;
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(8, 12, 25, 0.97) 52%,
+    rgba(6, 10, 20, 0.93) 78%,
+    rgba(203, 243, 110, 0.06) 100%
+  );
+  border: 1.5px solid rgba(203, 243, 110, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 8px 40px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+  z-index: 10000;
+  opacity: 0;
+  transform: scale(0.84);
+  transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.34, 1.26, 0.64, 1);
+  overflow: hidden;
+  text-align: center;
+}
+.gc-lens::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 20px;
+  right: 20px;
+  height: 46px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.gc-lens.gc-lens-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gc-lens { transition: opacity 0.1s ease; transform: scale(1); }
+}
+.gc-lens-char {
+  font-size: 90px;
+  line-height: 1;
+  color: rgba(203, 243, 110, 0.88);
+  filter: drop-shadow(0 0 6px rgba(203, 243, 110, 0.25));
+}
+.gc-lens-char.gc-font-egy { font-family: 'Noto Egyptian Hieroglyphs', serif; }
+.gc-lens-char.gc-font-sux { font-family: 'Noto Cuneiform', serif; }
+.gc-lens-trans {
+  font-family: var(--font-alt);
+  font-size: 10px;
+  color: rgba(203, 243, 110, 0.65);
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  max-width: 140px;
+  word-break: break-word;
+}
+.gc-lens-uname {
+  font-family: var(--font-alt);
+  font-size: 8px;
+  color: rgba(203, 243, 110, 0.35);
+  letter-spacing: 0.05em;
+  max-width: 140px;
+}
+
+/* ── Margin narrative register columns (legacy, kept for mobile GlyphDivider) */
 
 /* Mobile/tablet glyph divider between sections */
 .mg-divider {
