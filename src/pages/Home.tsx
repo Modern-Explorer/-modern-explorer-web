@@ -287,9 +287,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* bottom boundary for margin cipher — JS reads this to clip columns */}
-      <div data-gc-end />
-
       <GlyphDivider />
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
@@ -330,6 +327,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* bottom boundary for cipher columns — extended past Frontier so all 3 stanzas show */}
+      <div data-gc-end />
 
       <GlyphDivider />
       {/* ── EXPEDITIONS & TOURS ──────────────────────────────────────────── */}

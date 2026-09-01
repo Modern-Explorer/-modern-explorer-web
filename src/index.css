@@ -775,7 +775,7 @@ h1, h2, h3, h4, h5 {
   position: absolute;
   top: 0;
   height: auto;
-  max-height: 185vh; /* sentinel JS refines this; rough clip covers hero + mission */
+  /* max-height removed — wrapper overflow:hidden + JS sentinel height do the clipping */
   width: clamp(150px, calc((100vw - 1280px) / 2), 200px);
   display: flex;
   flex-direction: column;
