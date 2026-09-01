@@ -6,6 +6,7 @@ import { useWaitlist } from '../context/WaitlistContext';
 import { useReveal } from '../hooks/useReveal';
 import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import ParticleHero from '../components/ParticleHero';
+import GlyphColumns, { GlyphDivider } from '../components/GlyphColumns';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -92,7 +93,8 @@ export default function Home() {
   useReveal();
 
   return (
-    <main>
+    <main style={{ position: 'relative' }}>
+      <GlyphColumns />
       <SEO
         title="Modern Explorer | UFO, Paranormal & Cryptozoology Research — Crestone, CO"
         description="Modern Explorer investigates unknown phenomena — UAP, cryptozoology, and lost history — in Crestone, Colorado and the San Luis Valley. Join the research or book a guided expedition."
@@ -103,6 +105,7 @@ export default function Home() {
       <ParticleHero />
 
       {/* ── THE MISSION ──────────────────────────────────────────────────── */}
+      <GlyphDivider />
       <section className="section" style={{ background: 'var(--bg)' }}>
         <div className="container">
           <div data-reveal style={{ textAlign: 'center', marginBottom: 56 }}>
@@ -127,6 +130,7 @@ export default function Home() {
         </div>
       </section>
 
+      <GlyphDivider />
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
@@ -167,6 +171,7 @@ export default function Home() {
         </div>
       </section>
 
+      <GlyphDivider />
       {/* ── EXPEDITIONS & TOURS ──────────────────────────────────────────── */}
       <section id="mesa-tours" className="section">
         <div className="container">
@@ -293,6 +298,7 @@ export default function Home() {
         </div>
       </section>
 
+      <GlyphDivider />
       {/* ── LATEST FROM THE FIELD ────────────────────────────────────────── */}
       <section id="mesa-reports" className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
         <div className="container">

@@ -252,77 +252,311 @@ const SIDE_SYMBOLS: SymbolDef[] = [
   symBoomerang(), symNazcaBird(), symBigfootPrint(), symCairn(),
 ];
 
-// ─── Glyph generators (center formation) ─────────────────────────────────────
+// ─── Glyph generators (center formation — detailed technical-drawing quality) ──
+// Helper: points along an ellipse arc
+function arcPts(cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, n: number): [number,number][] {
+  return Array.from({length: n}, (_, i) => {
+    const a = a0 + (i / Math.max(n - 1, 1)) * (a1 - a0);
+    return [cx + Math.cos(a) * rx, cy + Math.sin(a) * ry] as [number,number];
+  });
+}
+// Helper: points along a line segment
+function linePts(x0: number, y0: number, x1: number, y1: number, n: number): [number,number][] {
+  return Array.from({length: n}, (_, i) => {
+    const t = i / Math.max(n - 1, 1);
+    return [x0 + (x1 - x0) * t, y0 + (y1 - y0) * t] as [number,number];
+  });
+}
+
+// 1. Compass — real instrument: bezel with degree ticks, rose, needle with pivot
 function glyphCompassRose(n: number): [number, number][] {
   const pts: [number, number][] = [];
-  for (const d of [0, 0.5, 1, 1.5]) {
-    const a = d * Math.PI;
-    for (let t = 0.1; t <= 1; t += 0.18) pts.push([Math.sin(a) * t, -Math.cos(a) * t]);
-    pts.push([Math.sin(a + 0.3) * 0.55, -Math.cos(a + 0.3) * 0.55]);
-    pts.push([Math.sin(a - 0.3) * 0.55, -Math.cos(a - 0.3) * 0.55]);
+  // Outer bezel circle
+  pts.push(...arcPts(0, 0, 0.92, 0.92, 0, Math.PI * 2, 40));
+  // Inner bezel ring
+  pts.push(...arcPts(0, 0, 0.82, 0.82, 0, Math.PI * 2, 36));
+  // Degree tick marks — 36 ticks (every 10°)
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2;
+    const inner = (i % 9 === 0) ? 0.70 : (i % 3 === 0) ? 0.76 : 0.80;
+    pts.push(...linePts(Math.cos(a) * inner, Math.sin(a) * inner, Math.cos(a) * 0.82, Math.sin(a) * 0.82, 3));
   }
-  for (const d of [0.25, 0.75, 1.25, 1.75]) {
-    const a = d * Math.PI;
-    for (let t = 0.15; t <= 0.65; t += 0.20) pts.push([Math.sin(a) * t, -Math.cos(a) * t]);
+  // 8-point compass rose arms
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+    const len = (i % 2 === 0) ? 0.60 : 0.44;
+    pts.push(...linePts(0, 0, Math.cos(a) * len, Math.sin(a) * len, 6));
+    // Arrowhead barbs on cardinal points
+    if (i % 2 === 0) {
+      const tip = [Math.cos(a) * 0.60, Math.sin(a) * 0.60] as [number,number];
+      const lb  = a + 0.28, rb = a - 0.28;
+      pts.push(...linePts(tip[0], tip[1], Math.cos(lb) * 0.44, Math.sin(lb) * 0.44, 3));
+      pts.push(...linePts(tip[0], tip[1], Math.cos(rb) * 0.44, Math.sin(rb) * 0.44, 3));
+    }
   }
-  for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; pts.push([Math.sin(a) * 0.22, Math.cos(a) * 0.22]); }
-  pts.push([0, 0]);
+  // Magnetic needle (elongated diamond): N-half bright, S-half dark
+  pts.push(...linePts(0, 0,  0,    -0.50, 5));  // north half
+  pts.push(...linePts(0, 0,  0.08, -0.28, 3));
+  pts.push(...linePts(0, 0, -0.08, -0.28, 3));
+  pts.push(...linePts(0, 0,  0,     0.38, 4));  // south half
+  // Pivot circle
+  pts.push(...arcPts(0, 0, 0.10, 0.10, 0, Math.PI * 2, 10));
+  pts.push(...arcPts(0, 0, 0.04, 0.04, 0, Math.PI * 2, 6));
+  // N/S/E/W letter position dots (very close to inner bezel)
+  for (const a of [0, Math.PI/2, Math.PI, Math.PI*1.5]) {
+    pts.push([Math.cos(a - Math.PI/2) * 0.68, Math.sin(a - Math.PI/2) * 0.68]);
+  }
   return pts.slice(0, n);
 }
+
+// 2. Cairn — stacked rocks with stone texture lines and shadow
 function glyphCairn(n: number): [number, number][] {
   const pts: [number, number][] = [];
-  for (const s of [{ y: 0.78, rx: 0.78, ry: 0.14, count: 22 }, { y: 0.48, rx: 0.60, ry: 0.13, count: 18 }, { y: 0.22, rx: 0.44, ry: 0.12, count: 14 }, { y: 0.00, rx: 0.30, ry: 0.11, count: 10 }, { y: -0.20, rx: 0.18, ry: 0.09, count: 7 }]) {
-    for (let i = 0; i < s.count; i++) { const a = (i / s.count) * Math.PI * 2; pts.push([Math.cos(a) * s.rx, s.y + Math.sin(a) * s.ry]); }
-    pts.push([0, s.y], [s.rx * 0.45, s.y + s.ry * 0.4], [-s.rx * 0.45, s.y - s.ry * 0.4]);
+  // Each rock: wide flat ellipse, stacked progressively narrower
+  const rocks = [
+    { y: 0.78, rx: 0.80, ry: 0.13, cnt: 24 },
+    { y: 0.56, rx: 0.62, ry: 0.12, cnt: 20 },
+    { y: 0.36, rx: 0.46, ry: 0.11, cnt: 16 },
+    { y: 0.17, rx: 0.32, ry: 0.10, cnt: 12 },
+    { y: 0.00, rx: 0.20, ry: 0.09, cnt: 9  },
+    { y: -0.15, rx: 0.11, ry: 0.07, cnt: 6 },
+  ];
+  for (const r of rocks) {
+    pts.push(...arcPts(0, r.y, r.rx, r.ry, 0, Math.PI * 2, r.cnt));
+    // Horizontal stone-grain lines across each rock
+    for (let j = 1; j < 3; j++) {
+      const oy = r.y - r.ry * 0.4 + r.ry * 0.4 * j;
+      const hw = r.rx * Math.sqrt(1 - ((oy - r.y) / r.ry) ** 2) * 0.85;
+      pts.push(...linePts(-hw, oy, hw, oy, 5));
+    }
+  }
+  // Rock seam lines (vertical cracks between rocks)
+  for (let i = 0; i < rocks.length - 1; i++) {
+    const ra = rocks[i], rb = rocks[i + 1];
+    const xoff = (i % 2 === 0 ? 0.12 : -0.10) * ra.rx;
+    pts.push(...linePts(xoff, ra.y - ra.ry, xoff, rb.y + rb.ry, 3));
   }
   return pts.slice(0, n);
 }
+
+// 3. Footprint — anatomically proportioned with arch, heel, 5 toes with depth detail
 function glyphFootprint(n: number): [number, number][] {
   const pts: [number, number][] = [];
-  const pc = Math.round(n * 0.65);
-  for (let i = 0; i < pc; i++) { const a = (i / pc) * Math.PI * 2; pts.push([Math.cos(a) * 0.44, Math.sin(a) * 0.82]); }
-  for (let i = 0; i < 20; i++) { const a = (i / 20) * Math.PI * 2; pts.push([Math.cos(a) * 0.22, Math.sin(a) * 0.50]); }
-  for (const [tx, ty] of [[-0.36, -0.90], [-0.18, -0.96], [0, -0.99], [0.18, -0.96], [0.36, -0.90]] as [number,number][]) {
-    for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; pts.push([tx + Math.cos(a) * 0.10, ty + Math.sin(a) * 0.08]); }
+  // Main footpad (heel + ball): asymmetric pointed-heel ellipse approximated with two arcs
+  pts.push(...arcPts(0, 0.30, 0.42, 0.62, 0, Math.PI * 2, 32));
+  // Arch area (medial side indentation) — overlay tighter arc on left
+  pts.push(...arcPts(-0.08, 0.18, 0.30, 0.36, Math.PI * 0.6, Math.PI * 1.4, 8));
+  // Ball of foot (upper pad)
+  pts.push(...arcPts(0, -0.18, 0.30, 0.18, 0, Math.PI * 2, 16));
+  // Depth contour inside heel
+  pts.push(...arcPts(0, 0.50, 0.26, 0.32, 0.3, Math.PI - 0.3, 8));
+  // 5 toes: size decreasing from big toe (left) to pinky (right)
+  const toes: [number, number, number, number][] = [
+    [-0.36, -0.92, 0.115, 0.09],
+    [-0.18, -0.98, 0.098, 0.08],
+    [ 0.01, -1.01, 0.092, 0.075],
+    [ 0.19, -0.98, 0.082, 0.068],
+    [ 0.35, -0.90, 0.070, 0.058],
+  ];
+  for (const [tx, ty, rx, ry] of toes) {
+    pts.push(...arcPts(tx, ty, rx, ry, 0, Math.PI * 2, 8));
+    // Toe nail line
+    pts.push(...arcPts(tx, ty - ry * 0.3, rx * 0.65, ry * 0.28, Math.PI * 1.1, Math.PI * 1.9, 4));
+    // Toe crease below nail
+    pts.push(...linePts(tx - rx * 0.5, ty + ry * 0.5, tx + rx * 0.5, ty + ry * 0.5, 3));
+  }
+  // Lateral toe knuckle ridges
+  for (let i = 0; i < 4; i++) {
+    const [tx, ty] = toes[i];
+    const [tx2, ty2] = toes[i + 1];
+    pts.push(...linePts(tx + 0.06, ty + 0.06, tx2 - 0.04, ty2 + 0.06, 3));
   }
   return pts.slice(0, n);
 }
+
+// 4. UAP — lenticular craft with panel lines, dome, running lights, perspective tilt
 function glyphUAP(n: number): [number, number][] {
   const pts: [number, number][] = [];
-  const bc = Math.round(n * 0.45);
-  for (let i = 0; i < bc; i++) { const a = (i / bc) * Math.PI * 2; pts.push([Math.cos(a) * 0.95, Math.sin(a) * 0.22]); }
-  for (let i = 0; i < 25; i++) { const a = (i / 25) * Math.PI * 2; pts.push([Math.cos(a) * 0.6, Math.sin(a) * 0.14]); }
-  const dc = Math.round(n * 0.25);
-  for (let i = 0; i < dc; i++) { const a = (i / dc) * Math.PI; pts.push([Math.cos(a) * 0.36, -0.18 - Math.sin(a) * 0.30]); }
-  for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2; pts.push([Math.cos(a) * 1.02, Math.sin(a) * 0.24]); }
-  for (let i = 0; i < 7; i++) pts.push([(i / 6 - 0.5) * 1.2, 0.28]);
-  return pts.slice(0, n);
-}
-function glyphPetroglyph(n: number): [number, number][] {
-  const pts: [number, number][] = [];
-  for (let i = 0; i < 18; i++) { const a = (i / 18) * Math.PI * 2; pts.push([Math.cos(a) * 0.22, -0.68 + Math.sin(a) * 0.22]); }
-  for (let t = 0; t <= 1; t += 0.1) pts.push([0, -0.44 + t * 0.72]);
-  for (let t = 0; t <= 1; t += 0.1) pts.push([-t * 0.72, -0.18 - t * 0.12]);
-  for (let t = 0; t <= 1; t += 0.1) pts.push([t * 0.72, -0.18 - t * 0.12]);
-  for (let t = 0; t <= 1; t += 0.12) pts.push([-t * 0.44, 0.28 + t * 0.60]);
-  for (let t = 0; t <= 1; t += 0.12) pts.push([t * 0.44, 0.28 + t * 0.60]);
-  for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2; pts.push([-0.72 + Math.cos(a) * 0.10, -0.30 + Math.sin(a) * 0.10]); }
-  for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2; pts.push([0.72 + Math.cos(a) * 0.10, -0.30 + Math.sin(a) * 0.10]); }
-  return pts.slice(0, n);
-}
-function glyphSpiral(n: number): [number, number][] {
-  const pts: [number, number][] = [];
-  for (let i = 0; i < n; i++) { const t = i / n; const a = t * Math.PI * 2 * 3.2; pts.push([Math.cos(a) * (0.08 + t * 0.88), Math.sin(a) * (0.08 + t * 0.88)]); }
-  return pts;
-}
-function glyphTopoRings(n: number): [number, number][] {
-  const pts: [number, number][] = [];
-  for (const ring of [{ r: 0.95, count: Math.round(n * 0.38) }, { r: 0.62, count: Math.round(n * 0.32) }, { r: 0.33, count: Math.round(n * 0.20) }, { r: 0.12, count: Math.round(n * 0.10) }]) {
-    for (let i = 0; i < ring.count; i++) { const a = (i / ring.count) * Math.PI * 2; const j = 0.04 * Math.sin(a * 5) + 0.02 * Math.cos(a * 8); pts.push([Math.cos(a) * (ring.r + j), Math.sin(a) * (ring.r + j)]); }
+  const tilt = -0.12; // slight nose-down perspective
+  // Outer hull (major ellipse, slightly tilted)
+  for (let i = 0; i < 52; i++) {
+    const a = (i / 52) * Math.PI * 2;
+    const rx = 0.92, ry = 0.20;
+    const x = Math.cos(a) * rx;
+    const y = Math.sin(a) * ry + x * tilt;
+    pts.push([x, y + 0.06]);
+  }
+  // Inner hull ring (secondary edge line)
+  for (let i = 0; i < 40; i++) {
+    const a = (i / 40) * Math.PI * 2;
+    const x = Math.cos(a) * 0.76;
+    const y = Math.sin(a) * 0.14 + x * tilt;
+    pts.push([x, y + 0.06]);
+  }
+  // Upper hull surface arc (flat top of saucer)
+  pts.push(...arcPts(0, 0.06 + tilt * 0, 0.88, 0.18, Math.PI * 1.05, Math.PI * 1.95, 22));
+  // Lower hull surface (convex underside with more curvature)
+  pts.push(...arcPts(0, 0.06, 0.86, 0.26, Math.PI * 0.05, Math.PI * 0.95, 22));
+  // Panel lines (3 horizontal seams across the hull)
+  for (let p = 0; p < 3; p++) {
+    const py = -0.08 + p * 0.09 + 0.06;
+    const hw = 0.88 * Math.sqrt(Math.max(0, 1 - ((py - 0.06) / 0.20) ** 2));
+    pts.push(...linePts(-hw * 0.9, py, hw * 0.9, py, 10));
+  }
+  // Vertical panel dividers (4 across the hull)
+  for (const xf of [-0.55, -0.20, 0.20, 0.55]) {
+    const hw = 0.20 * Math.sqrt(Math.max(0, 1 - (xf / 0.88) ** 2));
+    pts.push(...linePts(xf, 0.06 - hw * 0.85, xf, 0.06 + hw * 0.85, 4));
+  }
+  // Dome (flattened hemisphere on top-center)
+  pts.push(...arcPts(0.06, -0.10, 0.22, 0.20, Math.PI * 1.05, Math.PI * 1.95, 18));
+  pts.push(...arcPts(0.06, -0.10, 0.14, 0.13, Math.PI * 1.1, Math.PI * 1.9, 12));
+  // Dome base ring
+  pts.push(...arcPts(0.06, -0.09, 0.22, 0.06, Math.PI * 1.1, Math.PI * 1.9, 10));
+  // Running lights (small clusters at regular intervals around perimeter)
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const x = Math.cos(a) * 0.80;
+    const y = Math.sin(a) * 0.14 + x * tilt + 0.06;
+    for (let j = 0; j < 4; j++) {
+      const da = (j / 4) * Math.PI * 2;
+      pts.push([x + Math.cos(da) * 0.025, y + Math.sin(da) * 0.018]);
+    }
+  }
+  // Underside landing gear / strut suggestion
+  for (const xf of [-0.35, 0, 0.35]) {
+    pts.push(...linePts(xf, 0.22, xf + 0.02, 0.36, 3));
+    pts.push(...linePts(xf - 0.06, 0.36, xf + 0.08, 0.36, 3));
   }
   return pts.slice(0, n);
 }
-const GLYPHS = [glyphCompassRose, glyphCairn, glyphFootprint, glyphUAP, glyphPetroglyph, glyphSpiral, glyphTopoRings];
+
+// 5. Petroglyph — anthropomorphic figure (sun-headed) with detailed limbs + solar disc
+function glyphPetroglyph(n: number): [number, number][] {
+  const pts: [number, number][] = [];
+  // Solar disc head with 12 rays
+  pts.push(...arcPts(0, -0.64, 0.22, 0.22, 0, Math.PI * 2, 20));
+  pts.push(...arcPts(0, -0.64, 0.12, 0.12, 0, Math.PI * 2, 12));
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    pts.push(...linePts(Math.cos(a) * 0.22, -0.64 + Math.sin(a) * 0.22, Math.cos(a) * 0.34, -0.64 + Math.sin(a) * 0.34, 3));
+  }
+  // Neck
+  pts.push(...linePts(0, -0.42, 0, -0.34, 3));
+  // Torso (rectangular with rounded shoulders)
+  pts.push(...linePts(-0.28, -0.34, 0.28, -0.34, 5)); // shoulders
+  pts.push(...linePts(-0.18, -0.34, -0.18, 0.14, 6)); // left side
+  pts.push(...linePts(0.18, -0.34,  0.18, 0.14, 6)); // right side
+  pts.push(...linePts(-0.16, 0.14,  0.16, 0.14, 4)); // waist
+  // Arms: outstretched with upward tilt (supplication pose)
+  pts.push(...linePts(-0.28, -0.34, -0.64, -0.54, 6)); // left upper arm
+  pts.push(...linePts(-0.64, -0.54, -0.84, -0.32, 5)); // left forearm
+  // Left hand - 3 lines for fingers
+  for (const fa of [-0.3, 0, 0.3]) {
+    pts.push(...linePts(-0.84, -0.32, -0.84 + Math.cos(fa - 0.4) * 0.14, -0.32 + Math.sin(fa + 0.3) * 0.14, 2));
+  }
+  pts.push(...linePts(0.28, -0.34,  0.64, -0.54, 6)); // right upper arm
+  pts.push(...linePts(0.64, -0.54,  0.84, -0.32, 5)); // right forearm
+  for (const fa of [-0.3, 0, 0.3]) {
+    pts.push(...linePts(0.84, -0.32, 0.84 + Math.cos(fa + 0.4) * 0.14, -0.32 + Math.sin(fa + 0.3) * 0.14, 2));
+  }
+  // Legs: slightly splayed
+  pts.push(...linePts(-0.10, 0.14, -0.22, 0.60, 6)); // left upper leg
+  pts.push(...linePts(-0.22, 0.60, -0.30, 0.96, 5)); // left lower leg
+  pts.push(...linePts(-0.30, 0.96, -0.42, 0.96, 3)); // left foot
+  pts.push(...linePts(0.10, 0.14,  0.22, 0.60, 6)); // right upper leg
+  pts.push(...linePts(0.22, 0.60,  0.30, 0.96, 5)); // right lower leg
+  pts.push(...linePts(0.30, 0.96,  0.44, 0.96, 3)); // right foot
+  // Spiral on torso (common petroglyph marking)
+  for (let i = 0; i < 14; i++) {
+    const t = i / 14; const a = t * Math.PI * 2 * 2;
+    pts.push([Math.cos(a) * (0.02 + t * 0.10), 0.02 + Math.sin(a) * (0.02 + t * 0.06)]);
+  }
+  return pts.slice(0, n);
+}
+
+// 6. Ancient Ruins — broken columns, collapsed lintel, buried steps (replaces plain spiral)
+function glyphRuins(n: number): [number, number][] {
+  const pts: [number, number][] = [];
+  // Ground line
+  pts.push(...linePts(-0.95, 0.72, 0.95, 0.72, 14));
+  // Partially buried step blocks
+  pts.push(...linePts(-0.82, 0.72, -0.82, 0.54, 4));
+  pts.push(...linePts(-0.82, 0.54, -0.30, 0.54, 6));
+  pts.push(...linePts(-0.30, 0.54, -0.30, 0.72, 4));
+  pts.push(...linePts(0.30, 0.72, 0.30, 0.56, 4));
+  pts.push(...linePts(0.30, 0.56, 0.84, 0.56, 6));
+  pts.push(...linePts(0.84, 0.56, 0.84, 0.72, 4));
+  // Left standing column — cracked, worn
+  pts.push(...linePts(-0.62, 0.54, -0.62, -0.20, 14));
+  pts.push(...linePts(-0.46, 0.54, -0.46, -0.20, 14));
+  // Column capital top
+  pts.push(...linePts(-0.70, -0.20, -0.38, -0.20, 8));
+  pts.push(...linePts(-0.70, -0.26, -0.38, -0.26, 8));
+  // Column crack (horizontal fracture mid-shaft)
+  pts.push(...linePts(-0.62, 0.16, -0.48, 0.12, 4));
+  pts.push(...linePts(-0.48, 0.12, -0.46, 0.18, 3));
+  // Fluting lines on left column (3 channels)
+  for (const xf of [-0.60, -0.54, -0.48]) {
+    pts.push(...linePts(xf, 0.50, xf, -0.18, 6));
+  }
+  // Right broken column — tilted/toppled fragment
+  const tiltAngle = 0.18;
+  const colLen = 0.70;
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11;
+    pts.push([0.52 + t * Math.cos(Math.PI / 2 + tiltAngle) * colLen, 0.54 + t * Math.sin(Math.PI / 2 + tiltAngle) * colLen * -1]);
+    pts.push([0.36 + t * Math.cos(Math.PI / 2 + tiltAngle) * colLen, 0.54 + t * Math.sin(Math.PI / 2 + tiltAngle) * colLen * -1]);
+  }
+  // Capital of right column (lying at angle)
+  pts.push(...linePts(0.28, -0.20, 0.62, -0.32, 6));
+  pts.push(...linePts(0.28, -0.26, 0.62, -0.38, 6));
+  // Collapsed lintel spans top (broken in middle)
+  pts.push(...linePts(-0.70, -0.40, -0.10, -0.44, 10));
+  pts.push(...linePts(-0.10, -0.44, -0.06, -0.36, 3)); // break edge
+  pts.push(...linePts(-0.70, -0.46, -0.10, -0.50, 10));
+  // Right lintel fragment (fallen down)
+  pts.push(...linePts(0.08, -0.28, 0.56, -0.44, 8));
+  pts.push(...linePts(0.08, -0.34, 0.56, -0.50, 8));
+  // Erosion detail — small stone chunks near base
+  for (const [ex, ey] of [[-0.40, 0.58], [-0.20, 0.64], [0.10, 0.60], [0.55, 0.58]] as [number,number][]) {
+    pts.push(...arcPts(ex, ey, 0.06, 0.04, 0, Math.PI * 2, 5));
+  }
+  // Rubble near toppled column base
+  pts.push(...linePts(0.64, 0.70, 0.80, 0.66, 4));
+  pts.push(...linePts(0.74, 0.68, 0.72, 0.58, 3));
+  return pts.slice(0, n);
+}
+
+// 7. Topographic rings — refined with more organic jitter and elevation label dots
+function glyphTopoRings(n: number): [number, number][] {
+  const pts: [number, number][] = [];
+  const rings = [
+    { r: 0.92, cnt: Math.round(n * 0.35), j: 0.06 },
+    { r: 0.65, cnt: Math.round(n * 0.28), j: 0.05 },
+    { r: 0.42, cnt: Math.round(n * 0.20), j: 0.04 },
+    { r: 0.22, cnt: Math.round(n * 0.12), j: 0.03 },
+    { r: 0.08, cnt: Math.round(n * 0.05), j: 0.01 },
+  ];
+  for (const ring of rings) {
+    for (let i = 0; i < ring.cnt; i++) {
+      const a = (i / ring.cnt) * Math.PI * 2;
+      const j = ring.j * Math.sin(a * 5 + ring.r * 10) + ring.j * 0.5 * Math.cos(a * 9);
+      pts.push([Math.cos(a) * (ring.r + j), Math.sin(a) * (ring.r + j)]);
+    }
+    // Elevation tick marks at cardinal points of each ring
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2;
+      pts.push([Math.cos(a) * ring.r, Math.sin(a) * ring.r]);
+      pts.push([Math.cos(a) * (ring.r + 0.06), Math.sin(a) * (ring.r + 0.06)]);
+    }
+  }
+  // Summit marker cross
+  pts.push([0.02, 0], [-0.02, 0], [0, 0.02], [0, -0.02]);
+  return pts.slice(0, n);
+}
+
+const GLYPHS = [glyphCompassRose, glyphCairn, glyphFootprint, glyphUAP, glyphPetroglyph, glyphRuins, glyphTopoRings];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Particle {
