@@ -153,6 +153,91 @@ function LidarMark() {
   );
 }
 
+// ── Canvas fire-burn helper ───────────────────────────────────────────────────
+
+const BURN_BG = '#0b0f1c';
+
+function startBurn(el: HTMLElement, delay: number): () => void {
+  const canvas = document.createElement('canvas');
+  Object.assign(canvas.style, {
+    position: 'absolute', inset: '0', width: '100%', height: '100%',
+    pointerEvents: 'none', zIndex: '2',
+  });
+  el.appendChild(canvas);
+
+  let rafId = 0;
+  let timerId: ReturnType<typeof setTimeout>;
+
+  const run = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = el.offsetWidth;
+    const H = el.offsetHeight;
+    if (!W || !H) { canvas.remove(); return; }
+
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = BURN_BG;
+    ctx.fillRect(0, 0, W, H);
+
+    const DURATION = 3000;
+    const LEAD = 22;  // fire gradient height above revealed area (px)
+    const TRAIL = 7;  // fire penetration below front into hidden area (px)
+
+    const phases = new Float32Array(Math.ceil(W) + 2);
+    for (let i = 0; i < phases.length; i++) phases[i] = Math.random() * Math.PI * 2;
+
+    const start = performance.now();
+    const frame = (now: number) => {
+      const t = Math.min(1, (now - start) / DURATION);
+      const tBase = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      ctx.clearRect(0, 0, W, H);
+
+      for (let x = 0; x <= W; x++) {
+        const noise =
+          Math.sin(phases[x] + t * 9.1) * 0.065 +
+          Math.sin(phases[x] * 1.71 + t * 5.3) * 0.04 +
+          Math.sin(phases[x] * 3.2  + t * 13)  * 0.02;
+        const frontY = (tBase + noise) * H;
+
+        // Hidden area (below front + trail): fill bg
+        const bgStart = Math.max(0, frontY - TRAIL);
+        if (bgStart < H) {
+          ctx.fillStyle = BURN_BG;
+          ctx.fillRect(x, bgStart, 1, H - bgStart);
+        }
+
+        // Fire gradient strip
+        const ft = Math.max(0, frontY - LEAD);
+        const fb = Math.min(H, frontY + TRAIL);
+        if (ft < fb) {
+          const grd = ctx.createLinearGradient(0, ft, 0, fb);
+          grd.addColorStop(0.00, 'rgba(255,230,110,0.00)');
+          grd.addColorStop(0.15, 'rgba(255,210, 80,0.55)');
+          grd.addColorStop(0.40, 'rgba(255,140, 20,0.92)');
+          grd.addColorStop(0.65, 'rgba(255, 55,  8,0.98)');
+          grd.addColorStop(0.85, 'rgba(200, 25,  5,0.75)');
+          grd.addColorStop(1.00, 'rgba( 60,  8,  2,0.00)');
+          ctx.fillStyle = grd;
+          ctx.fillRect(x, ft, 1, fb - ft);
+        }
+      }
+
+      if (t < 1) {
+        rafId = requestAnimationFrame(frame);
+      } else {
+        ctx.clearRect(0, 0, W, H);
+        canvas.remove();
+      }
+    };
+    rafId = requestAnimationFrame(frame);
+  };
+
+  timerId = setTimeout(run, delay * 1000);
+  return () => { clearTimeout(timerId); cancelAnimationFrame(rafId); canvas.remove(); };
+}
+
 // ── Glyph cell ───────────────────────────────────────────────────────────────
 
 interface GlyphCellProps {
@@ -164,8 +249,22 @@ interface GlyphCellProps {
 }
 
 function GlyphCell({ entry, delay, burned, onEnter, onLeave }: GlyphCellProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (!burned || started.current) return;
+    started.current = true;
+    const el = ref.current;
+    if (!el) return;
+    // Skip canvas animation for reduced-motion; CSS handles final state
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    return startBurn(el, delay);
+  }, [burned, delay]);
+
   return (
     <div
+      ref={ref}
       className={`gc-glyph${burned ? ' gc-glyph-burned' : ''}`}
       style={{ animationDelay: `${delay}s` }}
       onMouseEnter={() => onEnter(entry)}
@@ -199,7 +298,7 @@ function GlyphStanza({ glyphs, lang, onGlyphEnter, onGlyphLeave }: StanzaProps) 
           io.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      { threshold: 0, rootMargin: '0px 0px -40% 0px' }  // triggers at ~60% down viewport
     );
     io.observe(el);
     return () => io.disconnect();
@@ -211,7 +310,7 @@ function GlyphStanza({ glyphs, lang, onGlyphEnter, onGlyphLeave }: StanzaProps) 
         <GlyphCell
           key={i}
           entry={g}
-          delay={i * 0.4}
+          delay={i * 0.5}
           burned={burned}
           onEnter={onGlyphEnter}
           onLeave={onGlyphLeave}
