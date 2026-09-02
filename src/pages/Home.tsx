@@ -6,7 +6,7 @@ import { useWaitlist } from '../context/WaitlistContext';
 import { useReveal } from '../hooks/useReveal';
 import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import ParticleHero from '../components/ParticleHero';
-import GlyphColumns, { GlyphDivider } from '../components/GlyphColumns';
+import GlyphColumns, { MobileCipherDivider } from '../components/GlyphColumns';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -261,7 +261,7 @@ export default function Home() {
       <ParticleHero />
 
       {/* ── THE MISSION ──────────────────────────────────────────────────── */}
-      <GlyphDivider />
+      <MobileCipherDivider breakIdx={0} />  {/* Egyptian S1 */}
       <section className="section" style={{ background: 'var(--bg)' }}>
         <div className="container">
           <div data-reveal style={{ textAlign: 'center', marginBottom: 56 }}>
@@ -287,7 +287,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <GlyphDivider />
+      <MobileCipherDivider breakIdx={1} />  {/* Sumerian S1 */}
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
@@ -330,7 +330,7 @@ export default function Home() {
       {/* bottom boundary for cipher columns — extended past Frontier so all 3 stanzas show */}
       <div data-gc-end />
 
-      <GlyphDivider />
+      <MobileCipherDivider breakIdx={2} />  {/* Egyptian S2+S3, Morse */}
       {/* ── EXPEDITIONS & TOURS ──────────────────────────────────────────── */}
       <section id="mesa-tours" className="section">
         <div className="container">
@@ -457,7 +457,7 @@ export default function Home() {
         </div>
       </section>
 
-      <GlyphDivider />
+      <MobileCipherDivider breakIdx={3} />  {/* Sumerian S2+S3 */}
       {/* ── LATEST FROM THE FIELD ────────────────────────────────────────── */}
       <section id="mesa-reports" className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
         <div className="container">

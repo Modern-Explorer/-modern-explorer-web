@@ -978,7 +978,15 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
   document.addEventListener('visibilitychange', onVis);
   const onResize = () => resize();
   window.addEventListener('resize', onResize, { passive: true });
-  return () => { stop(); io.disconnect(); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('resize', onResize); };
+  // Pause RAF during scroll to keep scroll thread jank-free on mobile
+  let scrollResumeTimer = 0;
+  const onScroll = () => {
+    if (running) stop();
+    clearTimeout(scrollResumeTimer);
+    scrollResumeTimer = window.setTimeout(() => { if (inView && !document.hidden) start(); }, 160);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  return () => { stop(); io.disconnect(); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('resize', onResize); window.removeEventListener('scroll', onScroll); clearTimeout(scrollResumeTimer); };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

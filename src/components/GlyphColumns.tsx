@@ -1,5 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+// ── Burn concurrency queue (shared desktop + mobile, ≤2 simultaneous) ────────
+let _burnActive = 0;
+const _burnQueue: Array<() => void> = [];
+const BURN_MAX = 2;
+
+function _tryDequeueBurn() {
+  while (_burnActive < BURN_MAX && _burnQueue.length > 0) {
+    _burnActive++;
+    (_burnQueue.shift()!)();
+  }
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type GlyphEntry = {
@@ -211,6 +223,8 @@ function startBurnStroke(
   el: HTMLElement,
   char: string,
   delay: number,
+  mobile: boolean,
+  onDone: () => void,
 ): () => void {
   const canvas = document.createElement('canvas');
   Object.assign(canvas.style, {
@@ -221,12 +235,15 @@ function startBurnStroke(
 
   let rafId = 0;
   let alive = true;
+  let doneEmitted = false;
+  const emitDone = () => { if (!doneEmitted) { doneEmitted = true; onDone(); } };
 
   const timerId = setTimeout(async () => {
     await document.fonts.ready;
     if (!alive) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Mobile: raster at display-res (DPR=1) to avoid expensive 2× BFS on small glyphs
+    const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 2);
     const W = el.offsetWidth;
     const H = el.offsetHeight;
     if (!W || !H) { canvas.remove(); return; }
@@ -361,6 +378,7 @@ function startBurnStroke(
       } else {
         ctx.clearRect(0, 0, PW, PH);
         canvas.remove();
+        emitDone();
       }
     };
     rafId = requestAnimationFrame(frame);
@@ -371,6 +389,44 @@ function startBurnStroke(
     clearTimeout(timerId);
     cancelAnimationFrame(rafId);
     canvas.remove();
+    emitDone();
+  };
+}
+
+// Enqueue a burn animation through the shared concurrency gate
+function enqueueBurnStroke(
+  el: HTMLElement,
+  char: string,
+  delay: number,
+  mobile = false,
+): () => void {
+  let cancelFn: (() => void) | null = null;
+  let started = false;
+
+  const onDone = () => {
+    _burnActive = Math.max(0, _burnActive - 1);
+    _tryDequeueBurn();
+  };
+
+  const doStart = () => {
+    started = true;
+    cancelFn = startBurnStroke(el, char, delay, mobile, onDone);
+  };
+
+  if (_burnActive < BURN_MAX) {
+    _burnActive++;
+    doStart();
+  } else {
+    _burnQueue.push(doStart);
+  }
+
+  return () => {
+    if (!started) {
+      const i = _burnQueue.indexOf(doStart);
+      if (i >= 0) _burnQueue.splice(i, 1);
+    } else {
+      cancelFn?.();
+    }
   };
 }
 
@@ -413,7 +469,7 @@ function GlyphCell({ entry, onEnter, onLeave }: GlyphCellProps) {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    return startBurnStroke(el, entry.char, jitterRef.current!);
+    return enqueueBurnStroke(el, entry.char, jitterRef.current!);
   }, [burned]);
 
   return (
@@ -676,24 +732,151 @@ export default function GlyphColumns() {
   );
 }
 
-// ── Mobile / tablet section divider (unchanged) ───────────────────────────────
-export function GlyphDivider() {
+// ── Mobile cipher: stanza pairings per section break ─────────────────────────
+// 6 stanzas across 4 breaks: first 2 breaks = 1 stanza, last 2 = 2 stanzas
+const MOBILE_BREAK_STANZAS: Array<Array<{ glyphs: GlyphEntry[]; font: 'egy' | 'sux'; lang: string }>> = [
+  [{ glyphs: LEFT_STANZAS[0],  font: 'egy', lang: 'egy' }],
+  [{ glyphs: RIGHT_STANZAS[0], font: 'sux', lang: 'sux' }],
+  [{ glyphs: LEFT_STANZAS[1],  font: 'egy', lang: 'egy' },
+   { glyphs: LEFT_STANZAS[2],  font: 'egy', lang: 'egy' }],
+  [{ glyphs: RIGHT_STANZAS[1], font: 'sux', lang: 'sux' },
+   { glyphs: RIGHT_STANZAS[2], font: 'sux', lang: 'sux' }],
+];
+
+// Full THRESHOLD sequence in Morse — shown on one middle divider
+const THRESHOLD_MORSE = '- .... .-. . ... .... --- .-.. -..';
+
+// ── Mobile glyph burn cell ────────────────────────────────────────────────────
+function MobileGlyphCell({ entry, onTap }: { entry: GlyphEntry; onTap: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [burned, setBurned] = useState(false);
+  const started = useRef(false);
+  const jitter = useRef(Math.random() * 0.3);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([obs]) => { if (obs.isIntersecting) { setBurned(true); io.disconnect(); } },
+      { threshold: 0, rootMargin: '0px 0px -15% 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!burned || started.current) return;
+    started.current = true;
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    return enqueueBurnStroke(el, entry.char, jitter.current, true);
+  }, [burned, entry.char]);
+
   return (
-    <div className="mg-divider" aria-hidden="true">
-      <svg viewBox="0 0 120 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-           strokeLinecap="round" strokeLinejoin="round">
-        <line x1="0" y1="12" x2="38" y2="12"/>
-        <circle cx="48" cy="12" r="4"/>
-        <line x1="44" y1="8" x2="48" y2="4"/>
-        <line x1="52" y1="8" x2="48" y2="4"/>
-        <line x1="44" y1="16" x2="48" y2="20"/>
-        <line x1="52" y1="16" x2="48" y2="20"/>
-        <line x1="40" y1="12" x2="36" y2="12"/>
-        <line x1="56" y1="12" x2="60" y2="12"/>
-        <circle cx="60" cy="12" r="1.5"/>
-        <line x1="82" y1="12" x2="120" y2="12"/>
-        <circle cx="72" cy="12" r="4"/>
-      </svg>
+    <div
+      ref={ref}
+      className={`mcd-glyph mcd-font-${entry.font}${burned ? ' mcd-glyph-burned' : ''}`}
+      style={burned ? { animationDelay: `${jitter.current}s` } : undefined}
+      onClick={onTap}
+      role="button"
+      tabIndex={0}
+      aria-label={`${entry.phon} — ${entry.gloss}`}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onTap(); }}
+    >
+      {entry.char}
     </div>
+  );
+}
+
+// ── Mobile bottom-sheet lens ──────────────────────────────────────────────────
+interface MobileLensState { glyphs: GlyphEntry[]; idx: number }
+
+function MobileLensSheet({ state, onClose }: { state: MobileLensState; onClose: () => void }) {
+  const [idx, setIdx] = useState(state.idx);
+  const g = state.glyphs[idx];
+
+  // Dismiss on scroll
+  useEffect(() => {
+    const dismiss = () => onClose();
+    window.addEventListener('scroll', dismiss, { passive: true, once: true });
+    return () => window.removeEventListener('scroll', dismiss);
+  }, [onClose]);
+
+  const before = g.stanzaEn.indexOf(g.highlight);
+  const after  = before + g.highlight.length;
+
+  return (
+    <div
+      className="mcd-sheet-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Glyph detail"
+    >
+      <div className="mcd-sheet" onClick={e => e.stopPropagation()}>
+        <button className="mcd-sheet-close" onClick={onClose} aria-label="Close">×</button>
+        <span className={`mcd-sheet-char gc-font-${g.font}`}>{g.char}</span>
+        <span className="mcd-sheet-phon">{g.phon}</span>
+        <span className="mcd-sheet-word">{g.word} — {g.gloss}</span>
+        <span className="mcd-sheet-sentence">
+          {before >= 0 ? (
+            <>
+              {g.stanzaEn.slice(0, before)}
+              <strong>{g.stanzaEn.slice(before, after)}</strong>
+              {g.stanzaEn.slice(after)}
+            </>
+          ) : g.stanzaEn}
+        </span>
+        <div className="mcd-sheet-nav">
+          <button
+            className="mcd-nav-btn"
+            onClick={() => setIdx(i => Math.max(0, i - 1))}
+            disabled={idx === 0}
+            aria-label="Previous glyph"
+          >←</button>
+          <span className="mcd-nav-pos">{idx + 1} / {state.glyphs.length}</span>
+          <button
+            className="mcd-nav-btn"
+            onClick={() => setIdx(i => Math.min(state.glyphs.length - 1, i + 1))}
+            disabled={idx === state.glyphs.length - 1}
+            aria-label="Next glyph"
+          >→</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MobileCipherDivider (replaces generic GlyphDivider on mobile) ─────────────
+export function MobileCipherDivider({ breakIdx }: { breakIdx: number }) {
+  const [lensState, setLensState] = useState<MobileLensState | null>(null);
+  const closeLens = useCallback(() => setLensState(null), []);
+
+  const stanzaRows = MOBILE_BREAK_STANZAS[breakIdx] ?? MOBILE_BREAK_STANZAS[0];
+  const showMorse = breakIdx === 2;
+
+  return (
+    <>
+      <div className="mcd-divider" aria-hidden="true">
+        {stanzaRows.map((row, ri) => (
+          <div key={ri} className="mcd-stanza-row" lang={row.lang}>
+            {row.glyphs.map((g, gi) => (
+              <MobileGlyphCell
+                key={gi}
+                entry={g}
+                onTap={() => setLensState({ glyphs: row.glyphs, idx: gi })}
+              />
+            ))}
+          </div>
+        ))}
+        {showMorse && (
+          <div className="mcd-morse-row">
+            <MorseTicks code={THRESHOLD_MORSE} />
+          </div>
+        )}
+      </div>
+      {lensState && <MobileLensSheet state={lensState} onClose={closeLens} />}
+    </>
   );
 }
