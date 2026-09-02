@@ -169,11 +169,50 @@ function LidarMark() {
   );
 }
 
-// ── Canvas fire-burn helper ───────────────────────────────────────────────────
+// ── Canvas stroke-fire helper ────────────────────────────────────────────────
+// Fire crawls along the ink paths of each glyph via BFS distance field.
+// No directional wipes — the flame front follows the strokes of the character.
 
-const BURN_BG = 'rgb(16, 13, 9)'; // warm dark to match amber column ground, not cold navy
+const BURN_BG_COLOR = [16, 13, 9] as const;     // warm dark, matches column ground
+const CHAR_SETTLED  = [58, 40, 22] as const;     // matches gc-glyph-burned color
+const FIRE_SWEEP_MS = 2600;                       // ms for front to cross all strokes
+const FIRE_SETTLE_MS = 700;                       // ms for tail pixels to char out
 
-function startBurn(el: HTMLElement, delay: number): () => void {
+// Map per-pixel age-since-ignition → fire RGB
+function fireColor(age: number): [number, number, number] {
+  if (age < 0.04) {
+    const u = age / 0.04;
+    return [255, Math.round(255 - 55 * u), Math.round(200 * (1 - u))];
+  }
+  if (age < 0.12) {
+    const u = (age - 0.04) / 0.08;
+    return [255, Math.round(200 - 100 * u), 0];
+  }
+  if (age < 0.25) {
+    const u = (age - 0.12) / 0.13;
+    return [255, Math.round(100 - 70 * u), 0];
+  }
+  if (age < 0.45) {
+    const u = (age - 0.25) / 0.20;
+    return [Math.round(255 - 55 * u), Math.round(30 - 10 * u), 0];
+  }
+  if (age < 0.70) {
+    const u = (age - 0.45) / 0.25;
+    return [Math.round(200 - 80 * u), Math.round(20 + u * 5), Math.round(u * 5)];
+  }
+  const u = Math.min(1, (age - 0.70) / 0.30);
+  return [
+    Math.round(120 + (CHAR_SETTLED[0] - 120) * u),
+    Math.round(25  + (CHAR_SETTLED[1] - 25)  * u),
+    Math.round(8   + (CHAR_SETTLED[2] - 8)   * u),
+  ];
+}
+
+function startBurnStroke(
+  el: HTMLElement,
+  char: string,
+  delay: number,
+): () => void {
   const canvas = document.createElement('canvas');
   Object.assign(canvas.style, {
     position: 'absolute', inset: '0', width: '100%', height: '100%',
@@ -182,76 +221,165 @@ function startBurn(el: HTMLElement, delay: number): () => void {
   el.appendChild(canvas);
 
   let rafId = 0;
-  let timerId: ReturnType<typeof setTimeout>;
+  let alive = true;
 
-  const run = () => {
+  const timerId = setTimeout(async () => {
+    await document.fonts.ready;
+    if (!alive) return;
+
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const W = el.offsetWidth;
     const H = el.offsetHeight;
     if (!W || !H) { canvas.remove(); return; }
 
-    canvas.width = Math.round(W * dpr);
-    canvas.height = Math.round(H * dpr);
+    const PW = Math.round(W * dpr);
+    const PH = Math.round(H * dpr);
+    canvas.width = PW;
+    canvas.height = PH;
     const ctx = canvas.getContext('2d')!;
-    ctx.scale(dpr, dpr);
-    ctx.fillStyle = BURN_BG;
-    ctx.fillRect(0, 0, W, H);
 
-    const DURATION = 3000;
-    const LEAD = 22;  // fire gradient height above revealed area (px)
-    const TRAIL = 7;  // fire penetration below front into hidden area (px)
+    // ── 1. Rasterize glyph into offscreen canvas ───────────────────────
+    const cs = window.getComputedStyle(el);
+    const fontFamily = cs.fontFamily;
+    const fontSize   = parseFloat(cs.fontSize) * dpr;
 
-    const phases = new Float32Array(Math.ceil(W) + 2);
-    for (let i = 0; i < phases.length; i++) phases[i] = Math.random() * Math.PI * 2;
+    const off = document.createElement('canvas');
+    off.width = PW; off.height = PH;
+    const oCtx = off.getContext('2d')!;
+    oCtx.fillStyle = '#000';
+    oCtx.fillRect(0, 0, PW, PH);
+    oCtx.fillStyle = '#fff';
+    oCtx.font = `${fontSize}px ${fontFamily}`;
+    oCtx.textAlign = 'center';
+    oCtx.textBaseline = 'middle';
+    oCtx.fillText(char, PW / 2, PH / 2);
+
+    const raw = oCtx.getImageData(0, 0, PW, PH).data;
+
+    // ── 2. Build ink mask (alpha > threshold = stroke pixel) ───────────
+    const inkMask = new Uint8Array(PW * PH);
+    let inkCount = 0;
+    for (let i = 0; i < PW * PH; i++) {
+      if (raw[i * 4] > 40) { inkMask[i] = 1; inkCount++; }
+    }
+    if (inkCount === 0) { canvas.remove(); return; }
+
+    // ── 3. BFS distance field through ink pixels (8-connected) ─────────
+    // Each ink pixel gets a distance = steps from the ignition seed.
+    // Disconnected components get their own slightly-delayed seed.
+    const DX = [-1, 0, 1, -1, 1, -1, 0, 1];
+    const DY = [-1, -1, -1, 0,  0,  1, 1, 1];
+
+    const dist      = new Float32Array(PW * PH).fill(-1);
+    const pixNoise  = new Float32Array(PW * PH);
+    for (let i = 0; i < PW * PH; i++) pixNoise[i] = (Math.random() * 2 - 1) * 0.07;
+
+    let maxDist    = 0;
+    let compOffset = 0;
+
+    const bfs = (seedIdx: number, offset: number) => {
+      const q: number[] = [seedIdx];
+      dist[seedIdx] = offset;
+      let h = 0;
+      while (h < q.length) {
+        const idx = q[h++];
+        const y = (idx / PW) | 0;
+        const x = idx % PW;
+        for (let k = 0; k < 8; k++) {
+          const nx = x + DX[k];
+          const ny = y + DY[k];
+          if (nx < 0 || nx >= PW || ny < 0 || ny >= PH) continue;
+          const ni = ny * PW + nx;
+          if (!inkMask[ni] || dist[ni] >= 0) continue;
+          const nd = dist[idx] + (DX[k] !== 0 && DY[k] !== 0 ? 1.414 : 1);
+          dist[ni] = nd;
+          if (nd > maxDist) maxDist = nd;
+          q.push(ni);
+        }
+      }
+    };
+
+    // Pick a random ink pixel as the primary ignition point
+    let seed = -1;
+    for (let a = 0; a < 5000 && seed < 0; a++) {
+      const c = (Math.random() * PW * PH) | 0;
+      if (inkMask[c]) seed = c;
+    }
+    if (seed < 0) { canvas.remove(); return; }
+    bfs(seed, 0);
+
+    // Disconnected stroke components ignite slightly after the main burn
+    for (let i = 0; i < PW * PH; i++) {
+      if (inkMask[i] && dist[i] < 0) {
+        compOffset += maxDist * 0.18;
+        dist[i] = compOffset;
+        bfs(i, compOffset);
+      }
+    }
+
+    // Normalize to [0, 1] and add per-pixel noise for ragged front
+    const denom = maxDist > 0 ? maxDist : 1;
+    for (let i = 0; i < PW * PH; i++) {
+      if (dist[i] >= 0) {
+        dist[i] = Math.max(0, Math.min(1, dist[i] / denom + pixNoise[i]));
+      }
+    }
+
+    // ── 4. Animate ─────────────────────────────────────────────────────
+    const outImg = ctx.createImageData(PW, PH);
+    const out    = outImg.data;
+    const [bgR, bgG, bgB] = BURN_BG_COLOR;
+    const TOTAL  = FIRE_SWEEP_MS + FIRE_SETTLE_MS;
+
+    // Initial fill: dark background before first frame
+    for (let o = 0; o < PW * PH * 4; o += 4) {
+      out[o] = bgR; out[o+1] = bgG; out[o+2] = bgB; out[o+3] = 255;
+    }
+    ctx.putImageData(outImg, 0, 0);
 
     const start = performance.now();
     const frame = (now: number) => {
-      const t = Math.min(1, (now - start) / DURATION);
-      const tBase = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-      ctx.clearRect(0, 0, W, H);
+      if (!alive) return;
+      const elapsed = now - start;
+      const rawT = elapsed / FIRE_SWEEP_MS;
+      // Ease during sweep, hold at 1 during settle
+      const tE = rawT >= 1 ? 1 : (rawT < 0.5 ? 2 * rawT * rawT : -1 + (4 - 2 * rawT) * rawT);
+      // Settle bonus ramps to 1.1 so the last pixel (d=1.0) reaches age≥1.0
+      // — fully charred [58,40,22] — matching gc-glyph-burned color exactly at canvas removal.
+      const settleBonus = elapsed > FIRE_SWEEP_MS
+        ? ((elapsed - FIRE_SWEEP_MS) / FIRE_SETTLE_MS) * 1.1
+        : 0;
 
-      for (let x = 0; x <= W; x++) {
-        const noise =
-          Math.sin(phases[x] + t * 9.1) * 0.065 +
-          Math.sin(phases[x] * 1.71 + t * 5.3) * 0.04 +
-          Math.sin(phases[x] * 3.2  + t * 13)  * 0.02;
-        const frontY = (tBase + noise) * H;
-
-        // Hidden area (below front + trail): fill bg
-        const bgStart = Math.max(0, frontY - TRAIL);
-        if (bgStart < H) {
-          ctx.fillStyle = BURN_BG;
-          ctx.fillRect(x, bgStart, 1, H - bgStart);
+      for (let i = 0; i < PW * PH; i++) {
+        const o = i * 4;
+        const d = dist[i];
+        if (!inkMask[i] || d < 0 || d > tE) {
+          out[o] = bgR; out[o+1] = bgG; out[o+2] = bgB; out[o+3] = 255;
+          continue;
         }
-
-        // Fire gradient strip
-        const ft = Math.max(0, frontY - LEAD);
-        const fb = Math.min(H, frontY + TRAIL);
-        if (ft < fb) {
-          const grd = ctx.createLinearGradient(0, ft, 0, fb);
-          grd.addColorStop(0.00, 'rgba(255,230,110,0.00)');
-          grd.addColorStop(0.15, 'rgba(255,210, 80,0.55)');
-          grd.addColorStop(0.40, 'rgba(255,140, 20,0.92)');
-          grd.addColorStop(0.65, 'rgba(255, 55,  8,0.98)');
-          grd.addColorStop(0.85, 'rgba(200, 25,  5,0.75)');
-          grd.addColorStop(1.00, 'rgba( 60,  8,  2,0.00)');
-          ctx.fillStyle = grd;
-          ctx.fillRect(x, ft, 1, fb - ft);
-        }
+        const age = tE - d + settleBonus;
+        const [r, g, b] = fireColor(age);
+        out[o] = r; out[o+1] = g; out[o+2] = b; out[o+3] = 255;
       }
 
-      if (t < 1) {
+      ctx.putImageData(outImg, 0, 0);
+
+      if (elapsed < TOTAL) {
         rafId = requestAnimationFrame(frame);
       } else {
-        ctx.clearRect(0, 0, W, H);
+        ctx.clearRect(0, 0, PW, PH);
         canvas.remove();
       }
     };
     rafId = requestAnimationFrame(frame);
-  };
+  }, delay * 1000);
 
-  timerId = setTimeout(run, delay * 1000);
-  return () => { clearTimeout(timerId); cancelAnimationFrame(rafId); canvas.remove(); };
+  return () => {
+    alive = false;
+    clearTimeout(timerId);
+    cancelAnimationFrame(rafId);
+    canvas.remove();
+  };
 }
 
 // ── Glyph cell ───────────────────────────────────────────────────────────────
@@ -293,7 +421,7 @@ function GlyphCell({ entry, onEnter, onLeave }: GlyphCellProps) {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    return startBurn(el, jitterRef.current!);
+    return startBurnStroke(el, entry.char, jitterRef.current!);
   }, [burned]);
 
   return (
