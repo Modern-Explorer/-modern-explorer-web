@@ -173,7 +173,6 @@ function LidarMark() {
 // Fire crawls along the ink paths of each glyph via BFS distance field.
 // No directional wipes — the flame front follows the strokes of the character.
 
-const BURN_BG_COLOR = [16, 13, 9] as const;     // warm dark, matches column ground
 const CHAR_SETTLED  = [58, 40, 22] as const;     // matches gc-glyph-burned color
 const FIRE_SWEEP_MS = 2600;                       // ms for front to cross all strokes
 const FIRE_SETTLE_MS = 700;                       // ms for tail pixels to char out
@@ -328,14 +327,7 @@ function startBurnStroke(
     // ── 4. Animate ─────────────────────────────────────────────────────
     const outImg = ctx.createImageData(PW, PH);
     const out    = outImg.data;
-    const [bgR, bgG, bgB] = BURN_BG_COLOR;
     const TOTAL  = FIRE_SWEEP_MS + FIRE_SETTLE_MS;
-
-    // Initial fill: dark background before first frame
-    for (let o = 0; o < PW * PH * 4; o += 4) {
-      out[o] = bgR; out[o+1] = bgG; out[o+2] = bgB; out[o+3] = 255;
-    }
-    ctx.putImageData(outImg, 0, 0);
 
     const start = performance.now();
     const frame = (now: number) => {
@@ -354,7 +346,7 @@ function startBurnStroke(
         const o = i * 4;
         const d = dist[i];
         if (!inkMask[i] || d < 0 || d > tE) {
-          out[o] = bgR; out[o+1] = bgG; out[o+2] = bgB; out[o+3] = 255;
+          out[o] = out[o+1] = out[o+2] = out[o+3] = 0; // transparent — no canvas bounds visible
           continue;
         }
         const age = tE - d + settleBonus;
@@ -472,7 +464,6 @@ interface DividerBandProps {
 function DividerBand({ data, onSymbolEnter, onSymbolLeave }: DividerBandProps) {
   return (
     <div className="gc-divider-band">
-      <div className="gc-divider-rule" />
       <div className="gc-divider-body">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span
@@ -502,7 +493,6 @@ function DividerBand({ data, onSymbolEnter, onSymbolLeave }: DividerBandProps) {
           <MorseTicks code={data.morse} />
         </span>
       </div>
-      <div className="gc-divider-rule" />
     </div>
   );
 }
@@ -582,8 +572,8 @@ export default function GlyphColumns() {
       }
       if (hero) {
         const heroBottom = hero.getBoundingClientRect().bottom + window.pageYOffset;
-        // Push columns so first glyph starts clear of the hero section
-        wrapper.style.setProperty('--gc-col-top', `${Math.max(0, heroBottom - wrapperTop)}px`);
+        // Push columns so first glyph starts clear of the hero section with breathing room
+        wrapper.style.setProperty('--gc-col-top', `${Math.max(0, heroBottom - wrapperTop + 48)}px`);
       }
     };
     measure();

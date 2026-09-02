@@ -784,8 +784,6 @@ h1, h2, h3, h4, h5 {
   gap: 8px;
   padding: var(--gc-col-top, 6vh) 0 0; /* JS sets --gc-col-top to hero's bottom edge */
   overflow: hidden;
-  /* Warm parchment-dark ground: char (dark brown) reads as carved mark against this */
-  background: radial-gradient(ellipse 88% 75% at 50% 46%, rgba(185, 140, 55, 0.14) 0%, transparent 100%);
 }
 .gc-col-left  { left: 40px; }
 .gc-col-right { right: 40px; }
@@ -846,20 +844,14 @@ h1, h2, h3, h4, h5 {
   }
 }
 
-/* Stanza divider band */
+/* Stanza divider band — bare gap, no container framing */
 .gc-divider-band {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 4px 0;
   pointer-events: none;
-}
-.gc-divider-rule {
-  width: 80%;
-  height: 1px;
-  background: rgba(203, 243, 110, 0.1);
 }
 .gc-divider-body {
   display: flex;
@@ -869,7 +861,7 @@ h1, h2, h3, h4, h5 {
 }
 .gc-concept-glyph {
   font-size: 22px;
-  color: rgba(203, 243, 110, 0.45);
+  color: rgba(58, 40, 22, 0.45);
   line-height: 1;
   pointer-events: auto;
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='10' cy='10' r='7' stroke='rgba(203,243,110,0.9)' stroke-width='1.5' fill='none'/%3E%3Cline x1='15.5' y1='15.5' x2='21' y2='21' stroke='rgba(203,243,110,0.9)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, zoom-in;
@@ -878,10 +870,10 @@ h1, h2, h3, h4, h5 {
   display: flex;
   align-items: center;
   gap: 2px;
-  color: rgba(203, 243, 110, 0.22);
+  color: rgba(58, 40, 22, 0.50);
 }
 .gc-lidar-mark {
-  color: rgba(203, 243, 110, 0.28);
+  color: rgba(58, 40, 22, 0.40);
 }
 
 /* Hover lens — rectangular panel, wide enough for the sentence */
