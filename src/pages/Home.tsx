@@ -1,3 +1,4 @@
+import { lazy, Suspense, type ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import GoogleReviews from '../components/GoogleReviews';
@@ -6,7 +7,19 @@ import { useWaitlist } from '../context/WaitlistContext';
 import { useReveal } from '../hooks/useReveal';
 import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import ParticleHero from '../components/ParticleHero';
-import GlyphColumns, { MobileCipherDivider } from '../components/GlyphColumns';
+import { CIPHER_ENABLED } from '../config';
+
+// When disabled: stubs render nothing and no cipher chunk is fetched.
+// When enabled: chunks load on demand via lazy import.
+// Rollup dead-code-eliminates the lazy branch when CIPHER_ENABLED is false,
+// so the cipher chunk does not appear in the production bundle at all.
+const GlyphColumns: ComponentType = CIPHER_ENABLED
+  ? lazy(() => import('../components/GlyphColumns'))
+  : () => null;
+
+const MobileCipherDivider: ComponentType<{ breakIdx: number }> = CIPHER_ENABLED
+  ? lazy(() => import('../components/GlyphColumns').then(m => ({ default: m.MobileCipherDivider })))
+  : () => null;
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -250,7 +263,7 @@ export default function Home() {
 
   return (
     <main style={{ position: 'relative' }}>
-      <GlyphColumns />
+      <Suspense fallback={null}><GlyphColumns /></Suspense>
       <SEO
         title="Modern Explorer | UFO, Paranormal & Cryptozoology Research — Crestone, CO"
         description="Modern Explorer investigates unknown phenomena — UAP, cryptozoology, and lost history — in Crestone, Colorado and the San Luis Valley. Join the research or book a guided expedition."
@@ -261,7 +274,7 @@ export default function Home() {
       <ParticleHero />
 
       {/* ── THE MISSION ──────────────────────────────────────────────────── */}
-      <MobileCipherDivider breakIdx={0} />  {/* Egyptian S1 */}
+      <Suspense fallback={null}><MobileCipherDivider breakIdx={0} /></Suspense>  {/* Egyptian S1 */}
       <section className="section" style={{ background: 'var(--bg)' }}>
         <div className="container">
           <div data-reveal style={{ textAlign: 'center', marginBottom: 56 }}>
@@ -287,7 +300,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <MobileCipherDivider breakIdx={1} />  {/* Sumerian S1 */}
+      <Suspense fallback={null}><MobileCipherDivider breakIdx={1} /></Suspense>  {/* Sumerian S1 */}
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
@@ -330,7 +343,7 @@ export default function Home() {
       {/* bottom boundary for cipher columns — extended past Frontier so all 3 stanzas show */}
       <div data-gc-end />
 
-      <MobileCipherDivider breakIdx={2} />  {/* Egyptian S2+S3, Morse */}
+      <Suspense fallback={null}><MobileCipherDivider breakIdx={2} /></Suspense>  {/* Egyptian S2+S3, Morse */}
       {/* ── EXPEDITIONS & TOURS ──────────────────────────────────────────── */}
       <section id="mesa-tours" className="section">
         <div className="container">
@@ -457,7 +470,7 @@ export default function Home() {
         </div>
       </section>
 
-      <MobileCipherDivider breakIdx={3} />  {/* Sumerian S2+S3 */}
+      <Suspense fallback={null}><MobileCipherDivider breakIdx={3} /></Suspense>  {/* Sumerian S2+S3 */}
       {/* ── LATEST FROM THE FIELD ────────────────────────────────────────── */}
       <section id="mesa-reports" className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)' }}>
         <div className="container">
