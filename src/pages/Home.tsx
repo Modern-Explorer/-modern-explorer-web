@@ -340,8 +340,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* bottom boundary for cipher columns — extended past Frontier so all 3 stanzas show */}
-      <div data-gc-end />
+      {/* cipher column sentinel — only needed when CIPHER_ENABLED */}
+      {CIPHER_ENABLED && <div data-gc-end />}
 
       <Suspense fallback={null}><MobileCipherDivider breakIdx={2} /></Suspense>  {/* Egyptian S2+S3, Morse */}
       {/* ── EXPEDITIONS & TOURS ──────────────────────────────────────────── */}
