@@ -31,6 +31,7 @@ const Tip           = lazy(() => import('./pages/Tip'));
 
 const Membership    = lazy(() => import('./pages/Membership'));
 const Threshold     = lazy(() => import('./pages/Threshold'));
+const NotFound      = lazy(() => import('./pages/NotFound'));
 const BookingDrawer = lazy(() => import('./components/BookingDrawer'));
 const Mesa          = lazy(() => import('./components/Mesa'));
 
@@ -38,6 +39,15 @@ const Mesa          = lazy(() => import('./components/Mesa'));
 function AppInner() {
   const { isMounted: bookingMounted, mount: mountBooking } = useBooking();
   const [mesaMounted, setMesaMounted] = useState(false);
+
+  // Quiet console whisper — fires once on mount.
+  useEffect(() => {
+    const dim = 'color:#3a3a4e;font-family:monospace;font-size:10px;line-height:1.45';
+    console.log('%c\n  ╔════════════╗\n  ║ ╔════════╗ ║\n  ║ ║ ╔════╗ ║ ║\n  ║ ║ ║ ╔╗ ║ ║ ║\n  ║ ║ ║ ╚╝ ║ ║ ║\n  ║ ║ ╚══╬═╝ ║ ║\n  ║ ╚════╝   ║ ║\n  ╚══════════╝ ║\n              ╚╝\n', dim);
+    console.log('%cad-ḫal ki-ta ĝál', dim);
+    console.log('%c  → /threshold',    dim);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Mesa: pure chat widget, no Stripe. Safe to defer to idle.
   // requestIdleCallback fires when the browser has spare cycles, keeping TBT low.
@@ -93,6 +103,7 @@ function AppInner() {
           <Route path="/tip"            element={<Tip />} />
           <Route path="/membership"     element={<Membership />} />
           <Route path="/threshold"      element={<Threshold />} />
+          <Route path="*"              element={<NotFound />} />
         </Routes>
       </Suspense>
       <Footer />

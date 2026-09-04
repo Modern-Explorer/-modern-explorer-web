@@ -105,7 +105,8 @@ export default function Footer() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <a href="https://admin.modernexplorer.me/admin" target="_blank" rel="noopener noreferrer" className="footer-sigil footer-sigil--spin" style={{ color: '#cbf36e', opacity: 0.7, fontSize: 42, textDecoration: 'none', userSelect: 'none', cursor: 'default', display: 'inline-block', lineHeight: 1, padding: '12px' }}>✦</a>
             <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', margin: 0 }}>
-              © {new Date().getFullYear()} Modern Explorer. All rights reserved.
+              © {new Date().getFullYear()} Modern Explorer. All rights reserved.{' '}
+              <span style={{ opacity: 0.5 }}>v37.7916-105.5943</span>
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

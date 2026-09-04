@@ -1,5 +1,6 @@
 import SEO from '../components/SEO';
 import { useWaitlist } from '../context/WaitlistContext';
+import GhostGlyph from '../components/GhostGlyph';
 
 // ─── Feature card data ────────────────────────────────────────────────────────
 
@@ -182,8 +183,9 @@ export default function Membership() {
       </section>
 
       {/* ── Tier strip ───────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 0', background: 'var(--bg)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-        <div className="container">
+      <section style={{ padding: '80px 0', background: 'var(--bg)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
+        <GhostGlyph variant="mandala" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 'min(70vw, 640px)' }} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', opacity: 0.8, marginBottom: 12 }}>
               Membership tiers

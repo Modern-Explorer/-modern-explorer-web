@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { useWaitlist } from '../context/WaitlistContext';
+import GhostGlyph from '../components/GhostGlyph';
 
 const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/${file}`;
 
@@ -53,8 +54,9 @@ export default function About() {
       </section>
 
       {/* SURFACE AND DEPTH */}
-      <section className="section" style={{ background: 'var(--bg-section)' }}>
-        <div className="container">
+      <section className="section" style={{ background: 'var(--bg-section)', position: 'relative', overflow: 'hidden' }}>
+        <GhostGlyph variant="barrier-figure" style={{ left: '-9%', top: '50%', transform: 'translateY(-44%)', width: 'min(22vw, 210px)' }} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ maxWidth: 820, margin: '0 auto' }}>
             <span className="eyebrow">How It Works</span>
             <h2 style={{ fontSize: 'clamp(30px, 4vw, 46px)', marginBottom: 28 }}>The Loop That Drives the Work</h2>
@@ -208,8 +210,9 @@ export default function About() {
       </section>
 
       {/* WHAT WE'RE BUILDING */}
-      <section className="section">
-        <div className="container">
+      <section className="section" style={{ position: 'relative', overflow: 'hidden' }}>
+        <GhostGlyph variant="ouroboros" style={{ right: '-8%', top: '50%', transform: 'translateY(-50%)', width: 'min(46vw, 520px)' }} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ maxWidth: 820, margin: '0 auto' }}>
             <span className="eyebrow">The Platform</span>
             <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 28 }}>What We're Building</h2>

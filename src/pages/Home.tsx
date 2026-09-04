@@ -8,6 +8,7 @@ import { useReveal } from '../hooks/useReveal';
 import { OrbIcon, CompassIcon, LanternIcon, GhostEyeIcon } from '../components/Icons';
 import ParticleHero from '../components/ParticleHero';
 import { CIPHER_ENABLED } from '../config';
+import GhostGlyph from '../components/GhostGlyph';
 
 // When disabled: stubs render nothing and no cipher chunk is fetched.
 // When enabled: chunks load on demand via lazy import.
@@ -275,8 +276,9 @@ export default function Home() {
 
       {/* ── THE MISSION ──────────────────────────────────────────────────── */}
       <Suspense fallback={null}><MobileCipherDivider breakIdx={0} /></Suspense>  {/* Egyptian S1 */}
-      <section className="section" style={{ background: 'var(--bg)' }}>
-        <div className="container">
+      <section className="section" style={{ background: 'var(--bg)', position: 'relative', overflow: 'hidden' }}>
+        <GhostGlyph variant="anthropomorph" style={{ right: '-4%', top: '6%', width: 'min(42vw, 480px)' }} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div data-reveal style={{ textAlign: 'center', marginBottom: 56 }}>
             <span className="eyebrow">What We Investigate</span>
             <h2 style={{ fontSize: 'clamp(30px, 4.5vw, 52px)', marginBottom: 18 }}>
@@ -302,8 +304,9 @@ export default function Home() {
       </section>
       <Suspense fallback={null}><MobileCipherDivider breakIdx={1} /></Suspense>  {/* Sumerian S1 */}
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
-      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-        <div className="container">
+      <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
+        <GhostGlyph variant="labyrinth" style={{ left: '-10%', top: '50%', transform: 'translateY(-50%)', width: 'min(58vw, 620px)' }} />
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', gap: 64, flexWrap: 'wrap', alignItems: 'center' }}>
             {/* Left: copy */}
             <div style={{ flex: '1 1 340px' }}>

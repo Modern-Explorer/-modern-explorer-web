@@ -206,4 +206,158 @@ Total: 26 Morse marks across 4 divider bands. Hidden word: **threshold** → `/t
 
 ---
 
-*Last updated: 2026-09-01*
+*Last updated: 2026-09-04*
+
+---
+
+## QUIET LAYER — Ghost Glyphs & Hidden Signals
+
+The cipher system (above) is currently flagged off (`CIPHER_ENABLED = false` in `src/config.ts`).
+In its place a second, quieter layer operates: barely-visible watermark SVGs, a console whisper,
+a 404 page, and a coordinate string. None of these are announced or explained anywhere on the site.
+
+All ghost glyphs live in **`src/components/GhostGlyph.tsx`** as inline SVG components (no image
+requests, no fonts, no network cost). Rendered at **4% opacity** — felt more than seen against
+the dark ground. `aria-hidden`, `pointer-events: none`, `z-index: 0` behind content.
+
+---
+
+### Ghost Glyph 1 — Fremont Anthropomorph
+
+**Location:** Homepage, Mission section (behind the four investigative-domain cards)  
+**Variant:** `anthropomorph`  
+**Position:** Right side of section, partially cropped off the right edge  
+**Style source:** McConkie Ranch Fremont rock art (Dinosaur National Monument, UT) — the
+  canonical large-bodied figure type: trapezoidal body wide at shoulders, three-pronged
+  headdress (horns or antennae with terminal dots), hollow eyes, geometric arms and legs.  
+**Meaning:** The watching figure. Fremont culture (700–1300 CE) left humanoid forms at sites
+  throughout the Four Corners / Great Basin. At McConkie Ranch they cluster with density that
+  has never been adequately explained. The figure here is a near-contact archetype — present
+  before the field investigator arrives, already looking.
+
+---
+
+### Ghost Glyph 2 — Cretan Labyrinth (7-circuit)
+
+**Location:** Homepage, Frontier section (behind the membership copy and feature list)  
+**Location also:** 404 page (at 8% opacity, centered)  
+**Variant:** `labyrinth`  
+**Position:** Left side of section, partially outside the section's left boundary  
+**Style source:** Classical 7-circuit Cretan / Minoan labyrinth — unicursal (one continuous path,
+  no dead ends). Constructed from alternating upper/lower semicircular walls connected by passages.
+  Entry on the right side (traditional orientation). Seed cross top arm visible at center.  
+**Meaning:** The Jungian journey inward — the labyrinth as psychological symbol of the descent
+  into and return from the unconscious. Adopted for the Frontier (research membership) because
+  the act of joining is a commitment to a non-linear path. The wanderer does not get lost; the
+  path is unicursal. Confusion is part of the design. Also used on the 404 page: those who reach
+  a dead end aren't lost — they're in the labyrinth.
+
+---
+
+### Ghost Glyph 3 — Barrier Canyon Figure
+
+**Location:** About page, "The Loop That Drives the Work" section (story)  
+**Variant:** `barrier-figure`  
+**Position:** Left side of section, bleeding off the left page edge  
+**Style source:** Barrier Canyon Polychrome Style (BCPS) — the Archaic rock art tradition of
+  the Colorado Plateau (~4,000–2,000 BCE, possibly older). Diagnostic features: extremely
+  elongated tapered body with no feet, enormous hollow circular eyes (the "saucer" eyes),
+  antennae or hair extensions above the head, ghostly vertical body striping. The figures
+  appear to float. Sites include Horseshoe Canyon (Canyonlands) and Nine Mile Canyon (UT).  
+**Meaning:** The witness that predates history. BCPS figures are among the oldest and most
+  formally consistent rock art traditions in North America — the same hollow-eyed form repeated
+  across thousands of years and hundreds of miles. Used here as the "story" glyph because
+  Modern Explorer's loop (observe → record → analyze → return) echoes the accumulative logic
+  of Archaic sites: successive layers of witness, all pointing at the same terrain.
+
+---
+
+### Ghost Glyph 4 — Ouroboros
+
+**Location:** About page, "What We're Building" section  
+**Variant:** `ouroboros`  
+**Position:** Right side of section, partially cropped  
+**Style source:** Classical ouroboros — the serpent eating its own tail. Body drawn as a thick
+  arc (stroke-width 13) covering ~320° of a circle; head and tail meet in the upper-right
+  quadrant. Forked tongue, single eye.  
+**Meaning:** Cyclical self-renewal. The "What We're Building" section describes an operational
+  loop (expedition → database → pattern → next target). The ouroboros is the oldest emblem of
+  that loop. Alchemical in origin (Chrysopoeia of Cleopatra, ~3rd century CE), adopted by Jung
+  as a symbol of psychic integration through repetition. Used here because the platform's
+  flywheel — fieldwork feeding a database feeding better fieldwork — is ouroboric: it sustains
+  itself and grows more precise with each cycle.
+
+---
+
+### Ghost Glyph 5 — Mandala (Squared Circle, Quadrated)
+
+**Location:** Membership page, tier-selection section  
+**Variant:** `mandala`  
+**Position:** Centered behind the tier cards  
+**Style source:** Jung's quaternary / quadrated circle — the archetypal wholeness symbol.
+  Composed of: outer circle (containing all), outer diamond (square rotated 45° = matter/earth),
+  cardinal cross (the four functions: thinking, feeling, sensation, intuition), diagonal cross
+  (completing 8-fold division), inner circle, inner diamond, center circle (the Self).  
+**Meaning:** Jung's "squaring of the circle" — the integration of psychic opposites into a
+  unified whole. Used on the Membership page because the four tiers (Visitor, Scout, Trailblazer,
+  Expedition) map loosely onto the quaternary: the initiate who watches, the tracker who moves,
+  the builder who leads, the guide who has completed the circuit. The mandala marks membership
+  as a path of integration, not just access.
+
+---
+
+### Console Whisper
+
+**Location:** `src/App.tsx`, `AppInner` component, single `useEffect(() => {...}, [])`  
+**Content:**
+```
+  ╔════════════╗
+  ║ ╔════════╗ ║
+  ║ ║ ╔════╗ ║ ║
+  ║ ║ ║ ╔╗ ║ ║ ║
+  ║ ║ ║ ╚╝ ║ ║ ║
+  ║ ║ ╚══╬═╝ ║ ║
+  ║ ╚════╝   ║ ║
+  ╚══════════╝ ║
+              ╚╝
+
+ad-ḫal ki-ta ĝál
+  → /threshold
+```
+**Style:** `color:#3a3a4e`, monospace, 10px, dim  
+**Meaning:** The Sumerian phrase is from the cipher's Stanza 3 (Right Column): *ad-ḫal ki-ta gál*
+  — "the secrets lie beneath" / "the concealed word exists from below." No translation is given.
+  The `/threshold` link is offered without explanation. Those who recognize the phrase already
+  know where to go.
+
+---
+
+### 404 Page
+
+**Route:** `path="*"` catch-all, lazy-loaded  
+**File:** `src/pages/NotFound.tsx`  
+**noindex:** yes (`<meta name="robots" content="noindex, nofollow" />`)  
+**Ghost glyph:** Labyrinth at 8% opacity (double the standard 4%), centered  
+**Headline:** "You've wandered off the trail."  
+**Body:** "Most who wander are lost. But not all."  
+**CTA:** Button — "Back to the Trail" → `/`  
+**Hidden link:** `⌖` (U+2316, Position Indicator) → `/threshold`, opacity 0.28, unlabeled  
+**Meaning:** The 404 as labyrinth frame — you've taken a wrong turn in a space with no wrong
+  turns. The ⌖ character (a targeting/position reticle) marks the door without naming it.
+
+---
+
+### Footer Coordinate String
+
+**Location:** `src/components/Footer.tsx`, copyright fine-print line  
+**String:** `v37.7916-105.5943`  
+**Styling:** Same as surrounding legal text (`var(--text-dim)`, 13px, `var(--font-alt)`),
+  with `opacity: 0.5` — slightly dimmer than the copyright line  
+**Coordinates:** 37.7916°N, 105.5943°W — the Great Sand Dunes National Park, Colorado.
+  The dunes are the geographic and mythic center of the Quiet Layer: site of Stanza 3's
+  cipher question ("Are there ancient settlements beneath the great sand dunes?"), the
+  derivation of THRESHOLD's Morse O·L·D, and the probable terminus of any serious
+  investigation of the San Luis Valley's anomalous archaeology.  
+**Meaning:** A build-tag-style coordinate string that looks like a version number to the
+  uninitiated. Those who know coordinates recognize it immediately. No label, no tooltip, no
+  explanation — the string either lands or it doesn't.
