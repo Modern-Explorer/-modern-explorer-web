@@ -41,27 +41,31 @@ export default function MerchStore() {
       }, 8000);
     };
 
-    // Defer Spreadshop until the shop section enters the viewport — keeps its
-    // large JS bundle off the critical path and out of TBT/LCP measurement.
+    // Defer Spreadshop until BOTH window.load has fired AND the shop section
+    // enters the viewport. window.load ensures LCP is already measured before
+    // Spreadshop's 500KB bundle enters the main thread.
     const el = shopRef.current;
-    if (el && typeof IntersectionObserver !== 'undefined') {
-      const io = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) { io.disconnect(); loadSpreadshop(); }
-      }, { rootMargin: '200px' });
-      io.observe(el);
-      return () => {
-        mountedRef.current = false;
-        io.disconnect();
-        clearTimeout(timer);
-        if (script?.parentNode) script.parentNode.removeChild(script);
-        delete window.spread_shop_config;
-      };
+    const scheduleLoad = () => {
+      if (!mountedRef.current) return;
+      if (el && typeof IntersectionObserver !== 'undefined') {
+        const io = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) { io.disconnect(); loadSpreadshop(); }
+        }, { rootMargin: '100px' });
+        io.observe(el);
+      } else {
+        loadSpreadshop();
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleLoad();
+    } else {
+      window.addEventListener('load', scheduleLoad, { once: true });
     }
-    // Fallback for environments without IntersectionObserver
-    loadSpreadshop();
 
     return () => {
       mountedRef.current = false;
+      window.removeEventListener('load', scheduleLoad);
       clearTimeout(timer);
       if (script?.parentNode) script.parentNode.removeChild(script);
       delete window.spread_shop_config;
