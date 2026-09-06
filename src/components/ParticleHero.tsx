@@ -815,10 +815,13 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
 
   // ── RAF loop ─────────────────────────────────────────────────────────────────
   let rafId = 0, lastT = 0, running = false, inView = false;
+  // Cap mobile to 30fps to halve per-frame CPU cost and keep TBT low.
+  const FPS_CAP = isMobile ? 33 : 16; // ms minimum between rendered frames
 
   function tick(now: number) {
     if (!running) return;
     rafId = requestAnimationFrame(tick);
+    if (lastT > 0 && now - lastT < FPS_CAP) return; // skip frame if under cap
     const dt = lastT > 0 ? Math.min(now - lastT, 50) : 16;
     lastT = now;
     ctx.clearRect(0, 0, W, H);
@@ -998,14 +1001,33 @@ export default function ParticleHero() {
     if (!canvas) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let dispose: (() => void) | null = null;
-    const load = () => { dispose = runCanvas(canvas, reduced); };
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(load, { timeout: 2000 });
-      return () => { window.cancelIdleCallback(id); dispose?.(); };
+    let icbId = 0;
+    let timerId = 0;
+
+    const launchCanvas = () => { dispose = runCanvas(canvas, reduced); };
+
+    // Defer canvas init until after window.load so the LCP image (hero logo)
+    // is already decoded before we start competing for main-thread time.
+    const scheduleAfterLoad = () => {
+      if (typeof window.requestIdleCallback === 'function') {
+        icbId = window.requestIdleCallback(launchCanvas, { timeout: 2000 });
+      } else {
+        timerId = window.setTimeout(launchCanvas, 200);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleAfterLoad();
     } else {
-      const id = setTimeout(load, 400);
-      return () => { clearTimeout(id); dispose?.(); };
+      window.addEventListener('load', scheduleAfterLoad, { once: true });
     }
+
+    return () => {
+      window.removeEventListener('load', scheduleAfterLoad);
+      if (icbId) window.cancelIdleCallback(icbId);
+      if (timerId) window.clearTimeout(timerId);
+      dispose?.();
+    };
   }, []);
 
   return (

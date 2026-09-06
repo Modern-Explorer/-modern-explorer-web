@@ -227,9 +227,9 @@ export default function FieldReports() {
         <section style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-section)' }}>
           <div className="container" style={{ padding: '40px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <span style={{ padding: '4px 12px', background: 'var(--accent)', color: '#0b0f1c', borderRadius: 3, fontSize: 10, fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+              <h2 style={{ padding: '4px 12px', background: 'var(--accent)', color: '#0b0f1c', borderRadius: 3, fontSize: 10, fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', margin: 0 }}>
                 Featured Events
-              </span>
+              </h2>
               <span style={{ fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--font-alt)' }}>Crestone · Summer–Fall 2026</span>
             </div>
             <div className="featured-events-grid">
@@ -238,7 +238,7 @@ export default function FieldReports() {
                 return (
                   <div key={p.id} className="featured-event-card">
                     <div className="fec-image" style={{ position: 'relative', minHeight: 220 }}>
-                      <img src={p.img} alt={p.title}
+                      <img src={p.img} alt={p.title} loading="lazy" decoding="async"
                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.1), rgba(12,16,28,0.65))' }} />
                       <div style={{
@@ -311,7 +311,8 @@ export default function FieldReports() {
             {filtered.map(post => (
               <article key={post.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
-                  <img src={post.img} alt={post.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                  <img src={post.img} alt={post.title} loading="lazy" decoding="async"
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                     onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.04)')}
                     onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
                   />
@@ -347,7 +348,7 @@ export default function FieldReports() {
                 <div key={post.id} className="fr-carousel-slide">
                   <article className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div style={{ position: 'relative', paddingTop: '56%', overflow: 'hidden' }}>
-                      <img src={post.img} alt={post.title}
+                      <img src={post.img} alt={post.title} loading="lazy" decoding="async"
                         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                     <div style={{ padding: '16px 18px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -508,7 +509,7 @@ export default function FieldReports() {
                     onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                   >
                     <div style={{ position: 'relative', paddingTop: '56.25%', borderRadius: 4, overflow: 'hidden', marginBottom: 10, background: 'var(--bg)' }}>
-                      <img src={v.thumbnail} alt={v.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={v.thumbnail} alt={v.title} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.3)' }}>
                         <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', paddingLeft: 3 }}>
                           ▶

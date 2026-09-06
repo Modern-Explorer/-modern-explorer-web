@@ -7,10 +7,9 @@
     <link rel="apple-touch-icon" sizes="512x512" href="/favicon-512.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Default SEO — overridden per-page by react-helmet-async -->
-    <title>Modern Explorer | Guided Tours in Crestone, Colorado &amp; the San Luis Valley</title>
-    <meta name="description" content="Immersive small-group guided tours in Crestone, Colorado. Explore UFO hotspots, Spanish treasure legends, paranormal history, and the mysteries of the San Luis Valley and Sangre de Cristo mountains." />
-    <meta name="keywords" content="Crestone Colorado tours, San Luis Valley, Great Sand Dunes, Sangre de Cristo mountains, UFO tours Colorado, paranormal tours, cryptozoology, Spanish treasure, Sasquatch expedition, guided tours Colorado" />
+    <!-- Title + description managed by react-helmet-async per page.
+         This shell title shows only during the JS loading gap. -->
+    <title>Modern Explorer | UFO, Paranormal &amp; Cryptozoology Tours — Crestone, Colorado &amp; the San Luis Valley</title>
 
     <!-- Open Graph -->
     <meta property="og:type"        content="website" />
@@ -42,6 +41,11 @@
          pages the 69 KB downloads in the background (no impact on their LCP
          since their LCP images are route-specific and discovered later). -->
     <link rel="preload" href="/assets/images/content/Logo/me-logo.webp" as="image" type="image/webp" />
+
+    <!-- Preconnect for external origins that can't be eliminated -->
+    <link rel="preconnect" href="https://www.google.com" />
+    <link rel="preconnect" href="https://maps.googleapis.com" />
+    <link rel="preconnect" href="https://maps.gstatic.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>

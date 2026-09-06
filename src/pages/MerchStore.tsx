@@ -114,7 +114,7 @@ export default function MerchStore() {
                 IMG('Animals', 'pexels-brett-sayles-1098886.webp'),
               ].map((src, i) => (
                 <div key={i} style={{ paddingTop: '75%', position: 'relative', overflow: 'hidden' }}>
-                  <img src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={src} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>

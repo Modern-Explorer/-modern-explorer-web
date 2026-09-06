@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -97,7 +97,7 @@ function AppInner() {
           <Route path="/coming-soon"    element={<ComingSoon />} />
           <Route path="/contact"        element={<Contact />} />
           <Route path="/what-to-expect" element={<WhatToExpect />} />
-          <Route path="/privacy"        element={<PrivacyPolicy />} />
+          <Route path="/privacy"        element={<Navigate to="/privacy-policy" replace />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/data-deletion"  element={<DataDeletion />} />
           <Route path="/tip"            element={<Tip />} />

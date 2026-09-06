@@ -266,8 +266,8 @@ export default function Home() {
     <main style={{ position: 'relative' }}>
       <Suspense fallback={null}><GlyphColumns /></Suspense>
       <SEO
-        title="Modern Explorer | UFO, Paranormal & Cryptozoology Research — Crestone, CO"
-        description="Modern Explorer investigates unknown phenomena — UAP, cryptozoology, and lost history — in Crestone, Colorado and the San Luis Valley. Join the research or book a guided expedition."
+        title="Modern Explorer | UFO, Paranormal &amp; Cryptozoology Tours — Crestone, Colorado &amp; the San Luis Valley"
+        description="Modern Explorer runs guided tours and field research expeditions in Crestone, Colorado — investigating UAP, cryptozoology, and lost history in one of North America's most documented anomaly corridors."
         url="/"
       />
 
@@ -459,7 +459,7 @@ export default function Home() {
                 </div>
                 <div style={{ padding: '14px 18px 18px' }}>
                   <p style={{ fontFamily: 'var(--font-alt)', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 3 }}>{tour.subtitle}</p>
-                  <h4 style={{ fontSize: 15 }}>{tour.title}</h4>
+                  <h3 style={{ fontSize: 15 }}>{tour.title}</h3>
                 </div>
               </div>
             ))}
