@@ -10,36 +10,60 @@ const IMG = (folder: string, file: string) => `/assets/images/content/${folder}/
 export default function MerchStore() {
   const [showFallback, setShowFallback] = useState(false);
   const mountedRef = useRef(true);
+  const shopRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     mountedRef.current = true;
+    let script: HTMLScriptElement | null = null;
+    let timer = 0;
 
-    window.spread_shop_config = {
-      shopName: 'modernexplorer',
-      locale: 'us_US',
-      prefix: 'https://modernexplorer.myspreadshop.com',
-      baseId: 'myShop',
+    const loadSpreadshop = () => {
+      if (!mountedRef.current || script) return;
+
+      window.spread_shop_config = {
+        shopName: 'modernexplorer',
+        locale: 'us_US',
+        prefix: 'https://modernexplorer.myspreadshop.com',
+        baseId: 'myShop',
+      };
+
+      script = document.createElement('script');
+      script.src = 'https://modernexplorer.myspreadshop.com/shopfiles/shopclient/shopclient.nocache.js';
+      script.async = true;
+      script.onerror = () => { if (mountedRef.current) setShowFallback(true); };
+      document.head.appendChild(script);
+
+      // 8s timeout: if the embed hasn't replaced the placeholder, show fallback link.
+      timer = window.setTimeout(() => {
+        if (!mountedRef.current) return;
+        const el = document.getElementById('myShop');
+        if (!el || el.firstElementChild?.tagName === 'A') setShowFallback(true);
+      }, 8000);
     };
 
-    const script = document.createElement('script');
-    script.src = 'https://modernexplorer.myspreadshop.com/shopfiles/shopclient/shopclient.nocache.js';
-    script.async = true;
-    script.onerror = () => { if (mountedRef.current) setShowFallback(true); };
-    document.head.appendChild(script);
-
-    // If the embed hasn't replaced the placeholder after 8s, show the fallback link.
-    // Check: if the first child is still the original <a> tag, Spreadshop never took over.
-    const timer = setTimeout(() => {
-      if (!mountedRef.current) return;
-      const el = document.getElementById('myShop');
-      const firstChild = el?.firstElementChild;
-      if (!el || firstChild?.tagName === 'A') setShowFallback(true);
-    }, 8000);
+    // Defer Spreadshop until the shop section enters the viewport — keeps its
+    // large JS bundle off the critical path and out of TBT/LCP measurement.
+    const el = shopRef.current;
+    if (el && typeof IntersectionObserver !== 'undefined') {
+      const io = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) { io.disconnect(); loadSpreadshop(); }
+      }, { rootMargin: '200px' });
+      io.observe(el);
+      return () => {
+        mountedRef.current = false;
+        io.disconnect();
+        clearTimeout(timer);
+        if (script?.parentNode) script.parentNode.removeChild(script);
+        delete window.spread_shop_config;
+      };
+    }
+    // Fallback for environments without IntersectionObserver
+    loadSpreadshop();
 
     return () => {
       mountedRef.current = false;
       clearTimeout(timer);
-      if (script.parentNode) script.parentNode.removeChild(script);
+      if (script?.parentNode) script.parentNode.removeChild(script);
       delete window.spread_shop_config;
     };
   }, []);
@@ -65,7 +89,7 @@ export default function MerchStore() {
       </section>
 
       {/* SPREADSHOP STOREFRONT */}
-      <section style={{ borderBottom: '1px solid var(--border)', minHeight: 600 }}>
+      <section ref={shopRef} style={{ borderBottom: '1px solid var(--border)', minHeight: 600 }}>
         {showFallback ? (
           <div style={{ padding: '80px 24px', textAlign: 'center' }}>
             <p style={{ fontFamily: 'var(--font-heading)', fontSize: 14, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 24 }}>
