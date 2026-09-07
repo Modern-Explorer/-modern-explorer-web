@@ -144,11 +144,27 @@ export default function About() {
                 I'm a Marine Corps infantry and intelligence veteran. I grew up partly in South America, and I've spent years doing serious fieldwork — Sasquatch research across Colorado's Front Range and the Cañon City corridor, Spanish-treasure and archaeological work in the San Luis Valley, and investigations into the UAP and high-strangeness phenomena this region produces at a rate that's hard to explain.
               </p>
               <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.78, marginBottom: 18 }}>
-                The channel has reached over a million people. But reach was never the point. The point was building something that produces real, structured data from the field — not viral moments.
+                The research channel has grown to roughly 16,000 subscribers with more than 2 million views — but reach was never the point. The point was building something that produces real, structured data from the field, not viral moments.
               </p>
-              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.78, marginBottom: 32 }}>
+              <p style={{ fontFamily: 'var(--font-alt)', color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.78, marginBottom: 24 }}>
                 Modern Explorer exists because the San Luis Valley demands it. There's more genuinely unexplained activity concentrated here than almost anywhere in the United States, and almost none of it is being studied rigorously. That's the gap we're filling.
               </p>
+
+              {/* Trust signals — crawlable credentials block */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginBottom: 32 }}>
+                {[
+                  { label: 'Background', value: 'USMC Infantry & Intelligence' },
+                  { label: 'Channel', value: '~16K subscribers · 2M+ views' },
+                  { label: 'Methodology', value: 'Drone · LIDAR · Thermal' },
+                  { label: 'Protocol', value: '4-pillar field investigation' },
+                ].map(c => (
+                  <div key={c.label} style={{ padding: '12px 14px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 5 }}>
+                    <p style={{ fontFamily: 'var(--font-heading)', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>{c.label}</p>
+                    <p style={{ fontFamily: 'var(--font-alt)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.45 }}>{c.value}</p>
+                  </div>
+                ))}
+              </div>
+
               <button onClick={() => openWaitlist('About — Founder bio')} className="btn btn-primary">Join the Research</button>
             </div>
           </div>

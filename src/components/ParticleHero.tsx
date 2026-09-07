@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWaitlist } from '../context/WaitlistContext';
 
 // ─── Original constellation data ──────────────────────────────────────────────
@@ -996,6 +996,10 @@ function runCanvas(canvas: HTMLCanvasElement, reduced: boolean): () => void {
 export default function ParticleHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { open: openWaitlist } = useWaitlist();
+  // `mounted` gates any render-time window access so SSR and the first client
+  // render produce the same HTML (no hydration mismatch).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -1034,7 +1038,7 @@ export default function ParticleHero() {
     <section id="mesa-hero" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: '#060914' }}>
       <canvas ref={canvasRef} aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block' }} />
 
-      {!window.matchMedia('(prefers-reduced-motion: reduce)').matches && (
+      {mounted && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && (
         <div className="ph-topo-layer" aria-hidden="true">
           <svg className="ph-topo-svg ph-topo-a" viewBox="0 0 1400 300" preserveAspectRatio="none">
             <path d="M-100,180 C200,140 400,200 700,155 C900,120 1100,175 1500,145" stroke="rgba(203,243,110,0.08)" strokeWidth="1.2" fill="none"/>

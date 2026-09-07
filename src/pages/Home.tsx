@@ -303,6 +303,45 @@ export default function Home() {
         </div>
       </section>
       <Suspense fallback={null}><MobileCipherDivider breakIdx={1} /></Suspense>  {/* Sumerian S1 */}
+
+      {/* ── FOUNDER STRIP ────────────────────────────────────────────────── */}
+      {/* Crawlable founder identity — names Mateo Argüello for Google/Surveyor */}
+      <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'var(--bg-section)' }}>
+        <div className="container" style={{ padding: '48px 0' }}>
+          <div style={{ display: 'flex', gap: 36, alignItems: 'center', flexWrap: 'wrap' }}>
+            <picture style={{ flexShrink: 0 }}>
+              <source srcSet={IMG('Mateo', 'mateo_main.webp')} type="image/webp" />
+              <img
+                src={IMG('Mateo', 'mateo_main.jpg')}
+                alt="Mateo Argüello — founder of Modern Explorer"
+                loading="lazy"
+                decoding="async"
+                width={88}
+                height={88}
+                style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', objectPosition: 'top', border: '2px solid var(--border-accent)' }}
+              />
+            </picture>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <p style={{ fontFamily: 'var(--font-heading)', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 6 }}>
+                Founder
+              </p>
+              <h2 style={{ fontSize: 'clamp(18px, 2.5vw, 26px)', marginBottom: 8, lineHeight: 1.2 }}>
+                Mateo Argüello
+              </h2>
+              <p style={{ fontFamily: 'var(--font-alt)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: 620 }}>
+                Marine Corps infantry &amp; intelligence veteran. Field investigator with years of documented fieldwork across
+                cryptozoology, UAP, and archaeological anomalies in the San Luis Valley. Research channel with
+                ~16,000 subscribers and over 2 million views. Instrument-based methodology: drone mapping, LIDAR, thermal imaging,
+                and a four-pillar investigation protocol built for high-strangeness terrain.
+              </p>
+            </div>
+            <Link to="/about" className="btn btn-ghost" style={{ flexShrink: 0, fontSize: 13, padding: '10px 22px' }}>
+              Full Story →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── THE FRONTIER — RESEARCH ACCESS ───────────────────────────────── */}
       <section className="section" style={{ background: 'var(--bg-section)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
         <GhostGlyph variant="labyrinth" style={{ left: '-10%', top: '50%', transform: 'translateY(-50%)', width: 'min(58vw, 620px)' }} />

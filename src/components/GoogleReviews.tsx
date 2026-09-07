@@ -146,40 +146,33 @@ function useMobileCarousel(count: number) {
   return { trackRef, activeIdx, scrollTo, onScroll, count };
 }
 
-export default function GoogleReviews() {
-  const [data, setData]       = useState<ReviewsData | null>(null);
-  const [loading, setLoading] = useState(true);
+// Initial state uses fallback reviews so both SSR and the first client render
+// produce the same HTML (no hydration mismatch, no loading skeleton flash).
+const INITIAL_DATA: ReviewsData = {
+  configured: false,
+  rating:     0,
+  total:      0,
+  reviews:    FALLBACK_REVIEWS,
+};
 
-  // ALL hooks must be called before any conditional return
-  const carousel = useMobileCarousel(data?.reviews?.length || 3);
+export default function GoogleReviews() {
+  const [data, setData] = useState<ReviewsData>(INITIAL_DATA);
+
+  const carousel = useMobileCarousel(data.reviews.length);
 
   useEffect(() => {
     fetch('/api/reviews')
       .then(r => r.json())
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then((d: ReviewsData) => {
+        // Only swap in API data if it has real reviews; otherwise keep fallback.
+        if (d.reviews && d.reviews.length > 0) setData(d);
+      })
+      .catch(() => {});
   }, []);
 
-  // Loading skeleton
-  if (loading) {
-    return (
-      <div className="grid-3" style={{ marginBottom: 20 }}>
-        {[1,2,3].map(i => (
-          <div key={i} style={{ padding: '22px 24px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, minHeight: 160 }}>
-            <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'var(--bg-card)', marginBottom: 12 }} />
-            <div style={{ height: 12, width: '60%', background: 'var(--bg-card)', borderRadius: 3, marginBottom: 8 }} />
-            <div style={{ height: 10, width: '40%', background: 'var(--bg-card)', borderRadius: 3, marginBottom: 16 }} />
-            <div style={{ height: 8, width: '100%', background: 'var(--bg-card)', borderRadius: 2, marginBottom: 6 }} />
-            <div style={{ height: 8, width: '80%', background: 'var(--bg-card)', borderRadius: 2 }} />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  const apiReviews  = data?.reviews || [];
-  const hasApiData  = apiReviews.length > 0;
-  const reviews     = hasApiData ? apiReviews : FALLBACK_REVIEWS;
+  const apiReviews  = data.reviews;
+  const hasApiData  = data.configured && apiReviews.length > 0;
+  const reviews     = apiReviews;
   const isFallback  = !hasApiData;
   return (
     <>

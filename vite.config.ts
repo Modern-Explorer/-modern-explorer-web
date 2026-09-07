@@ -2,6 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  ssr: {
+    // Keep three as external so its (large) module graph isn't bundled into
+    // the SSR build — it's only used inside useEffect, never at render time.
+    external: ['three'],
+  },
   plugins: [react()],
   server: {
     proxy: {
