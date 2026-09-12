@@ -100,6 +100,7 @@ export default function Navbar() {
 
         <NavLink
           to={MEMBERSHIP_LINK.to}
+          className="nav-desktop-btn"
           style={({ isActive }) => ({
             flexShrink: 0,
             padding: '6px 13px',
@@ -119,7 +120,7 @@ export default function Navbar() {
 
         <button
           onClick={openBooking}
-          className="btn btn-primary"
+          className="btn btn-primary nav-desktop-btn"
           style={{ flexShrink: 0, padding: '10px 22px', fontSize: 13 }}
         >
           Book a Tour
@@ -214,12 +215,12 @@ export default function Navbar() {
       <style>{`
         @media (max-width: 767px) {
           .nav-links-desktop { display: none !important; }
-          .nav-hamburger { display: flex !important; }
+          .nav-desktop-btn   { display: none !important; }
+          .nav-hamburger     { display: flex !important; margin-left: auto; }
         }
-        /* Tablet: force desktop nav visible, hide hamburger */
         @media (min-width: 768px) {
           .nav-links-desktop { display: flex !important; }
-          .nav-hamburger { display: none !important; }
+          .nav-hamburger     { display: none !important; }
         }
       `}</style>
     </nav>
