@@ -15,7 +15,7 @@ const specialtyTours = [
     desc: 'A dedicated evening tour focused entirely on UAP phenomena in the San Luis Valley. Ground-based sky watch protocols, historical sighting data, and a guided visit to the highest-activity corridors we\'ve documented.',
     img: IMG('UFOs', 'pexels-miriamespacio-365625.webp'),
     tags: ['Evening Tour', '~90 min', 'Small Group'],
-    eta: 'Fall 2025',
+    eta: 'Spring 2027',
   },
   {
     title: 'Paranormal & Ghosts',
@@ -23,7 +23,7 @@ const specialtyTours = [
     desc: 'An after-dark walking tour through the most historically active locations in Crestone. EMF detection, EVP sessions, and documented accounts from locals who\'ve witnessed things they can\'t explain.',
     img: IMG('Ghosts', 'ZtDXn.webp'),
     tags: ['Night Tour', '~90 min', 'Ages 16+'],
-    eta: 'Winter 2025',
+    eta: 'Winter 2026',
   },
   {
     title: 'Mining & History',
@@ -31,7 +31,7 @@ const specialtyTours = [
     desc: 'A deep dive into the mining and settler history of the Sangre de Cristo range. Abandoned sites, forgotten stories, and the economic forces that shaped — and scarred — this landscape.',
     img: IMG('History', '20241222_124511-EDIT.webp'),
     tags: ['Day Tour', '~90 min', 'Moderate Hike'],
-    eta: '2026',
+    eta: 'In Development',
   },
 ];
 

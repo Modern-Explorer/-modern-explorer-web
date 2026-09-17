@@ -231,9 +231,9 @@ const activeTour = {
 };
 
 const comingSoon = [
-  { title: 'UFO / UAP Tour', subtitle: 'The Sky Watch Experience', img: IMG('UFOs', 'pexels-miriamespacio-365625.webp'), eta: 'Fall 2025' },
-  { title: 'Paranormal & Ghosts', subtitle: 'Crestone After Dark', img: IMG('Ghosts', 'ZtDXn.webp'), eta: 'Winter 2025' },
-  { title: 'Mining & History', subtitle: 'The Hidden Past', img: IMG('History', '20241222_124511-EDIT.webp'), eta: '2026' },
+  { title: 'UFO / UAP Tour', subtitle: 'The Sky Watch Experience', img: IMG('UFOs', 'pexels-miriamespacio-365625.webp'), eta: 'Spring 2027' },
+  { title: 'Paranormal & Ghosts', subtitle: 'Crestone After Dark', img: IMG('Ghosts', 'ZtDXn.webp'), eta: 'Winter 2026' },
+  { title: 'Mining & History', subtitle: 'The Hidden Past', img: IMG('History', '20241222_124511-EDIT.webp'), eta: 'In Development' },
   { title: 'Future Expeditions', subtitle: 'Multi-Day Field Operations', img: IMG('Nature', '20250510_124904-EDIT.webp'), eta: 'In Development' },
 ];
 
