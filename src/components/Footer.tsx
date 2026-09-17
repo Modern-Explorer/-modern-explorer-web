@@ -109,6 +109,16 @@ export default function Footer() {
               <span style={{ opacity: 0.5 }}>v37.7916-105.5943</span>
             </p>
           </div>
+          <a
+            href="https://visionhorizon.enterprises/?utm_source=modernexplorer&utm_medium=footer"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-vhe-credit"
+          >
+            <img src="/brand/vhe-v-mark.svg" alt="Vision Horizon Enterprises" width="24" height="24" />
+            Website by{' '}
+            <span className="footer-vhe-name">Vision Horizon Enterprises</span>
+          </a>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <p style={{ color: 'var(--text-dim)', fontSize: 13, fontFamily: 'var(--font-alt)', margin: 0 }}>
               Crestone · San Luis Valley, Colorado · Near Great Sand Dunes National Park
@@ -141,6 +151,36 @@ export default function Footer() {
         @media (max-width: 768px) {
           .footer-sigil--guide { margin-bottom: 80px; }
         }
+        .footer-vhe-credit {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          font-size: 0.78rem;
+          font-family: var(--font-alt);
+          color: rgba(255, 255, 255, 0.40);
+          text-decoration: none;
+          transition: color 0.2s ease;
+        }
+        .footer-vhe-credit img {
+          width: 24px;
+          height: 24px;
+          flex-shrink: 0;
+          transition: filter 0.2s ease;
+        }
+        .footer-vhe-name {
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          background: linear-gradient(135deg, #FF00C8 0%, #8800FF 50%, #00E5FF 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          color: #8800FF;
+          opacity: 0.78;
+          transition: opacity 0.2s ease;
+        }
+        .footer-vhe-credit:hover { color: rgba(255, 255, 255, 0.65); }
+        .footer-vhe-credit:hover .footer-vhe-name { opacity: 1; }
+        .footer-vhe-credit:hover img { filter: drop-shadow(0 0 6px rgba(136, 0, 255, 0.55)); }
         @media (max-width: 560px) {
           footer .container > div:first-child { grid-template-columns: 1fr !important; }
         }
