@@ -12,9 +12,12 @@ dist
 dist-ssr
 *.local
 
-# Environment variables
+# Environment variables — ignore ALL env files (they hold secrets), keep only the
+# committed template. deploy.sh regenerates .env.production from .env on the server,
+# so it must never be tracked (it would carry RESEND/ANTHROPIC/etc. into git).
 .env
-.env.local
+.env.*
+!.env.example
 
 # DB-backed abuse controls for /api/mesa (rate-limit + spend ledger).
 # Persistent SQLite state — never commit it; production uses ME_DATA_DIR outside the repo.
