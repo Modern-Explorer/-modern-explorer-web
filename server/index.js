@@ -6,9 +6,14 @@ import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import * as store from './store.js';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+
+// Behind Nginx — trust the proxy so X-Forwarded-For / req.ip reflect the real
+// client. Per-IP rate limiting on /api/mesa depends on this being accurate.
+app.set('trust proxy', true);
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -336,22 +341,96 @@ app.get('/api/waitlist/export.csv', (req, res) => {
 });
 
 // ── MESA AI ───────────────────────────────────────────────────────────────────
+// Public + unauthenticated + calls the PAID Claude API, so it is defended from
+// abuse the same way the VLD site's Sage chatbot is (ported from that pattern):
+//   • per-IP + global rate limit (429 over cap) ......... store.rateStatus
+//   • per-conversation message cap + input-size caps .... here
+//   • hard daily + monthly Claude spend ceiling (503) ... store.spendStatus
+// All controls are DB-backed (server/store.js) so a restart can't reset them.
+
+const MESA_MODEL      = 'claude-haiku-4-5-20251001';
+const MESA_MAX_TOKENS = 400;
+
+// Limits (env-tunable). Sized for a low-traffic marketing site with a real, hard
+// dollar ceiling — see store.js for MESA_DAILY_USD / MESA_MONTHLY_USD.
+const MESA_PER_IP    = parseInt(process.env.MESA_PER_IP    || '30',   10); // messages / IP / hour
+const MESA_GLOBAL    = parseInt(process.env.MESA_GLOBAL    || '400',  10); // messages / hour, all IPs
+const MESA_MAX_TURNS = parseInt(process.env.MESA_MAX_TURNS || '24',   10); // messages allowed per conversation
+const MESA_MAX_CHARS = parseInt(process.env.MESA_MAX_CHARS || '2000', 10); // per user message
+
+// Prefer the real client IP behind Nginx (X-Real-IP / X-Forwarded-For), else req.ip.
+function clientIp(req) {
+  const xf = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return req.headers['x-real-ip'] || xf || req.ip || '';
+}
 
 app.post('/api/mesa', async (req, res) => {
-  const { messages } = req.body;
+  const ip = clientIp(req);
+  const { messages } = req.body || {};
+
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'Invalid messages.' });
   }
+  // Per-conversation cap: reject an over-long history outright (bounds token cost
+  // per call and stops a client from stuffing a huge context).
+  if (messages.length > MESA_MAX_TURNS) {
+    return res.status(400).json({ error: 'Transmission too long. Start a new field session.' });
+  }
+
+  // Normalize + size-cap every message before it ever reaches the API.
+  let sanitized;
+  try {
+    sanitized = messages.map(m => {
+      const role = m && m.role === 'assistant' ? 'assistant' : 'user';
+      const content = String((m && m.content) || '').slice(0, MESA_MAX_CHARS);
+      if (!content) throw new Error('empty');
+      return { role, content };
+    });
+  } catch {
+    return res.status(400).json({ error: 'Invalid message content.' });
+  }
+
+  // Rate limit (per-IP + global), DB-backed so a restart can't reset it.
+  const rl = store.rateStatus(
+    { ipScope: 'chat_ip', globalScope: 'chat_global', perIp: MESA_PER_IP, global: MESA_GLOBAL },
+    ip
+  );
+  if (rl.limited) {
+    res.set('Retry-After', '3600');
+    return res.status(429).json({
+      error: rl.scope === 'ip'
+        ? 'Signal saturated from your location. Stand by and try again later.'
+        : 'MESA is handling heavy field traffic. Try again shortly.',
+    });
+  }
+
+  // Hard spend ceiling — refuse before spending another cent if over the cap.
+  const spend = store.spendStatus();
+  if (spend.over) {
+    console.warn(`[MESA] spend ceiling hit (${spend.window}) — refusing chat. ${JSON.stringify(store.spendSnapshot())}`);
+    res.set('Retry-After', '3600');
+    return res.status(503).json({ error: 'Field intelligence is offline for resupply. Try again later.' });
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return res.status(503).json({ error: 'MESA offline — ANTHROPIC_API_KEY not configured.' });
   }
+
+  // Count this attempt against the budgets BEFORE the paid call, so failures/aborts
+  // still cost the abuser their per-IP slot.
+  store.recordEvent('chat_ip', ip);
+  store.recordEvent('chat_global', ip);
+
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 400,
+      model: MESA_MODEL,
+      max_tokens: MESA_MAX_TOKENS,
       system: MESA_SYSTEM,
-      messages,
+      messages: sanitized,
     });
+    // Record actual cost from the API's usage numbers for the spend ceiling.
+    const u = response.usage || {};
+    store.recordSpend(u.input_tokens || 0, u.output_tokens || 0);
     res.json({ content: response.content[0].text });
   } catch (err) {
     console.error('MESA error:', err.message);

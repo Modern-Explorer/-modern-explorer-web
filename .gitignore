@@ -16,6 +16,14 @@ dist-ssr
 .env
 .env.local
 
+# DB-backed abuse controls for /api/mesa (rate-limit + spend ledger).
+# Persistent SQLite state — never commit it; production uses ME_DATA_DIR outside the repo.
+data
+server/data
+*.db
+*.db-shm
+*.db-wal
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
