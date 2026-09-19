@@ -1045,6 +1045,12 @@ function StripeForm({ promoCode, slot, groupSize, tourType, customer, waiverAgre
       console.error('[booking] PAYMENT SUCCEEDED BUT BOOKING PERSISTENCE FAILED — manual follow-up required', {
         payment_intent_id: paymentIntentId, customer_email: customer.email, error: err,
       });
+      // Best-effort admin alert so the captured payment gets reconciled even if
+      // the customer closes the tab. Fire-and-forget; ignore its own failure.
+      void fetch(`${API_URL}/bookings/persistence-failure`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_intent_id: paymentIntentId, customer_email: customer.email, tour_name: slot.tour_name, date: slot.date, start_time: slot.start_time, group_size: groupSize }),
+      }).catch(() => {});
       setPersistPending(true);
       setProcessing(false);
     }
