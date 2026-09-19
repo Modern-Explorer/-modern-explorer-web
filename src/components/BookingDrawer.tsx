@@ -998,7 +998,7 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
         )}
         {!loading && clientSecret && !missingKey && (
           <Elements key={intentKey} stripe={stripePromise} options={{ clientSecret, appearance: STRIPE_APPEARANCE, fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap' }] }}>
-            <StripeForm estimatedTotal={displayTotal} promoCode={appliedPromo?.code ?? null} slot={slot} groupSize={groupSize} tourType={tourType} customer={customer} waiverAgreedAt={waiverAgreedAt} onConfirmed={onConfirmed} onBack={onBack} />
+            <StripeForm promoCode={appliedPromo?.code ?? null} slot={slot} groupSize={groupSize} tourType={tourType} customer={customer} waiverAgreedAt={waiverAgreedAt} onConfirmed={onConfirmed} onBack={onBack} />
           </Elements>
         )}
         {!loading && !clientSecret && !intentError && !missingKey && (
@@ -1011,14 +1011,44 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
 }
 
 // ─── Stripe form ──────────────────────────────────────────────────────────────
-function StripeForm({ estimatedTotal, promoCode, slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack }: {
-  estimatedTotal: number; promoCode: string | null; slot: Slot; groupSize: number; tourType: TourType;
+function StripeForm({ promoCode, slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack }: {
+  promoCode: string | null; slot: Slot; groupSize: number; tourType: TourType;
   customer: Customer; waiverAgreedAt: string; onConfirmed: (r: BookingResult) => void; onBack: () => void;
 }) {
   const stripe   = useStripe();
   const elements = useElements();
   const [processing,  setProcessing]  = useState(false);
   const [stripeError, setStripeError] = useState<string | null>(null);
+  // Set only when the card was charged but saving the booking failed. We must
+  // NEVER fake a confirmation in this state — the customer has paid, so we show
+  // an honest "confirmation pending" message and allow retrying persistence.
+  const [persistPending, setPersistPending] = useState(false);
+  const [paidIntent,     setPaidIntent]     = useState<{ id: string; pm: string | null } | null>(null);
+
+  // Persist the booking after a successful charge. Separated so it can be
+  // retried without re-charging the card.
+  async function persistBooking(paymentIntentId: string, paymentMethodId: string | null) {
+    setProcessing(true);
+    setStripeError(null);
+    try {
+      const res = await fetch(`${API_URL}/bookings`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_intent_id: paymentIntentId, payment_method_id: paymentMethodId, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined, ...(promoCode ? { promo_code: promoCode } : {}) }),
+      });
+      const data = await res.json() as Record<string, unknown>;
+      if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');
+      setPersistPending(false);
+      onConfirmed(data as unknown as BookingResult);
+    } catch (err) {
+      // Payment succeeded but the booking did not persist. Surface honestly and
+      // log loudly for admin follow-up — do NOT invent a confirmation code.
+      console.error('[booking] PAYMENT SUCCEEDED BUT BOOKING PERSISTENCE FAILED — manual follow-up required', {
+        payment_intent_id: paymentIntentId, customer_email: customer.email, error: err,
+      });
+      setPersistPending(true);
+      setProcessing(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -1031,25 +1061,31 @@ function StripeForm({ estimatedTotal, promoCode, slot, groupSize, tourType, cust
     if (error) { setStripeError(error.message ?? 'Could not process payment. Please try again.'); setProcessing(false); return; }
     if (!paymentIntent || paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture' && paymentIntent.status !== 'processing') { setStripeError('Payment was not completed. Please try again.'); setProcessing(false); return; }
 
-    try {
-      const res = await fetch(`${API_URL}/bookings`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payment_intent_id: paymentIntent.id, payment_method_id: paymentIntent.payment_method, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined, ...(promoCode ? { promo_code: promoCode } : {}) }),
-      });
-      const data = await res.json() as Record<string, unknown>;
-      if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');
-      onConfirmed(data as unknown as BookingResult);
-    } catch {
-      const { subtotal: fallbackSub } = calcAmounts(groupSize, tourType, slot);
-      onConfirmed({
-        confirmation_code: `MEX-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-        tour_name: slot.tour_name, date: slot.date, start_time: slot.start_time,
-        group_size: groupSize, is_private: tourType === 'private-guaranteed', tour_type: tourType,
-        subtotal: fallbackSub,
-        service_fee: Math.round(estimatedTotal * SERVICE_RATE * 100) / 100,
-        total_amount: estimatedTotal, customer_name: customer.name,
-      });
-    }
+    const pm = typeof paymentIntent.payment_method === 'string' ? paymentIntent.payment_method : null;
+    setPaidIntent({ id: paymentIntent.id, pm });
+    await persistBooking(paymentIntent.id, pm);
+  }
+
+  // Payment went through but we couldn't record the booking — honest holding state.
+  if (persistPending) {
+    return (
+      <div>
+        <div style={{ padding: '16px 18px', marginBottom: 16, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.35)', borderRadius: 8 }}>
+          <p style={{ fontFamily: 'var(--font-heading)', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f59e0b', marginBottom: 8 }}>Payment received · Confirmation pending</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65, marginBottom: 8 }}>
+            Your card was charged successfully, but we hit a snag saving your booking. <strong style={{ color: 'var(--text)' }}>Your spot and payment are safe.</strong> Please retry below.
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.65 }}>
+            If it keeps failing, email <a href="mailto:hello@modernexplorer.me" style={{ color: 'var(--accent)' }}>hello@modernexplorer.me</a> and we'll confirm your booking manually — no need to pay again.
+          </p>
+        </div>
+        <button className="btn btn-primary" disabled={processing || !paidIntent} onClick={() => paidIntent && persistBooking(paidIntent.id, paidIntent.pm)} style={{ width: '100%', justifyContent: 'center' }}>
+          {processing
+            ? <><span style={{ width: 16, height: 16, border: '2px solid rgba(8,12,23,0.3)', borderTopColor: '#080c17', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block', flexShrink: 0, marginRight: 8 }} />Retrying…</>
+            : 'Retry confirmation'}
+        </button>
+      </div>
+    );
   }
 
   return (
