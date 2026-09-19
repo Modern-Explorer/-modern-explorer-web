@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useBooking } from '../context/BookingContext';
-import WaiverModal from './WaiverModal';
+import WaiverModal, { type WaiverDoc } from './WaiverModal';
 
 // ─── Stripe & API config ──────────────────────────────────────────────────────
 // loadStripe() deferred to first drawer open — avoids loading 750 KB of Stripe CDN
@@ -60,6 +60,12 @@ interface BookingResult {
   customer_name: string;
 }
 type DrawerStep = 'calendar' | 'slot' | 'tour-type' | 'group-size' | 'customer' | 'review' | 'confirmation';
+
+// Current waiver version fetched from GET /api/waiver/current, plus the
+// parent/guardian's addendum acceptance when the group includes a minor.
+interface WaiverData { versionId: string; effectiveDate: string | null; title: string; doc: WaiverDoc | null; }
+interface MinorAcceptance { agreedAt: string; signerName: string; relationship: string; }
+interface DetailsPayload { waiverAgreedAt: string; minor: MinorAcceptance | null; }
 
 // ─── Pricing & date utilities ─────────────────────────────────────────────────
 const PRIVATE_GUARANTEED_BASE = 85;
@@ -609,22 +615,29 @@ function TimeSlotStep({ date, slots, selectedSlot, setSelectedSlot }: {
 }
 
 // ─── STEP 4: Customer — matches CustomerForm exactly ─────────────────────────
-function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
-  customer: Customer; setCustomer: (c: Customer) => void; onWaiverAgreed: (ts: string) => void;
+function CustomerStep({ customer, setCustomer, waiver, waiverError, onDetailsComplete }: {
+  customer: Customer; setCustomer: (c: Customer) => void;
+  waiver: WaiverData | null; waiverError: boolean;
+  onDetailsComplete: (payload: DetailsPayload) => void;
 }) {
   const [waiverChecked,      setWaiverChecked]      = useState(false);
   const [hasMinors,          setHasMinors]          = useState(false);
   const [minorWaiverChecked, setMinorWaiverChecked] = useState(false);
+  const [minorSignerName,    setMinorSignerName]    = useState('');
+  const [minorRelationship,  setMinorRelationship]  = useState('');
   const [waiverTimestamp,    setWaiverTimestamp]    = useState<string | null>(null);
+  const [minorTimestamp,     setMinorTimestamp]     = useState<string | null>(null);
   const [modalOpen,          setModalOpen]          = useState(false);
 
+  const waiverReady   = !!waiver?.doc && !waiverError;
   const pref          = customer.contact_preference ?? 'email';
   const smsSelected   = pref === 'sms' || pref === 'both';
   const phoneProvided = customer.phone.trim().length > 0;
   const phoneRequired = smsSelected && !phoneProvided;
   const emailValid    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email);
   const formValid     = customer.name.trim().length > 0 && emailValid && !phoneRequired;
-  const canContinue   = formValid && waiverChecked && (!hasMinors || minorWaiverChecked);
+  const minorValid    = !hasMinors || (minorWaiverChecked && minorSignerName.trim().length > 0 && minorRelationship.trim().length > 0);
+  const canContinue   = formValid && waiverChecked && waiverReady && minorValid;
 
   function setField(field: keyof Customer, value: string) { setCustomer({ ...customer, [field]: value }); }
   function setPref(p: ContactPref) { setCustomer({ ...customer, contact_preference: p }); }
@@ -642,9 +655,23 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
     setModalOpen(false);
   }
 
+  function handleMinorCheckbox(checked: boolean) {
+    setMinorWaiverChecked(checked);
+    if (checked && !minorTimestamp) setMinorTimestamp(new Date().toISOString());
+    if (!checked) setMinorTimestamp(null);
+  }
+
+  function toggleHasMinors(checked: boolean) {
+    setHasMinors(checked);
+    if (!checked) { setMinorWaiverChecked(false); setMinorTimestamp(null); setMinorSignerName(''); setMinorRelationship(''); }
+  }
+
   function handleContinue() {
     if (!canContinue || !waiverTimestamp) return;
-    onWaiverAgreed(waiverTimestamp);
+    const minor: MinorAcceptance | null = hasMinors && minorTimestamp
+      ? { agreedAt: minorTimestamp, signerName: minorSignerName.trim(), relationship: minorRelationship.trim() }
+      : null;
+    onDetailsComplete({ waiverAgreedAt: waiverTimestamp, minor });
   }
 
   const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 4, padding: '12px 14px', fontFamily: 'var(--font-alt)', fontSize: 14, color: 'var(--text)', outline: 'none', transition: 'border-color .15s' };
@@ -652,7 +679,16 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
 
   return (
     <>
-      {modalOpen && <WaiverModal onAgree={handleWaiverAgree} onClose={() => setModalOpen(false)} />}
+      {modalOpen && (
+        <WaiverModal
+          doc={waiver?.doc ?? null}
+          effectiveDate={waiver?.effectiveDate ?? null}
+          title={waiver?.title ?? 'Participant Agreement & Liability Waiver'}
+          loadError={waiverError}
+          onAgree={handleWaiverAgree}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
 
       <div>
         <p style={{ fontFamily: 'var(--font-alt)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>Your Details</p>
@@ -722,9 +758,9 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="1" width="10" height="12" rx="1.5"/><path d="M4 4h6M4 7h6M4 10h4"/></svg>
             View Participant Agreement &amp; Liability Waiver
           </button>
-          <label style={{ display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer' }}>
+          <label style={{ display: 'flex', gap: 12, alignItems: 'flex-start', cursor: waiverReady ? 'pointer' : 'not-allowed', opacity: waiverReady ? 1 : 0.55 }}>
             <span style={{ position: 'relative', flexShrink: 0, marginTop: 1 }}>
-              <input type="checkbox" checked={waiverChecked} onChange={e => handleCheckbox(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+              <input type="checkbox" checked={waiverChecked} disabled={!waiverReady} onChange={e => handleCheckbox(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: waiverReady ? 'pointer' : 'not-allowed' }} />
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: 3, background: waiverChecked ? 'var(--accent)' : 'var(--bg-section)', border: `2px solid ${waiverChecked ? 'var(--accent)' : 'var(--border)'}`, transition: 'background 0.15s, border-color 0.15s' }}>
                 {waiverChecked && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#080c17" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
               </span>
@@ -732,36 +768,51 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
             <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
               I have read and agree to the{' '}
               <button type="button" onClick={() => setModalOpen(true)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--accent)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 2 }}>Participant Agreement &amp; Liability Waiver</button>
-              , including the Release of Liability, Assumption of Risk, and all Terms of Participation.
+              , including the Release of Liability, Assumption of Risk, all Terms of Participation, and the Minor Participant Addendum where applicable.
             </span>
           </label>
+          {waiverError && <p style={{ fontSize: 12, color: 'rgba(245,158,11,0.85)', marginTop: 12, lineHeight: 1.5 }}>We couldn't load the current agreement. Please close and reopen the booking window — you must be able to review it before agreeing.</p>}
         </div>
 
-        {/* Minor participants */}
+        {/* Minor participants — in-flow Minor Participant Addendum (Article IX-A) */}
         <label style={{ display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', marginBottom: hasMinors ? 12 : 20 }}>
           <span style={{ position: 'relative', flexShrink: 0, marginTop: 2 }}>
-            <input type="checkbox" checked={hasMinors} onChange={e => setHasMinors(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+            <input type="checkbox" checked={hasMinors} onChange={e => toggleHasMinors(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: 3, background: hasMinors ? 'var(--accent)' : 'var(--bg-section)', border: `2px solid ${hasMinors ? 'var(--accent)' : 'var(--border)'}`, transition: 'background 0.15s, border-color 0.15s' }}>
               {hasMinors && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#080c17" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
             </span>
           </span>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>My group includes participants under 18 years old.</span>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>Is any participant under 18 years old?</span>
         </label>
         {hasMinors && (
-          <>
-            <div style={{ padding: '14px 18px', marginBottom: 12, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.28)', borderLeft: '3px solid rgba(245,158,11,0.6)', borderRadius: 5 }}>
-              <p style={{ fontSize: 13, color: 'rgba(245,158,11,0.9)', lineHeight: 1.7 }}>A parent or legal guardian must sign the waiver for all minors. Separate waiver forms will be sent after booking.</p>
+          <div style={{ padding: '18px 20px', marginBottom: 20, background: 'var(--bg-section)', border: '1px solid var(--border-accent)', borderRadius: 8 }}>
+            <div style={{ padding: '12px 16px', marginBottom: 16, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.28)', borderLeft: '3px solid rgba(245,158,11,0.6)', borderRadius: 5 }}>
+              <p style={{ fontSize: 13, color: 'rgba(245,158,11,0.9)', lineHeight: 1.65 }}>A parent or legal guardian must review and accept the <strong>Minor Participant Addendum (Article IX-A)</strong> on behalf of every participant under 18.</p>
             </div>
-            <label style={{ display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={labelStyle}>Parent / Guardian Name *</label>
+                <input style={inputStyle} type="text" placeholder="Full name" value={minorSignerName} onChange={e => setMinorSignerName(e.target.value)} onFocus={e => (e.target.style.borderColor = 'rgba(203,243,110,0.4)')} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.07)')} />
+              </div>
+              <div>
+                <label style={labelStyle}>Relationship to Minor *</label>
+                <input style={inputStyle} type="text" placeholder="e.g. Parent, Guardian" value={minorRelationship} onChange={e => setMinorRelationship(e.target.value)} onFocus={e => (e.target.style.borderColor = 'rgba(203,243,110,0.4)')} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.07)')} />
+              </div>
+            </div>
+            <label style={{ display: 'flex', gap: 12, alignItems: 'flex-start', cursor: waiverReady ? 'pointer' : 'not-allowed', opacity: waiverReady ? 1 : 0.55 }}>
               <span style={{ position: 'relative', flexShrink: 0, marginTop: 2 }}>
-                <input type="checkbox" checked={minorWaiverChecked} onChange={e => setMinorWaiverChecked(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+                <input type="checkbox" checked={minorWaiverChecked} disabled={!waiverReady} onChange={e => handleMinorCheckbox(e.target.checked)} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', cursor: waiverReady ? 'pointer' : 'not-allowed' }} />
                 <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: 3, background: minorWaiverChecked ? 'var(--accent)' : 'var(--bg-section)', border: `2px solid ${minorWaiverChecked ? 'var(--accent)' : 'var(--border)'}`, transition: 'background 0.15s, border-color 0.15s' }}>
                   {minorWaiverChecked && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#080c17" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 </span>
               </span>
-              <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>I confirm that a parent or legal guardian will complete a separate minor participant waiver for all participants under 18 before the tour.</span>
+              <span style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                I am the parent or legal guardian named above, and I have read and accept the{' '}
+                <button type="button" onClick={() => setModalOpen(true)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--accent)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 2 }}>Minor Participant Addendum (Article IX-A)</button>
+                {' '}on behalf of all participants under 18.
+              </span>
             </label>
-          </>
+          </div>
         )}
 
         <div style={{ padding: '12px 16px', background: 'var(--bg-section)', border: '1px solid var(--border)', borderRadius: 6, marginBottom: 20 }}>
@@ -779,9 +830,10 @@ function CustomerStep({ customer, setCustomer, onWaiverAgreed }: {
 }
 
 // ─── STEP 5: Review & Pay ─────────────────────────────────────────────────────
-function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack, stripePromise }: {
+function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, waiverVersionId, minorInfo, onConfirmed, onBack, stripePromise }: {
   slot: Slot; groupSize: number; tourType: TourType; customer: Customer;
-  waiverAgreedAt: string; onConfirmed: (r: BookingResult) => void; onBack: () => void;
+  waiverAgreedAt: string; waiverVersionId: string | null; minorInfo: MinorAcceptance | null;
+  onConfirmed: (r: BookingResult) => void; onBack: () => void;
   stripePromise: ReturnType<typeof loadStripe> | null;
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -998,7 +1050,7 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
         )}
         {!loading && clientSecret && !missingKey && (
           <Elements key={intentKey} stripe={stripePromise} options={{ clientSecret, appearance: STRIPE_APPEARANCE, fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap' }] }}>
-            <StripeForm promoCode={appliedPromo?.code ?? null} slot={slot} groupSize={groupSize} tourType={tourType} customer={customer} waiverAgreedAt={waiverAgreedAt} onConfirmed={onConfirmed} onBack={onBack} />
+            <StripeForm promoCode={appliedPromo?.code ?? null} slot={slot} groupSize={groupSize} tourType={tourType} customer={customer} waiverAgreedAt={waiverAgreedAt} waiverVersionId={waiverVersionId} minorInfo={minorInfo} onConfirmed={onConfirmed} onBack={onBack} />
           </Elements>
         )}
         {!loading && !clientSecret && !intentError && !missingKey && (
@@ -1011,9 +1063,10 @@ function ReviewStep({ slot, groupSize, tourType, customer, waiverAgreedAt, onCon
 }
 
 // ─── Stripe form ──────────────────────────────────────────────────────────────
-function StripeForm({ promoCode, slot, groupSize, tourType, customer, waiverAgreedAt, onConfirmed, onBack }: {
+function StripeForm({ promoCode, slot, groupSize, tourType, customer, waiverAgreedAt, waiverVersionId, minorInfo, onConfirmed, onBack }: {
   promoCode: string | null; slot: Slot; groupSize: number; tourType: TourType;
-  customer: Customer; waiverAgreedAt: string; onConfirmed: (r: BookingResult) => void; onBack: () => void;
+  customer: Customer; waiverAgreedAt: string; waiverVersionId: string | null; minorInfo: MinorAcceptance | null;
+  onConfirmed: (r: BookingResult) => void; onBack: () => void;
 }) {
   const stripe   = useStripe();
   const elements = useElements();
@@ -1033,7 +1086,7 @@ function StripeForm({ promoCode, slot, groupSize, tourType, customer, waiverAgre
     try {
       const res = await fetch(`${API_URL}/bookings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payment_intent_id: paymentIntentId, payment_method_id: paymentMethodId, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined, ...(promoCode ? { promo_code: promoCode } : {}) }),
+        body: JSON.stringify({ payment_intent_id: paymentIntentId, payment_method_id: paymentMethodId, availability_id: slot.id, group_size: groupSize, is_private: tourType === 'private-guaranteed', tenant_slug: 'modern-explorer', customer, contact_preference: customer.contact_preference ?? 'email', waiver_agreed_at: waiverAgreedAt || undefined, ...(waiverVersionId ? { waiver_version_id: waiverVersionId } : {}), minor_participants: !!minorInfo, ...(minorInfo ? { minor_waiver_agreed_at: minorInfo.agreedAt, minor_waiver_signer_name: minorInfo.signerName, minor_waiver_signer_relationship: minorInfo.relationship } : {}), ...(promoCode ? { promo_code: promoCode } : {}) }),
       });
       const data = await res.json() as Record<string, unknown>;
       if (!res.ok) throw new Error((data.error as string) ?? 'Booking failed');
@@ -1203,6 +1256,9 @@ export default function BookingDrawer() {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [customer,       setCustomer]       = useState<Customer>({ name: '', email: '', phone: '' });
   const [waiverAgreedAt, setWaiverAgreedAt] = useState<string | null>(null);
+  const [waiver,         setWaiver]         = useState<WaiverData | null>(null);
+  const [waiverError,    setWaiverError]    = useState(false);
+  const [minorInfo,      setMinorInfo]      = useState<MinorAcceptance | null>(null);
   const [booking,        setBooking]        = useState<BookingResult | null>(null);
   const [apiSlots,       setApiSlots]       = useState<Slot[]>([]);
   const [slotsLoading,   setSlotsLoading]   = useState(true);
@@ -1225,6 +1281,19 @@ export default function BookingDrawer() {
       .finally(() => setSlotsLoading(false));
   }, [isOpen]);
 
+  // Fetch the current waiver version on open — the customer flow renders and
+  // records exactly this version (its id travels with the booking POST).
+  useEffect(() => {
+    if (!isOpen) return;
+    fetch(`${API_URL}/waiver/current?tenant=modern-explorer`)
+      .then(r => { if (!r.ok) throw new Error('waiver load failed'); return r.json(); })
+      .then((d: { waiver_version_id: string; effective_date: string; title: string; document: WaiverDoc }) => {
+        setWaiver({ versionId: d.waiver_version_id, effectiveDate: d.effective_date, title: d.title, doc: d.document });
+        setWaiverError(false);
+      })
+      .catch(() => setWaiverError(true));
+  }, [isOpen]);
+
   // Body scroll lock
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -1244,7 +1313,7 @@ export default function BookingDrawer() {
     if (!isOpen) {
       const t = setTimeout(() => {
         setStep('calendar'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
-        setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setBooking(null);
+        setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setMinorInfo(null); setBooking(null);
       }, 380);
       return () => clearTimeout(t);
     }
@@ -1252,7 +1321,7 @@ export default function BookingDrawer() {
 
   function reset() {
     setStep('calendar'); setTourType(null); setShowTourRequest(false); setGroupSize(1); setSelectedDate(null); setSelectedSlot(null);
-    setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setBooking(null);
+    setCustomer({ name: '', email: '', phone: '' }); setWaiverAgreedAt(null); setMinorInfo(null); setBooking(null);
   }
 
   function handleTourTypeSelect(t: TourType) {
@@ -1356,7 +1425,9 @@ export default function BookingDrawer() {
               <CustomerStep
                 customer={customer}
                 setCustomer={setCustomer}
-                onWaiverAgreed={ts => { setWaiverAgreedAt(ts); setStep('review'); }}
+                waiver={waiver}
+                waiverError={waiverError}
+                onDetailsComplete={payload => { setWaiverAgreedAt(payload.waiverAgreedAt); setMinorInfo(payload.minor); setStep('review'); }}
               />
             )}
             {step === 'review' && selectedSlot && tourType && (
@@ -1366,6 +1437,8 @@ export default function BookingDrawer() {
                 tourType={tourType}
                 customer={customer}
                 waiverAgreedAt={waiverAgreedAt ?? ''}
+                waiverVersionId={waiver?.versionId ?? null}
+                minorInfo={minorInfo}
                 onConfirmed={result => { setBooking(result); setStep('confirmation'); }}
                 onBack={() => setStep('customer')}
                 stripePromise={stripePromise}
