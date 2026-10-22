@@ -866,4 +866,6 @@ app.get('/api/reviews', async (_req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`API server → http://localhost:${PORT}`));
+// Loopback-only: nginx reverse-proxies to 127.0.0.1:PORT; never bind 0.0.0.0.
+const HOST = process.env.HOST || "127.0.0.1";
+app.listen(PORT, HOST, () => console.log(`API server → http://${HOST}:${PORT}`));
