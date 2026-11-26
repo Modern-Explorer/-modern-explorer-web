@@ -44,6 +44,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Console Leads ingest — sync waitlist signups to the VHE Console Leads module.
+// No-op when CONSOLE_INGEST_KEY is unset (local dev stays silent).
+const CONSOLE_INGEST_URL = process.env.CONSOLE_INGEST_URL
+  || 'https://console.visionhorizon.enterprises/api/ingest/leads';
+const CONSOLE_INGEST_KEY = process.env.CONSOLE_INGEST_KEY || '';
+
 const INTEREST_LABELS = {
   'general-tour':    'General Walking Tour',
   'specialty-tours': 'Future Specialty Tours',
@@ -209,8 +215,9 @@ app.post('/api/waitlist', async (req, res) => {
   const entries = loadWaitlist();
   const isNew   = !entries.find(e => e.email === trimmedEmail);
 
+  let savedEntry = null;
   if (isNew) {
-    entries.push({
+    savedEntry = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: trimmedName, email: trimmedEmail,
       phone: trimmedPhone,
@@ -218,7 +225,8 @@ app.post('/api/waitlist', async (req, res) => {
       message: trimmedMsg,
       source: sourceLabel,
       createdAt: new Date().toISOString(),
-    });
+    };
+    entries.push(savedEntry);
     saveWaitlist(entries);
   }
 
@@ -320,6 +328,26 @@ app.post('/api/waitlist', async (req, res) => {
     }
   } else {
     console.warn('Waitlist: email skipped — RESEND_API_KEY not configured');
+  }
+
+  // Console Leads sync — fire-and-forget, never blocks or throws.
+  if (savedEntry && CONSOLE_INGEST_KEY) {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 5000);
+    fetch(CONSOLE_INGEST_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${CONSOLE_INGEST_KEY}` },
+      body: JSON.stringify({
+        type:        'expedition-waitlist',
+        email:       savedEntry.email,
+        name:        savedEntry.name    || null,
+        message:     savedEntry.message || null,
+        source:      savedEntry.source,
+        external_id: `mktg-wl-${savedEntry.id}`,
+        ts:          savedEntry.createdAt,
+      }),
+      signal: ctrl.signal,
+    }).catch(err => console.error('[marketing→Console] waitlist sync error:', err.message));
   }
 
   res.json({ ok: true });
